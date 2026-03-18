@@ -16,7 +16,7 @@ const navigation = [
 </script>
 
 <template>
-  <header class="glass-effect sticky top-0 z-50 border-b border-white/20">
+  <header class="glass-effect sticky top-0 z-50 border-b border-white/20 shadow-lg">
     <div class="container-custom">
       <div class="flex items-center justify-between h-20">
         <!-- Logo -->
@@ -33,7 +33,7 @@ const navigation = [
             v-for="item in navigation"
             :key="item.name"
             :to="item.href"
-            class="nav-link text-text-secondary hover:text-gold-500 transition-colors duration-300 font-medium text-sm tracking-wide"
+            class="nav-link text-text-secondary hover:text-[#FFB000] transition-colors duration-300 font-medium text-sm tracking-wide relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-gradient-to-r after:from-[#FFB000] after:to-[#FFD680] after:transition-all duration-300"
           >
             {{ item.name }}
           </RouterLink>
@@ -43,19 +43,19 @@ const navigation = [
         <div class="hidden lg:flex items-center space-x-6">
           <a
             :href="`tel:${env.contactPhone}`"
-            class="flex items-center space-x-2 text-text-secondary hover:text-gold-500 transition-colors group"
+            class="flex items-center space-x-2 text-text-secondary hover:text-[#FFB000] transition-colors group"
           >
-            <div class="w-10 h-10 bg-gold-50 rounded-lg flex items-center justify-center group-hover:bg-gold-100 transition-colors">
-              <Phone class="w-5 h-5 text-gold-500" />
+            <div class="w-10 h-10 bg-[#FFB000]/10 rounded-lg flex items-center justify-center group-hover:bg-[#FFB000]/20 transition-colors">
+              <Phone class="w-5 h-5 text-[#FFB000]" />
             </div>
             <span class="text-sm font-medium">{{ env.contactPhone }}</span>
           </a>
           <a
             :href="`mailto:${env.contactEmail}`"
-            class="flex items-center space-x-2 text-text-secondary hover:text-gold-500 transition-colors group"
+            class="flex items-center space-x-2 text-text-secondary hover:text-[#FFB000] transition-colors group"
           >
-            <div class="w-10 h-10 bg-gold-50 rounded-lg flex items-center justify-center group-hover:bg-gold-100 transition-colors">
-              <Mail class="w-5 h-5 text-gold-500" />
+            <div class="w-10 h-10 bg-[#FFB000]/10 rounded-lg flex items-center justify-center group-hover:bg-[#FFB000]/20 transition-colors">
+              <Mail class="w-5 h-5 text-[#FFB000]" />
             </div>
             <span class="text-sm font-medium hidden xl:inline">{{ env.contactEmail }}</span>
           </a>
@@ -80,7 +80,7 @@ const navigation = [
             v-for="item in navigation"
             :key="item.name"
             :to="item.href"
-            class="block px-4 py-3 text-text-secondary hover:text-gold-500 hover:bg-gold-50 rounded-xl transition-colors duration-300 font-medium text-sm tracking-wide"
+            class="block px-4 py-3 text-text-secondary hover:text-[#FFB000] hover:bg-[#FFB000]/10 rounded-xl transition-colors duration-300 font-medium text-sm tracking-wide"
             @click="menuStore.closeMenu"
           >
             {{ item.name }}
@@ -88,19 +88,19 @@ const navigation = [
           <div class="pt-4 pb-2 border-t border-silver-200">
             <a
               :href="`tel:${env.contactPhone}`"
-              class="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-gold-500 transition-colors"
+              class="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-[#FFB000] transition-colors"
             >
-              <div class="w-10 h-10 bg-gold-50 rounded-lg flex items-center justify-center">
-                <Phone class="w-5 h-5 text-gold-500" />
+              <div class="w-10 h-10 bg-[#FFB000]/10 rounded-lg flex items-center justify-center">
+                <Phone class="w-5 h-5 text-[#FFB000]" />
               </div>
               <span class="font-medium">{{ env.contactPhone }}</span>
             </a>
             <a
               :href="`mailto:${env.contactEmail}`"
-              class="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-gold-500 transition-colors"
+              class="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-[#FFB000] transition-colors"
             >
-              <div class="w-10 h-10 bg-gold-50 rounded-lg flex items-center justify-center">
-                <Mail class="w-5 h-5 text-gold-500" />
+              <div class="w-10 h-10 bg-[#FFB000]/10 rounded-lg flex items-center justify-center">
+                <Mail class="w-5 h-5 text-[#FFB000]" />
               </div>
               <span class="font-medium">{{ env.contactEmail }}</span>
             </a>

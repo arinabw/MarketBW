@@ -42,19 +42,19 @@
   }
 
   .gradient-gold {
-    @apply bg-gradient-to-r from-gold-500 via-gold-400 to-gold-500;
+    @apply bg-gradient-to-r from-[#FFB000] via-[#FFD680] to-[#FFB000];
   }
 
   .gradient-silver {
-    @apply bg-gradient-to-r from-silver-500 via-silver-400 to-silver-500;
+    @apply bg-gradient-to-r from-[#ADB5BD] via-[#E9ECEF] to-[#ADB5BD];
   }
 
   .text-gradient-gold {
-    @apply bg-gradient-to-r from-gold-500 via-gold-400 to-gold-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-[#FFB000] via-[#FFD680] to-[#FFB000] bg-clip-text text-transparent;
   }
 
   .text-gradient-silver {
-    @apply bg-gradient-to-r from-silver-500 via-silver-400 to-silver-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-[#ADB5BD] via-[#E9ECEF] to-[#ADB5BD] bg-clip-text text-transparent;
   }
 }
 
@@ -97,11 +97,11 @@ html {
 
 /* Премиальные кнопки */
 .btn-premium {
-  @apply bg-gradient-to-r from-gold-500 via-gold-400 to-gold-500 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-gold hover:shadow-gold-lg hover:-translate-y-0.5;
+  @apply bg-gradient-to-r from-[#FFB000] via-[#FFD680] to-[#FFB000] text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-gold hover:shadow-gold-lg hover:-translate-y-0.5;
 }
 
 .btn-premium-outline {
-  @apply border-2 border-gold-500 text-gold-600 px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:bg-gold-50 hover:shadow-gold;
+  @apply border-2 border-[#FFB000] text-[#FFB000] px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:bg-[#FFB000]/10 hover:shadow-gold;
 }
 
 /* Премиальные заголовки */
@@ -126,6 +126,6 @@ html {
   }
 
   .hero-section {
-    @apply min-h-auto py-20;
+    @apply py-20;
   }
 }
