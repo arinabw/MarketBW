@@ -122,12 +122,12 @@ status() {
     $COMPOSE_CMD -p marketbw-stack ps
 }
 
-# Очистка (удаление контейнеров и образов)
+# Очистка (удаление контейнеров и образов; внешняя сеть docker_static-net не удаляется)
 clean() {
-    log_warn "Это действие удалит все контейнеры и образы. Продолжить? (y/n)"
+    log_warn "Это действие удалит контейнеры и образы MarketBW. Внешняя сеть docker_static-net не затрагивается. Продолжить? (y/n)"
     read -r response
     if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-        log_info "Остановка и удаление контейнеров..."
+        log_info "Остановка и удаление контейнеров и образов..."
         $COMPOSE_CMD -p marketbw-stack down -v --rmi all
         log_info "✅ Очистка завершена!"
     else

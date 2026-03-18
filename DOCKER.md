@@ -101,6 +101,51 @@ docker compose up -d --build
 
 ## Решение проблем
 
+### 502 Bad Gateway (Caddy проксирует на MarketBW)
+
+Ошибка значит: Caddy получил запрос, но не дождался ответа от контейнера MarketBW. Проверьте по шагам.
+
+1. **Контейнер запущен и слушает порт**
+   На сервере:
+   ```bash
+   docker ps
+   ```
+   Должен быть контейнер `marketbw-app` (или сервис `marketbw`) в статусе `Up`. Проверьте, что из контейнера отвечает nginx:
+   ```bash
+   docker exec marketbw-app wget -qO- http://127.0.0.1:3000/ | head -5
+   ```
+   Должен вернуться HTML. Если нет — перезапустите: `docker compose restart` (из папки проекта MarketBW).
+
+2. **Caddy в Docker и `reverse_proxy marketbw:3000`**
+   Имя `marketbw` должно резолвиться из контейнера Caddy. Контейнеры должны быть в **одной Docker-сети**:
+   ```bash
+   docker network ls
+   docker network inspect <сеть_где_caddy>
+   ```
+   В списке контейнеров сети должен быть контейнер MarketBW. Если его нет — добавьте в `docker-compose.yml` MarketBW внешнюю сеть Caddy (см. блок «Если Caddy в Docker» выше) и выполните:
+   ```bash
+   docker compose up -d
+   ```
+   После этого перезапустите Caddy.
+
+3. **Caddy на хосте и `reverse_proxy 127.0.0.1:3000`**
+   Порт 3000 должен быть проброшен на хост. В `docker-compose.yml` должно быть:
+   ```yaml
+   ports:
+     - "3000:3000"
+   ```
+   Проверка с сервера:
+   ```bash
+   curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/
+   ```
+   Ожидается `200`. Если нет — контейнер не слушает на хосте или упал, смотрите п. 1.
+
+4. **Логи Caddy**
+   При 502 в логах Caddy часто видна причина (connection refused, timeout, wrong host):
+   ```bash
+   docker logs <контейнер_caddy> 2>&1 | tail -50
+   ```
+
 ### Контейнер не запускается
 
 Проверьте логи:
