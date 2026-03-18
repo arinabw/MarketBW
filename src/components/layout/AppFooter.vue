@@ -4,7 +4,7 @@ import { Phone, Mail, MapPin, Instagram, Send, MessageCircle } from 'lucide-vue-
 import { env } from '@/lib/env'
 
 const currentYear = new Date().getFullYear()
-const version = "v1.0.1"
+const version = "v1.0.5"
 
 const navigation = [
   { name: 'Главная', href: '/' },
