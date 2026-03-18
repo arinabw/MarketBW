@@ -1,6 +1,9 @@
 # Базовый образ Node.js
 FROM node:25-alpine AS base
 
+# Обновление пакетов Alpine
+RUN apk update && apk upgrade --no-cache
+
 # Установка зависимостей для сборки
 FROM base AS deps
 RUN apk add --no-cache libc6-compat

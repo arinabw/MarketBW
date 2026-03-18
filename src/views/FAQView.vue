@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
-import AppCard, { AppCardContent, AppCardHeader, AppCardTitle } from '@/components/ui/AppCard.vue'
+import AppCard from '@/components/ui/AppCard.vue'
+import AppCardContent from '@/components/ui/AppCardContent.vue'
+import AppCardHeader from '@/components/ui/AppCardHeader.vue'
+import AppCardTitle from '@/components/ui/AppCardTitle.vue'
 import { faqs } from '@/lib/data'
 
 const selectedCategory = ref<string>('all')
