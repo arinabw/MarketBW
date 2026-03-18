@@ -51,52 +51,20 @@ chmod +x deploy.sh
 ./deploy.sh clean      # Полная очистка
 ```
 
-## Настройка переменных окружения
+## Настройка сайта
 
-Переменные окружения можно настроить двумя способами:
-
-### Способ 1: Через docker-compose.yml
-
-Отредактируйте файл `docker/docker-compose.yml`:
-
-```yaml
-environment:
-  - NODE_ENV=production
-  - NEXT_PUBLIC_SITE_NAME=MarketBW
-  - NEXT_PUBLIC_SITE_URL=https://your-domain.com
-  - NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com
-  - NEXT_PUBLIC_CONTACT_PHONE=+7 (999) 123-45-67
-  - NEXT_PUBLIC_INSTAGRAM=https://instagram.com/your-profile
-  - NEXT_PUBLIC_TELEGRAM=https://t.me/your-profile
-  - NEXT_PUBLIC_VK=https://vk.com/your-profile
-```
-
-### Способ 2: Через .env файл
-
-Создайте файл `.env` в корне проекта:
-
-```env
-NODE_ENV=production
-NEXT_PUBLIC_SITE_NAME=MarketBW
-NEXT_PUBLIC_SITE_URL=https://your-domain.com
-NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com
-NEXT_PUBLIC_CONTACT_PHONE=+7 (999) 123-45-67
-NEXT_PUBLIC_INSTAGRAM=https://instagram.com/your-profile
-NEXT_PUBLIC_TELEGRAM=https://t.me/your-profile
-NEXT_PUBLIC_VK=https://vk.com/your-profile
-```
+Конфигурация сайта находится в файле `src/lib/env.ts`. Для изменения параметров сайта (название, URL, контакты, социальные сети) отредактируйте этот файл.
 
 ## Структура Docker контейнера
 
 Сайт использует многоступенчатую сборку (multi-stage build):
 
 1. **deps** - Установка зависимостей
-2. **builder** - Сборка Next.js приложения
+2. **builder** - Сборка Vite приложения
 3. **runner** - Финальный образ для запуска
 
 Преимущества:
 - Минимальный размер финального образа
-- Безопасность (запуск от имени пользователя nextjs)
 - Оптимизация для production
 
 ## Порты

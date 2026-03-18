@@ -49,16 +49,6 @@ install() {
         exit 1
     fi
 
-    # Создание .env файла, если его нет
-    if [ ! -f "../.env" ]; then
-        log_warn "Файл .env не найден. Создаю базовый .env файл..."
-        cat > ../.env << EOF
-NODE_ENV=production
-VITE_SITE_NAME=MarketBW
-VITE_SITE_URL=https://your-domain.com
-EOF
-    fi
-
     # Сборка Docker образа (включая установку зависимостей и сборку)
     log_info "Сборка Docker образа..."
     docker-compose -p marketbw-stack build
