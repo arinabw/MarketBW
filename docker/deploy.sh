@@ -54,8 +54,8 @@ install() {
         log_warn "Файл .env не найден. Создаю базовый .env файл..."
         cat > ../.env << EOF
 NODE_ENV=production
-NEXT_PUBLIC_SITE_NAME=MarketBW
-NEXT_PUBLIC_SITE_URL=https://your-domain.com
+VITE_SITE_NAME=MarketBW
+VITE_SITE_URL=https://your-domain.com
 EOF
     fi
 
@@ -68,7 +68,7 @@ EOF
     docker-compose up -d
 
     log_info "✅ Сайт успешно установлен и запущен!"
-    log_info "Сайт доступен по адресу: http://localhost:3000"
+    log_info "Сайт доступен по адресу: http://localhost:4173"
 }
 
 # Обновление сайта

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { ArrowLeft, Heart, Star } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
@@ -7,7 +7,7 @@ import AppCard from '@/components/ui/AppCard.vue'
 import AppCardContent from '@/components/ui/AppCardContent.vue'
 import AppCardHeader from '@/components/ui/AppCardHeader.vue'
 import AppCardTitle from '@/components/ui/AppCardTitle.vue'
-import { getProductById, getReviewsByProductId } from '@/lib/data'
+import { getProductById, getReviewsByProductId, categories } from '@/lib/data'
 import { formatPrice } from '@/lib/utils'
 
 const route = useRoute()
