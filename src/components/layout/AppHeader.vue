@@ -28,7 +28,7 @@ const navigation = [
         </RouterLink>
 
         <!-- Desktop Navigation -->
-        <nav class="hidden md:flex items-center space-x-8">
+          <nav class="hidden md:flex items-center space-x-8">
           <RouterLink
             v-for="item in navigation"
             :key="item.name"

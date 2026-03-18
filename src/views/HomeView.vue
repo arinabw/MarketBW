@@ -15,7 +15,7 @@ const featuredReviews = computed(() => reviews.slice(0, 3))
 <template>
   <div class="min-h-screen">
     <!-- Hero Section -->
-    <section class="relative overflow-hidden gradient-bg">
+    <section class="relative overflow-hidden gradient-bg hero-section">
       <div class="container-custom section-padding">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div class="space-y-8 animate-fade-in">
