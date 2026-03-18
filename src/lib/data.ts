@@ -251,11 +251,6 @@ export const faqs: FAQ[] = [
   }
 ]
 
-// Вспомогательные функции
-export function getProductsByCategory(category: string): Product[] {
-  return products.filter(product => product.category === category)
-}
-
 export function getFeaturedProducts(): Product[] {
   return products.filter(product => product.featured)
 }
@@ -266,8 +261,4 @@ export function getProductById(id: string): Product | undefined {
 
 export function getReviewsByProductId(productId: string): Review[] {
   return reviews.filter(review => review.productId === productId)
-}
-
-export function getFAQsByCategory(category: string): FAQ[] {
-  return faqs.filter(faq => faq.category === category)
 }

@@ -12,14 +12,9 @@ export const useMenuStore = defineStore('menu', () => {
     isMenuOpen.value = false
   }
 
-  function openMenu() {
-    isMenuOpen.value = true
-  }
-
   return {
     isMenuOpen,
     toggleMenu,
     closeMenu,
-    openMenu,
   }
 })

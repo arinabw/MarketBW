@@ -1,0 +1,33 @@
+# Зависимости (устанавливаются в контейнере)
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Сборка (пересобирается в контейнере)
+dist
+
+# Git и IDE
+.git
+.gitignore
+.cursor
+.vscode
+*.md
+!README.md
+
+# Документация и планы (не нужны в образе)
+plans
+DOCKER.md
+INSTALL.md
+PROJECT_RULES.md
+project-history.md
+
+# Скрипты (не нужны в образе; docker/ нужен для nginx.conf)
+scripts
+
+# Прочее
+.env
+.env.*
+*.log
+.DS_Store
