@@ -1,48 +1,47 @@
 # MarketBW - Сайт украшений из бисера
 
-Современный сайт для продажи и демонстрации украшений из бисера ручной работы, созданный с использованием Next.js 14 и современных технологий.
+Современный сайт для продажи и демонстрации украшений из бисера ручной работы, созданный с использованием Vue 3, Vite и современных технологий.
 
 ## 🌟 Особенности
 
 - **Современный дизайн** в романтичном стиле с пастельными тонами
 - **Адаптивная вёрстка** для всех устройств
-- **Оптимизированная производительность** с Next.js 14
+- **Оптимизированная производительность** с Vite
 - **SEO-дружественный** с Server-Side Rendering
 - **Docker-контейнеризация** для лёгкого развёртывания
 
 ## 🛠️ Технологический стек
 
-- **Frontend**: Next.js 14 (App Router), TypeScript
+- **Frontend**: Vue 3, TypeScript, Vite
 - **Стилизация**: Tailwind CSS с кастомной цветовой палитрой
-- **UI компоненты**: shadcn/ui
-- **Анимации**: Framer Motion
-- **Иконки**: Lucide React
-- **Формы**: React Hook Form + Zod
+- **UI компоненты**: Кастомные компоненты
+- **Иконки**: Lucide Vue Next
 - **Контейнеризация**: Docker + Docker Compose
 
 ## 📁 Структура проекта
 
 ```
 marketbw/
-├── app/                    # Страницы Next.js
-│   ├── layout.tsx         # Главный layout
-│   ├── page.tsx           # Главная страница
-│   ├── catalog/           # Каталог изделий
-│   ├── product/           # Детальная страница изделия
-│   ├── contact/           # Контакты
-│   └── faq/               # FAQ
-├── components/            # React компоненты
-│   ├── ui/                # Базовые UI компоненты
-│   ├── layout/            # Layout компоненты
-│   ├── catalog/           # Компоненты каталога
-│   └── product/           # Компоненты изделий
-├── lib/                   # Утилиты и данные
-├── public/                # Статические файлы
-├── plans/                 # Планирование проекта
-└── docker/                # Docker конфигурация
-    ├── Dockerfile         # Docker конфигурация
+├── src/                   # Исходный код
+│   ├── views/            # Страницы Vue
+│   │   ├── HomeView.vue  # Главная страница
+│   │   ├── CatalogView.vue # Каталог изделий
+│   │   ├── ProductView.vue # Детальная страница изделия
+│   │   ├── ContactView.vue # Контакты
+│   │   └── FAQView.vue   # FAQ
+│   ├── components/       # Vue компоненты
+│   │   ├── ui/            # Базовые UI компоненты
+│   │   └── layout/        # Layout компоненты
+│   ├── router/           # Vue Router
+│   ├── stores/           # Pinia stores
+│   ├── lib/              # Утилиты и данные
+│   └── styles/           # Глобальные стили
+├── public/               # Статические файлы
+├── plans/                # Планирование проекта
+└── docker/               # Docker конфигурация
+    ├── Dockerfile        # Docker конфигурация
     ├── docker-compose.yml # Docker Compose конфигурация
-    └── deploy.sh          # Скрипт деплоя
+    └── deploy.sh         # Скрипт деплоя
 ```
 
 ## 🚀 Быстрый старт
@@ -154,13 +153,13 @@ cd marketbw
 
 ```env
 NODE_ENV=production
-NEXT_PUBLIC_SITE_NAME=MarketBW
-NEXT_PUBLIC_SITE_URL=https://your-domain.com
-NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com
-NEXT_PUBLIC_CONTACT_PHONE=+7 (999) 123-45-67
-NEXT_PUBLIC_INSTAGRAM=https://instagram.com/your-profile
-NEXT_PUBLIC_TELEGRAM=https://t.me/your-profile
-NEXT_PUBLIC_VK=https://vk.com/your-profile
+VITE_SITE_NAME=MarketBW
+VITE_SITE_URL=http://marketbw.ru
+VITE_CONTACT_EMAIL=your-email@example.com
+VITE_CONTACT_PHONE=+7 (999) 123-45-67
+VITE_INSTAGRAM=https://instagram.com/your-profile
+VITE_TELEGRAM=https://t.me/your-profile
+VITE_VK=https://vk.com/your-profile
 ```
 
 ## 📝 Лицензия

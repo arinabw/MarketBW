@@ -30,13 +30,13 @@ cp .env.example .env
 Отредактируйте файл `.env` с вашими данными:
 ```env
 NODE_ENV=development
-NEXT_PUBLIC_SITE_NAME=MarketBW
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-NEXT_PUBLIC_CONTACT_EMAIL=your-email@example.com
-NEXT_PUBLIC_CONTACT_PHONE=+7 (999) 123-45-67
-NEXT_PUBLIC_INSTAGRAM=https://instagram.com/your-profile
-NEXT_PUBLIC_TELEGRAM=https://t.me/your-profile
-NEXT_PUBLIC_VK=https://vk.com/your-profile
+VITE_SITE_NAME=MarketBW
+VITE_SITE_URL=http://localhost:3000
+VITE_CONTACT_EMAIL=your-email@example.com
+VITE_CONTACT_PHONE=+7 (999) 123-45-67
+VITE_INSTAGRAM=https://instagram.com/your-profile
+VITE_TELEGRAM=https://t.me/your-profile
+VITE_VK=https://vk.com/your-profile
 ```
 
 #### Запуск в режиме разработки
@@ -83,24 +83,28 @@ chmod +x deploy.sh
 
 ```
 marketbw/
-├── app/                    # Страницы Next.js
-│   ├── layout.tsx         # Главный layout
-│   ├── page.tsx           # Главная страница
-│   ├── catalog/           # Каталог изделий
-│   ├── product/           # Детальная страница изделия
-│   ├── contact/           # Контакты
-│   └── faq/               # FAQ
-├── components/            # React компоненты
-│   ├── ui/                # Базовые UI компоненты
-│   ├── layout/            # Layout компоненты
-│   ├── catalog/           # Компоненты каталога
-│   └── product/           # Компоненты изделий
-├── lib/                   # Утилиты и данные
-├── public/                # Статические файлы и изображения
-├── plans/                 # Планирование проекта
-├── Dockerfile             # Docker конфигурация
-├── docker-compose.yml     # Docker Compose конфигурация
-└── deploy.sh              # Скрипт деплоя
+├── src/                   # Исходный код
+│   ├── views/            # Страницы Vue
+│   │   ├── HomeView.vue  # Главная страница
+│   │   ├── CatalogView.vue # Каталог изделий
+│   │   ├── ProductView.vue # Детальная страница изделия
+│   │   ├── ContactView.vue # Контакты
+│   │   └── FAQView.vue   # FAQ
+│   ├── components/       # Vue компоненты
+│   │   ├── ui/            # Базовые UI компоненты
+│   │   └── layout/        # Layout компоненты
+│   ├── router/           # Vue Router
+│   ├── stores/           # Pinia stores
+│   ├── lib/              # Утилиты и данные
+│   └── styles/           # Глобальные стили
+├── public/               # Статические файлы и изображения
+├── plans/                # Планирование проекта
+├── docker/               # Docker конфигурация
+│   ├── Dockerfile        # Docker конфигурация
+│   ├── docker-compose.yml # Docker Compose конфигурация
+│   └── deploy.sh         # Скрипт деплоя
+├── vite.config.ts       # Конфигурация Vite
+└── package.json          # Зависимости проекта
 ```
 
 ## 🖼️ Изображения
