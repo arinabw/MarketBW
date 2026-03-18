@@ -1,5 +1,5 @@
-/* Импорт современных шрифтов */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+/* Импорт премиальных шрифтов */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lato:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -8,47 +8,11 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 355.8 100% 97.3%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --foreground: 0 0% 10%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 0% 10%;
     --radius: 0.75rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
   }
 }
 
@@ -57,78 +21,53 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-[#FAFAFA] text-[#1A1A1A];
+    font-family: 'Lato', sans-serif;
+    min-height: 100vh;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    color: #1A1A1A;
+    font-weight: 600;
   }
 }
 
 @layer components {
-  .btn-primary {
-    @apply bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-modern hover:shadow-modern-lg hover:-translate-y-0.5;
-  }
-  
-  .btn-secondary {
-    @apply bg-white hover:bg-surface-50 text-text-primary border-2 border-surface-200 px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-modern hover:shadow-modern-lg;
-  }
-  
-  .card-modern {
-    @apply bg-white rounded-2xl shadow-modern hover:shadow-modern-xl transition-all duration-300 border border-surface-100 hover:border-primary-200;
-  }
-  
-  .text-gradient {
-    @apply bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent;
-  }
-  
   .container-custom {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
-  
+
   .glass-effect {
-    @apply bg-white/70 backdrop-blur-xl border border-white/20;
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
   }
-  
-  .gradient-bg {
-    @apply bg-gradient-to-br from-primary-50 via-white to-accent-50;
+
+  .gradient-gold {
+    @apply bg-gradient-to-r from-gold-500 via-gold-400 to-gold-500;
+  }
+
+  .gradient-silver {
+    @apply bg-gradient-to-r from-silver-500 via-silver-400 to-silver-500;
+  }
+
+  .text-gradient-gold {
+    @apply bg-gradient-to-r from-gold-500 via-gold-400 to-gold-500 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-silver {
+    @apply bg-gradient-to-r from-silver-500 via-silver-400 to-silver-500 bg-clip-text text-transparent;
   }
 }
 
-/* Современные стили */
+/* Плавные анимации */
 html {
   scroll-behavior: smooth;
 }
 
-body {
-  font-family: 'Inter', sans-serif;
-  background: linear-gradient(to bottom, #f5f7fa, #c3cfe2);
-  color: #0F172A;
-  min-height: 100vh;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  color: #0F172A;
-  font-weight: 700;
-}
-
-/* Улучшенная адаптивность */
-.hero-section {
-  min-height: 80vh;
-  display: flex;
-  align-items: center;
-}
-
-@media (max-width: 768px) {
-  .hero-section {
-    min-height: auto;
-    padding: 80px 0;
-  }
-}
-
-/* Современные анимации */
+/* Анимации появления */
 .fade-in-up {
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
 .fade-in-up.visible {
@@ -136,121 +75,57 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(0);
 }
 
-/* Современные стили для изображений */
+/* Анимации изображений */
 .image-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.5s ease;
 }
 
 .image-hover:hover {
   transform: scale(1.05);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
 
-/* Добавляем скругление и плавный переход для всех изображений */
-img {
-  border-radius: 0.5rem;
-  transition: transform 0.3s ease;
-  max-width: 100%;
-  height: auto;
-  display: block;
+/* Премиальные карточки */
+.card-premium {
+  @apply bg-white rounded-2xl shadow-soft hover:shadow-soft-lg transition-all duration-500 border border-silver-200;
 }
 
-/* Современные стили для карточек изделий */
-.product-card {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.product-card:hover {
+.card-premium:hover {
   transform: translateY(-8px);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
 }
 
-/* Современные стили для кнопок */
-.btn-modern {
-  background: linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%);
-  color: white;
-  padding: 14px 28px;
-  border-radius: 16px;
-  font-weight: 600;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
-  border: none;
-  cursor: pointer;
+/* Премиальные кнопки */
+.btn-premium {
+  @apply bg-gradient-to-r from-gold-500 via-gold-400 to-gold-500 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 shadow-gold hover:shadow-gold-lg hover:-translate-y-0.5;
 }
 
-.btn-modern:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
+.btn-premium-outline {
+  @apply border-2 border-gold-500 text-gold-600 px-8 py-4 rounded-xl font-semibold transition-all duration-300 hover:bg-gold-50 hover:shadow-gold;
 }
 
-/* Современные стили для навигации */
-.nav-link {
-  position: relative;
-  transition: color 0.3s ease;
-  font-weight: 500;
-}
-
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #EC4899, #8B5CF6);
-  transition: width 0.3s ease;
-  border-radius: 2px;
-}
-
-.nav-link:hover::after {
-  width: 100%;
-}
-
-/* Современные стили для форм */
-.form-input {
-  background: white;
-  border: 2px solid #E5E5E5;
-  border-radius: 12px;
-  padding: 14px 16px;
-  transition: all 0.3s ease;
-  font-size: 15px;
-}
-
-.form-input:focus {
-  border-color: #EC4899;
-  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.1);
-  outline: none;
-}
-
-.form-input::placeholder {
-  color: #94A3B8;
-}
-
-/* Современные стили для секций */
-.section-padding {
-  padding: 140px 0;
-}
-
+/* Премиальные заголовки */
 .section-title {
-  font-size: 3.5rem;
-  font-weight: 800;
-  text-align: center;
-  margin-bottom: 5rem;
-  background: linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%);
+  @apply text-4xl md:text-5xl font-bold text-center mb-12;
+  background: linear-gradient(135deg, #1A1A1A 0%, #4A4A4A 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: -0.02em;
 }
 
+/* Hero секция */
+.hero-section {
+  @apply min-h-[80vh] flex items-center;
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
-  .section-padding {
-    padding: 60px 0;
-  }
-  
   .section-title {
-    font-size: 2rem;
-    margin-bottom: 2rem;
+    @apply text-3xl;
+  }
+
+  .hero-section {
+    @apply min-h-auto py-20;
   }
 }

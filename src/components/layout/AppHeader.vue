@@ -16,24 +16,24 @@ const navigation = [
 </script>
 
 <template>
-  <header class="glass-effect shadow-modern sticky top-0 z-50 border-b border-surface-100">
+  <header class="glass-effect sticky top-0 z-50 border-b border-white/20">
     <div class="container-custom">
       <div class="flex items-center justify-between h-20">
         <!-- Logo -->
         <RouterLink to="/" class="flex items-center space-x-3 group">
-          <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center shadow-glow group-hover:shadow-glow-lg transition-all duration-300">
-            <span class="text-white font-bold text-lg">BW</span>
+          <div class="w-12 h-12 gradient-gold rounded-xl flex items-center justify-center shadow-gold group-hover:shadow-gold-lg transition-all duration-300">
+            <span class="text-white font-bold text-2xl">BW</span>
           </div>
-          <span class="font-display text-xl font-bold text-text-primary group-hover:text-gradient transition-all duration-300">{{ env.siteName }}</span>
+          <span class="font-display text-2xl font-bold text-text-primary group-hover:text-gradient-gold transition-all duration-300">{{ env.siteName }}</span>
         </RouterLink>
 
         <!-- Desktop Navigation -->
-          <nav class="hidden md:flex items-center space-x-8">
+        <nav class="hidden md:flex items-center space-x-8">
           <RouterLink
             v-for="item in navigation"
             :key="item.name"
             :to="item.href"
-            class="nav-link text-text-secondary hover:text-primary-500 transition-colors duration-300 font-medium"
+            class="nav-link text-text-secondary hover:text-gold-500 transition-colors duration-300 font-medium text-sm tracking-wide"
           >
             {{ item.name }}
           </RouterLink>
@@ -43,19 +43,19 @@ const navigation = [
         <div class="hidden lg:flex items-center space-x-6">
           <a
             :href="`tel:${env.contactPhone}`"
-            class="flex items-center space-x-2 text-text-secondary hover:text-primary-500 transition-colors group"
+            class="flex items-center space-x-2 text-text-secondary hover:text-gold-500 transition-colors group"
           >
-            <div class="w-8 h-8 bg-primary-50 rounded-lg flex items-center justify-center group-hover:bg-primary-100 transition-colors">
-              <Phone class="w-4 h-4 text-primary-500" />
+            <div class="w-10 h-10 bg-gold-50 rounded-lg flex items-center justify-center group-hover:bg-gold-100 transition-colors">
+              <Phone class="w-5 h-5 text-gold-500" />
             </div>
             <span class="text-sm font-medium">{{ env.contactPhone }}</span>
           </a>
           <a
             :href="`mailto:${env.contactEmail}`"
-            class="flex items-center space-x-2 text-text-secondary hover:text-primary-500 transition-colors group"
+            class="flex items-center space-x-2 text-text-secondary hover:text-gold-500 transition-colors group"
           >
-            <div class="w-8 h-8 bg-primary-50 rounded-lg flex items-center justify-center group-hover:bg-primary-100 transition-colors">
-              <Mail class="w-4 h-4 text-primary-500" />
+            <div class="w-10 h-10 bg-gold-50 rounded-lg flex items-center justify-center group-hover:bg-gold-100 transition-colors">
+              <Mail class="w-5 h-5 text-gold-500" />
             </div>
             <span class="text-sm font-medium hidden xl:inline">{{ env.contactEmail }}</span>
           </a>
@@ -65,7 +65,7 @@ const navigation = [
         <AppButton
           variant="ghost"
           size="icon"
-          class="md:hidden hover:bg-surface-100"
+          class="md:hidden hover:bg-silver-100"
           @click="menuStore.toggleMenu"
         >
           <X v-if="menuStore.isMenuOpen" class="w-6 h-6 text-text-primary" />
@@ -75,32 +75,32 @@ const navigation = [
 
       <!-- Mobile Navigation -->
       <div v-if="menuStore.isMenuOpen" class="md:hidden pb-4">
-        <div class="px-2 pt-2 pb-3 space-y-1 bg-white/95 backdrop-blur-xl rounded-2xl mt-2 border border-surface-100 shadow-modern-lg">
+        <div class="px-2 pt-2 pb-3 space-y-1 bg-white/95 backdrop-blur-xl rounded-2xl mt-2 border border-silver-200 shadow-soft-lg">
           <RouterLink
             v-for="item in navigation"
             :key="item.name"
             :to="item.href"
-            class="block px-4 py-3 text-text-secondary hover:text-primary-500 hover:bg-primary-50 rounded-xl transition-colors duration-300 font-medium"
+            class="block px-4 py-3 text-text-secondary hover:text-gold-500 hover:bg-gold-50 rounded-xl transition-colors duration-300 font-medium text-sm tracking-wide"
             @click="menuStore.closeMenu"
           >
             {{ item.name }}
           </RouterLink>
-          <div class="pt-4 pb-2 border-t border-surface-200">
+          <div class="pt-4 pb-2 border-t border-silver-200">
             <a
               :href="`tel:${env.contactPhone}`"
-              class="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-primary-500 transition-colors"
+              class="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-gold-500 transition-colors"
             >
-              <div class="w-8 h-8 bg-primary-50 rounded-lg flex items-center justify-center">
-                <Phone class="w-4 h-4 text-primary-500" />
+              <div class="w-10 h-10 bg-gold-50 rounded-lg flex items-center justify-center">
+                <Phone class="w-5 h-5 text-gold-500" />
               </div>
               <span class="font-medium">{{ env.contactPhone }}</span>
             </a>
             <a
               :href="`mailto:${env.contactEmail}`"
-              class="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-primary-500 transition-colors"
+              class="flex items-center space-x-3 px-4 py-3 text-text-secondary hover:text-gold-500 transition-colors"
             >
-              <div class="w-8 h-8 bg-primary-50 rounded-lg flex items-center justify-center">
-                <Mail class="w-4 h-4 text-primary-500" />
+              <div class="w-10 h-10 bg-gold-50 rounded-lg flex items-center justify-center">
+                <Mail class="w-5 h-5 text-gold-500" />
               </div>
               <span class="font-medium">{{ env.contactEmail }}</span>
             </a>
