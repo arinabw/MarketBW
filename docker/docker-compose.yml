@@ -1,6 +1,6 @@
 services:
   marketbw:
-    container_name: marketbw
+    container_name: marketbw-app
     build:
       context: ..
       dockerfile: docker/Dockerfile
@@ -17,8 +17,9 @@ services:
       - VITE_VK=https://vk.com/your-profile
     restart: unless-stopped
     networks:
-      - marketbw-net
+      - marketbw-stack-net
 
 networks:
-  marketbw-net:
+  marketbw-stack-net:
     driver: bridge
+    name: marketbw-stack-net

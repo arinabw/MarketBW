@@ -61,11 +61,11 @@ EOF
 
     # Сборка Docker образа (включая установку зависимостей и сборку)
     log_info "Сборка Docker образа..."
-    docker-compose build
+    docker-compose -p marketbw-stack build
 
     # Запуск контейнера
     log_info "Запуск контейнера..."
-    docker-compose up -d
+    docker-compose -p marketbw-stack up -d
 
     log_info "✅ Сайт успешно установлен и запущен!"
     log_info "Сайт доступен по адресу: http://localhost:3000"
@@ -77,7 +77,7 @@ update() {
 
     # Остановка контейнера
     log_info "Остановка контейнера..."
-    docker-compose down
+    docker-compose -p marketbw-stack down
 
     # Получение последних изменений (если используется git)
     if [ -d "../.git" ]; then
@@ -89,11 +89,11 @@ update() {
 
     # Пересборка Docker образа (включая установку зависимостей и сборку)
     log_info "Пересборка Docker образа..."
-    docker-compose build
+    docker-compose -p marketbw-stack build
 
     # Запуск контейнера
     log_info "Запуск контейнера..."
-    docker-compose up -d
+    docker-compose -p marketbw-stack up -d
 
     log_info "✅ Сайт успешно обновлен и запущен!"
 }
@@ -101,27 +101,27 @@ update() {
 # Перезапуск сайта
 restart() {
     log_info "Перезапуск сайта..."
-    docker-compose restart
+    docker-compose -p marketbw-stack restart
     log_info "✅ Сайт успешно перезапущен!"
 }
 
 # Остановка сайта
 stop() {
     log_info "Остановка сайта..."
-    docker-compose down
+    docker-compose -p marketbw-stack down
     log_info "✅ Сайт успешно остановлен!"
 }
 
 # Просмотр логов
 logs() {
     log_info "Просмотр логов (Ctrl+C для выхода)..."
-    docker-compose logs -f
+    docker-compose -p marketbw-stack logs -f
 }
 
 # Проверка статуса
 status() {
     log_info "Статус контейнеров:"
-    docker-compose ps
+    docker-compose -p marketbw-stack ps
 }
 
 # Очистка (удаление контейнеров и образов)
@@ -130,7 +130,7 @@ clean() {
     read -r response
     if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
         log_info "Остановка и удаление контейнеров..."
-        docker-compose down -v --rmi all
+        docker-compose -p marketbw-stack down -v --rmi all
         log_info "✅ Очистка завершена!"
     else
         log_info "Очистка отменена."
