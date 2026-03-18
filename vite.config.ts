@@ -11,8 +11,8 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    host: '0.0.0.0',
-    allowedHosts: ['marketbw.ru', 'localhost', '172.20.0.2'],
+    host: true,
+    allowedHosts: true,
   },
   build: {
     outDir: 'dist',
