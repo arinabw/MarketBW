@@ -3,12 +3,12 @@ import { computed } from 'vue'
 
 interface Props {
   variant?: 'default' | 'premium'
-  class?: string
+  customClass?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   variant: 'default',
-  class: '',
+  customClass: '',
 })
 
 const cardClass = computed(() => {
@@ -16,7 +16,7 @@ const cardClass = computed(() => {
   const variantClasses = props.variant === 'premium'
     ? 'card-premium'
     : 'bg-white shadow-soft hover:shadow-soft-lg border border-silver-200'
-  return `${baseClasses} ${variantClasses} ${props.class}`
+  return `${baseClasses} ${variantClasses} ${props.customClass}`
 })
 </script>
 

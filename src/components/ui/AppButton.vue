@@ -4,13 +4,13 @@ import { computed } from 'vue'
 interface Props {
   variant?: 'default' | 'premium' | 'outline' | 'ghost'
   size?: 'sm' | 'md' | 'lg'
-  class?: string
+  customClass?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   variant: 'default',
   size: 'md',
-  class: '',
+  customClass: '',
 })
 
 const buttonClass = computed(() => {
@@ -29,7 +29,7 @@ const buttonClass = computed(() => {
     ghost: 'hover:bg-silver-100 text-text-secondary',
   }
 
-  return `${baseClasses} ${sizeClasses[props.size]} ${variantClasses[props.variant]} ${props.class}`
+  return `${baseClasses} ${sizeClasses[props.size]} ${variantClasses[props.variant]} ${props.customClass}`
 })
 </script>
 
