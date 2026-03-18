@@ -90,13 +90,13 @@ html {
 }
 
 body {
-  font-family: var(--font-lato), sans-serif;
+  font-family: 'Lato', sans-serif;
   background-color: #FFF5F5;
   color: #4A4A4A;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-playfair), serif;
+  font-family: 'Playfair Display', serif;
   color: #D4A5A5;
 }
 

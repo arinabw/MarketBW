@@ -17,9 +17,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Установка переменных окружения для сборки
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NODE_ENV=production
 
-# Сборка Next.js приложения
+# Сборка Vite приложения
 RUN npm run build
 
 # Финальный образ для запуска
@@ -27,23 +27,11 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
 
-# Создание пользователя для безопасности
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules/.vite ./node_modules/.vite
+COPY --from=builder /app/package.json ./package.json
 
-# Копирование необходимых файлов
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+EXPOSE 4173
 
-USER nextjs
-
-EXPOSE 3000
-
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
-
-# Запуск приложения
-CMD ["node", "server.js"]
+CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "4173"]
