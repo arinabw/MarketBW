@@ -1,5 +1,5 @@
 services:
-  web:
+  marketbw:
     container_name: marketbw
     build:
       context: ..
@@ -17,8 +17,8 @@ services:
       - VITE_VK=https://vk.com/your-profile
     restart: unless-stopped
     networks:
-      - marketbw
+      - marketbw-net
 
 networks:
-  marketbw:
+  marketbw-net:
     driver: bridge
