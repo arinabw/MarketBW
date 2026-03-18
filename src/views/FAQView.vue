@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { ChevronDown } from 'lucide-vue-next'
-import AppCard from '@/components/ui/AppCard.vue'
-import AppCardContent from '@/components/ui/AppCardContent.vue'
-import AppCardHeader from '@/components/ui/AppCardHeader.vue'
-import AppCardTitle from '@/components/ui/AppCardTitle.vue'
+import { RouterLink } from 'vue-router'
+import { ChevronDown, ArrowRight } from 'lucide-vue-next'
+import AppButton from '@/components/ui/AppButton.vue'
 import { faqs } from '@/lib/data'
 
 const selectedCategory = ref<string>('all')
 
-const categories = [
+const categoryOptions = [
   { id: 'all', name: 'Все вопросы' },
   { id: 'order', name: 'Заказ и оплата' },
   { id: 'shipping', name: 'Доставка' },
@@ -33,33 +31,33 @@ const toggleFAQ = (id: string) => {
 </script>
 
 <template>
-  <div class="min-h-screen">
-    <!-- Header Section -->
-    <section class="section-padding gradient-bg">
-      <div class="container-custom">
-        <div class="text-center">
-          <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-gradient mb-4">
-            Часто задаваемые вопросы
-          </h1>
-          <p class="text-lg text-text-secondary max-w-2xl mx-auto">
-            Здесь вы найдете ответы на самые популярные вопросы о моих изделиях
-          </p>
-        </div>
+  <div>
+    <!-- Page Header -->
+    <section class="py-14 md:py-20 gradient-bg">
+      <div class="container-custom text-center">
+        <h1 class="text-4xl md:text-5xl font-display font-bold text-gradient mb-3">
+          Часто задаваемые вопросы
+        </h1>
+        <p class="text-text-secondary max-w-lg mx-auto">
+          Здесь вы найдёте ответы на самые популярные вопросы
+        </p>
       </div>
     </section>
 
-    <!-- Category Filter -->
-    <section class="py-8 bg-white border-b border-surface-200">
+    <!-- Filter -->
+    <section class="py-6 bg-white border-b border-surface-200">
       <div class="container-custom">
-        <div class="flex flex-wrap justify-center gap-3">
+        <div class="flex flex-wrap justify-center gap-2">
           <button
-            v-for="category in categories"
-            :key="category.id"
-            @click="selectedCategory = category.id"
-            class="px-6 py-2.5 rounded-full transition-all duration-300 font-medium"
-            :class="selectedCategory === category.id ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-glow' : 'bg-surface-100 text-text-secondary hover:bg-primary-50 hover:text-primary-500'"
+            v-for="cat in categoryOptions"
+            :key="cat.id"
+            @click="selectedCategory = cat.id"
+            class="px-5 py-2 rounded-full text-sm font-medium transition-all duration-300"
+            :class="selectedCategory === cat.id
+              ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-glow'
+              : 'bg-surface-100 text-text-secondary hover:bg-primary-50 hover:text-primary-600'"
           >
-            {{ category.name }}
+            {{ cat.name }}
           </button>
         </div>
       </div>
@@ -68,17 +66,17 @@ const toggleFAQ = (id: string) => {
     <!-- FAQ List -->
     <section class="section-padding bg-white">
       <div class="container-custom">
-        <div class="max-w-3xl mx-auto space-y-4">
-          <AppCard
+        <div class="max-w-3xl mx-auto space-y-3">
+          <div
             v-for="faq in filteredFAQs"
             :key="faq.id"
             class="card-modern overflow-hidden"
           >
             <button
               @click="toggleFAQ(faq.id)"
-              class="w-full text-left p-6 flex items-center justify-between hover:bg-surface-50 transition-colors"
+              class="w-full text-left px-6 py-5 flex items-center justify-between hover:bg-surface-50 transition-colors"
             >
-              <h3 class="font-display text-lg font-bold text-text-primary pr-4">
+              <h3 class="font-display text-base font-semibold text-text-primary pr-4">
                 {{ faq.question }}
               </h3>
               <ChevronDown
@@ -86,41 +84,48 @@ const toggleFAQ = (id: string) => {
                 :class="openFAQs.has(faq.id) ? 'rotate-180' : ''"
               />
             </button>
-            <div
-              v-if="openFAQs.has(faq.id)"
-              class="px-6 pb-6 border-t border-surface-100 pt-4"
+            <Transition
+              enter-active-class="transition-all duration-300 ease-out"
+              enter-from-class="max-h-0 opacity-0"
+              enter-to-class="max-h-96 opacity-100"
+              leave-active-class="transition-all duration-200 ease-in"
+              leave-from-class="max-h-96 opacity-100"
+              leave-to-class="max-h-0 opacity-0"
             >
-              <p class="text-text-secondary leading-relaxed">
-                {{ faq.answer }}
-              </p>
-            </div>
-          </AppCard>
+              <div
+                v-if="openFAQs.has(faq.id)"
+                class="overflow-hidden"
+              >
+                <div class="px-6 pb-5 border-t border-surface-100 pt-4">
+                  <p class="text-text-secondary text-sm leading-relaxed">
+                    {{ faq.answer }}
+                  </p>
+                </div>
+              </div>
+            </Transition>
+          </div>
         </div>
 
-        <div v-if="filteredFAQs.length === 0" class="text-center py-12">
+        <div v-if="filteredFAQs.length === 0" class="text-center py-16">
           <p class="text-text-secondary text-lg">В этой категории пока нет вопросов</p>
         </div>
       </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="section-padding bg-gradient-to-r from-primary-500 to-accent-500 text-white relative overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-br from-primary-600 to-accent-600 opacity-50"></div>
+    <!-- CTA -->
+    <section class="section-padding bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 text-white relative overflow-hidden">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.08),transparent_60%)]"></div>
       <div class="container-custom text-center relative z-10">
-        <h2 class="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-6">
+        <h2 class="text-3xl md:text-4xl font-display font-bold mb-4 text-white">
           Не нашли ответ на свой вопрос?
         </h2>
-        <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto opacity-90">
+        <p class="text-lg mb-8 max-w-xl mx-auto text-white/85">
           Свяжитесь со мной, и я с радостью отвечу на все ваши вопросы
         </p>
         <RouterLink to="/contact" custom v-slot="{ navigate }">
-          <AppButton 
-            size="lg" 
-            variant="secondary"
-            class="bg-white text-primary-500 hover:bg-surface-50 shadow-glow hover:shadow-glow-lg"
-            @click="navigate"
-          >
+          <AppButton size="lg" variant="secondary" @click="navigate">
             Задать вопрос
+            <ArrowRight class="ml-2 w-5 h-5" />
           </AppButton>
         </RouterLink>
       </div>

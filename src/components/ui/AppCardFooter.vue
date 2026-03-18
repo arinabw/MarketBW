@@ -1,15 +1,5 @@
-<script setup lang="ts">
-import { cn } from '@/lib/utils'
-
-interface Props {
-  customClass?: string
-}
-
-const props = defineProps<Props>()
-</script>
-
 <template>
-  <div :class="cn('flex items-center p-6 pt-0', props.customClass)">
+  <div class="px-6 pb-6">
     <slot />
   </div>
 </template>

@@ -3,8 +3,6 @@ import { computed } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { ArrowRight, Heart } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
-import AppCard from '@/components/ui/AppCard.vue'
-import AppCardContent from '@/components/ui/AppCardContent.vue'
 import { products, categories } from '@/lib/data'
 import { formatPrice } from '@/lib/utils'
 
@@ -25,29 +23,29 @@ const selectedCategoryName = computed(() => {
 </script>
 
 <template>
-  <div class="min-h-screen">
-    <!-- Header Section -->
-    <section class="section-padding gradient-bg">
-      <div class="container-custom">
-        <div class="text-center">
-          <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-gradient mb-4">
-            {{ selectedCategoryName }}
-          </h1>
-          <p class="text-lg text-text-secondary max-w-2xl mx-auto">
-            Выберите уникальное украшение из бисера ручной работы
-          </p>
-        </div>
+  <div>
+    <!-- Page Header -->
+    <section class="py-14 md:py-20 gradient-bg">
+      <div class="container-custom text-center">
+        <h1 class="text-4xl md:text-5xl font-display font-bold text-gradient mb-3">
+          {{ selectedCategoryName }}
+        </h1>
+        <p class="text-text-secondary max-w-lg mx-auto">
+          Выберите уникальное украшение из бисера ручной работы
+        </p>
       </div>
     </section>
 
-    <!-- Category Filter -->
-    <section class="py-8 bg-white border-b border-surface-200">
+    <!-- Filter -->
+    <section class="py-6 bg-white border-b border-surface-200">
       <div class="container-custom">
-        <div class="flex flex-wrap justify-center gap-3">
+        <div class="flex flex-wrap justify-center gap-2">
           <RouterLink
             to="/catalog"
-            class="px-6 py-2.5 rounded-full transition-all duration-300 font-medium"
-            :class="!selectedCategory ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-glow' : 'bg-surface-100 text-text-secondary hover:bg-primary-50 hover:text-primary-500'"
+            class="px-5 py-2 rounded-full text-sm font-medium transition-all duration-300"
+            :class="!selectedCategory
+              ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-glow'
+              : 'bg-surface-100 text-text-secondary hover:bg-primary-50 hover:text-primary-600'"
           >
             Все
           </RouterLink>
@@ -55,8 +53,10 @@ const selectedCategoryName = computed(() => {
             v-for="category in categories"
             :key="category.id"
             :to="`/catalog?category=${category.id}`"
-            class="px-6 py-2.5 rounded-full transition-all duration-300 font-medium"
-            :class="selectedCategory === category.id ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-glow' : 'bg-surface-100 text-text-secondary hover:bg-primary-50 hover:text-primary-500'"
+            class="px-5 py-2 rounded-full text-sm font-medium transition-all duration-300"
+            :class="selectedCategory === category.id
+              ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-glow'
+              : 'bg-surface-100 text-text-secondary hover:bg-primary-50 hover:text-primary-600'"
           >
             {{ category.name }}
           </RouterLink>
@@ -67,51 +67,48 @@ const selectedCategoryName = computed(() => {
     <!-- Products Grid -->
     <section class="section-padding bg-white">
       <div class="container-custom">
-        <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div v-if="filteredProducts.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <RouterLink
             v-for="product in filteredProducts"
             :key="product.id"
             :to="`/product/${product.id}`"
             class="group block"
           >
-            <AppCard class="card-modern overflow-hidden product-card">
+            <div class="product-card">
               <div class="aspect-square relative overflow-hidden">
                 <img
                   :src="product.images[0]"
                   :alt="product.name"
-                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
-                <div v-if="product.featured" class="absolute top-4 right-4 bg-gradient-to-r from-primary-500 to-accent-500 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-glow">
+                <div v-if="product.featured" class="absolute top-3 right-3 bg-primary-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-glow">
                   Хит
                 </div>
-                <div v-if="!product.inStock" class="absolute top-4 left-4 bg-surface-500 text-white px-4 py-1.5 rounded-full text-xs font-bold">
+                <div v-if="!product.inStock" class="absolute top-3 left-3 bg-surface-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
                   Нет в наличии
                 </div>
               </div>
-              <AppCardContent class="p-6">
-                <h3 class="font-display text-xl font-bold text-text-primary mb-2 group-hover:text-primary-500 transition-colors">
+              <div class="p-5">
+                <h3 class="font-display text-base font-bold text-text-primary mb-1.5 group-hover:text-primary-600 transition-colors line-clamp-1">
                   {{ product.name }}
                 </h3>
-                <p class="text-text-secondary text-sm mb-4 line-clamp-2">
+                <p class="text-text-muted text-sm mb-3 line-clamp-2">
                   {{ product.description }}
                 </p>
                 <div class="flex items-center justify-between">
-                  <span class="text-lg font-bold text-text-primary">
+                  <span class="text-lg font-bold text-primary-600">
                     {{ formatPrice(product.price) }}
                   </span>
-                  <div class="flex items-center space-x-1">
-                    <Heart class="w-4 h-4 text-primary-500" />
-                    <span class="text-sm text-text-secondary">В избранное</span>
-                  </div>
+                  <Heart class="w-4 h-4 text-surface-400 group-hover:text-primary-400 transition-colors" />
                 </div>
-              </AppCardContent>
-            </AppCard>
+              </div>
+            </div>
           </RouterLink>
         </div>
-        <div v-else class="text-center py-12">
-          <p class="text-text-secondary text-lg">В этой категории пока нет изделий</p>
-          <RouterLink to="/catalog" class="inline-block mt-4">
-            <AppButton variant="outline" class="border-2 border-surface-200 hover:border-primary-500 hover:text-primary-500">
+        <div v-else class="text-center py-16">
+          <p class="text-text-secondary text-lg mb-4">В этой категории пока нет изделий</p>
+          <RouterLink to="/catalog" custom v-slot="{ navigate }">
+            <AppButton variant="outline" @click="navigate">
               Смотреть все изделия
             </AppButton>
           </RouterLink>
@@ -119,24 +116,19 @@ const selectedCategoryName = computed(() => {
       </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="section-padding bg-gradient-to-r from-primary-500 to-accent-500 text-white relative overflow-hidden">
-      <div class="absolute inset-0 bg-gradient-to-br from-primary-600 to-accent-600 opacity-50"></div>
+    <!-- CTA -->
+    <section class="section-padding bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 text-white relative overflow-hidden">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.08),transparent_60%)]"></div>
       <div class="container-custom text-center relative z-10">
-        <h2 class="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-6">
+        <h2 class="text-3xl md:text-4xl font-display font-bold mb-4 text-white">
           Не нашли то, что искали?
         </h2>
-        <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto opacity-90">
-          Я создаю украшения на заказ по вашим индивидуальным пожеланиям. 
+        <p class="text-lg mb-8 max-w-xl mx-auto text-white/85">
+          Я создаю украшения на заказ по вашим индивидуальным пожеланиям.
           Свяжитесь со мной, и мы вместе создадим уникальное изделие!
         </p>
         <RouterLink to="/contact" custom v-slot="{ navigate }">
-          <AppButton 
-            size="lg" 
-            variant="secondary"
-            class="bg-white text-primary-500 hover:bg-surface-50 shadow-glow hover:shadow-glow-lg"
-            @click="navigate"
-          >
+          <AppButton size="lg" variant="secondary" @click="navigate">
             Заказать индивидуальное изделие
             <ArrowRight class="ml-2 w-5 h-5" />
           </AppButton>

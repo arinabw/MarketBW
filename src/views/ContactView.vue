@@ -3,8 +3,8 @@ import { ref } from 'vue'
 import { Phone, Mail, MapPin, Send } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
 import AppCard from '@/components/ui/AppCard.vue'
-import AppCardContent from '@/components/ui/AppCardContent.vue'
 import AppCardHeader from '@/components/ui/AppCardHeader.vue'
+import AppCardContent from '@/components/ui/AppCardContent.vue'
 import AppCardTitle from '@/components/ui/AppCardTitle.vue'
 import { env } from '@/lib/env'
 
@@ -19,45 +19,35 @@ const isSubmitting = ref(false)
 
 const handleSubmit = async () => {
   isSubmitting.value = true
-  // TODO: подключить отправку формы (backend/API)
-
-  // Имитация отправки
   await new Promise(resolve => setTimeout(resolve, 1000))
-  
+
   alert('Спасибо за сообщение! Я свяжусь с вами в ближайшее время.')
-  formData.value = {
-    name: '',
-    email: '',
-    phone: '',
-    message: '',
-  }
+  formData.value = { name: '', email: '', phone: '', message: '' }
   isSubmitting.value = false
 }
 </script>
 
 <template>
-  <div class="min-h-screen">
-    <!-- Header Section -->
-    <section class="section-padding gradient-bg">
-      <div class="container-custom">
-        <div class="text-center">
-          <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-gradient mb-4">
-            Свяжитесь со мной
-          </h1>
-          <p class="text-lg text-text-secondary max-w-2xl mx-auto">
-            Я всегда рада ответить на ваши вопросы и помочь с выбором уникального украшения
-          </p>
-        </div>
+  <div>
+    <!-- Page Header -->
+    <section class="py-14 md:py-20 gradient-bg">
+      <div class="container-custom text-center">
+        <h1 class="text-4xl md:text-5xl font-display font-bold text-gradient mb-3">
+          Свяжитесь со мной
+        </h1>
+        <p class="text-text-secondary max-w-lg mx-auto">
+          Я всегда рада ответить на ваши вопросы и помочь с выбором украшения
+        </p>
       </div>
     </section>
 
-    <!-- Contact Section -->
+    <!-- Contact -->
     <section class="section-padding bg-white">
       <div class="container-custom">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <!-- Contact Info -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+          <!-- Info -->
           <div class="space-y-6">
-            <AppCard class="card-modern">
+            <AppCard class="shadow-card">
               <AppCardHeader>
                 <AppCardTitle>Контактная информация</AppCardTitle>
               </AppCardHeader>
@@ -65,73 +55,73 @@ const handleSubmit = async () => {
                 <div class="space-y-4">
                   <a
                     :href="`tel:${env.contactPhone}`"
-                    class="flex items-center space-x-4 text-text-secondary hover:text-primary-500 transition-colors group"
+                    class="flex items-center gap-4 text-text-secondary hover:text-primary-600 transition-colors group"
                   >
-                    <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center group-hover:bg-primary-100 transition-colors">
+                    <div class="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center group-hover:bg-primary-100 transition-colors flex-shrink-0">
                       <Phone class="w-5 h-5 text-primary-500" />
                     </div>
                     <div>
-                      <p class="text-sm text-text-secondary font-medium">Телефон</p>
-                      <p class="font-bold text-text-primary">{{ env.contactPhone }}</p>
+                      <p class="text-xs text-text-muted font-medium">Телефон</p>
+                      <p class="font-semibold text-text-primary text-sm">{{ env.contactPhone }}</p>
                     </div>
                   </a>
                   <a
                     :href="`mailto:${env.contactEmail}`"
-                    class="flex items-center space-x-4 text-text-secondary hover:text-primary-500 transition-colors group"
+                    class="flex items-center gap-4 text-text-secondary hover:text-primary-600 transition-colors group"
                   >
-                    <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center group-hover:bg-primary-100 transition-colors">
+                    <div class="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center group-hover:bg-primary-100 transition-colors flex-shrink-0">
                       <Mail class="w-5 h-5 text-primary-500" />
                     </div>
                     <div>
-                      <p class="text-sm text-text-secondary font-medium">Email</p>
-                      <p class="font-bold text-text-primary">{{ env.contactEmail }}</p>
+                      <p class="text-xs text-text-muted font-medium">Email</p>
+                      <p class="font-semibold text-text-primary text-sm">{{ env.contactEmail }}</p>
                     </div>
                   </a>
-                  <div class="flex items-center space-x-4 text-text-secondary">
-                    <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center">
+                  <div class="flex items-center gap-4">
+                    <div class="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center flex-shrink-0">
                       <MapPin class="w-5 h-5 text-primary-500" />
                     </div>
                     <div>
-                      <p class="text-sm text-text-secondary font-medium">Адрес</p>
-                      <p class="font-bold text-text-primary">Россия, доставка по всей стране</p>
+                      <p class="text-xs text-text-muted font-medium">Адрес</p>
+                      <p class="font-semibold text-text-primary text-sm">Россия, доставка по всей стране</p>
                     </div>
                   </div>
                 </div>
               </AppCardContent>
             </AppCard>
 
-            <AppCard class="card-modern">
+            <AppCard class="shadow-card">
               <AppCardHeader>
                 <AppCardTitle>Режим работы</AppCardTitle>
               </AppCardHeader>
               <AppCardContent>
-                <div class="space-y-3">
+                <div class="space-y-2">
                   <div class="flex justify-between py-2 border-b border-surface-100">
-                    <span class="text-text-secondary font-medium">Понедельник - Пятница</span>
-                    <span class="font-bold text-text-primary">9:00 - 18:00</span>
+                    <span class="text-text-secondary text-sm">Понедельник — Пятница</span>
+                    <span class="font-semibold text-text-primary text-sm">9:00 — 18:00</span>
                   </div>
                   <div class="flex justify-between py-2 border-b border-surface-100">
-                    <span class="text-text-secondary font-medium">Суббота</span>
-                    <span class="font-bold text-text-primary">10:00 - 16:00</span>
+                    <span class="text-text-secondary text-sm">Суббота</span>
+                    <span class="font-semibold text-text-primary text-sm">10:00 — 16:00</span>
                   </div>
                   <div class="flex justify-between py-2">
-                    <span class="text-text-secondary font-medium">Воскресенье</span>
-                    <span class="font-bold text-text-primary">Выходной</span>
+                    <span class="text-text-secondary text-sm">Воскресенье</span>
+                    <span class="font-semibold text-text-primary text-sm">Выходной</span>
                   </div>
                 </div>
               </AppCardContent>
             </AppCard>
           </div>
 
-          <!-- Contact Form -->
-          <AppCard class="card-modern">
+          <!-- Form -->
+          <AppCard class="shadow-card">
             <AppCardHeader>
               <AppCardTitle>Напишите мне</AppCardTitle>
             </AppCardHeader>
             <AppCardContent>
               <form @submit.prevent="handleSubmit" class="space-y-5">
                 <div>
-                  <label for="name" class="block text-sm font-bold text-text-primary mb-2">
+                  <label for="name" class="block text-sm font-semibold text-text-primary mb-1.5">
                     Ваше имя *
                   </label>
                   <input
@@ -139,12 +129,12 @@ const handleSubmit = async () => {
                     v-model="formData.name"
                     type="text"
                     required
-                    class="form-input w-full"
+                    class="form-input"
                     placeholder="Введите ваше имя"
                   />
                 </div>
                 <div>
-                  <label for="email" class="block text-sm font-bold text-text-primary mb-2">
+                  <label for="email" class="block text-sm font-semibold text-text-primary mb-1.5">
                     Email *
                   </label>
                   <input
@@ -152,24 +142,24 @@ const handleSubmit = async () => {
                     v-model="formData.email"
                     type="email"
                     required
-                    class="form-input w-full"
+                    class="form-input"
                     placeholder="example@mail.com"
                   />
                 </div>
                 <div>
-                  <label for="phone" class="block text-sm font-bold text-text-primary mb-2">
+                  <label for="phone" class="block text-sm font-semibold text-text-primary mb-1.5">
                     Телефон
                   </label>
                   <input
                     id="phone"
                     v-model="formData.phone"
                     type="tel"
-                    class="form-input w-full"
+                    class="form-input"
                     placeholder="+7 (999) 123-45-67"
                   />
                 </div>
                 <div>
-                  <label for="message" class="block text-sm font-bold text-text-primary mb-2">
+                  <label for="message" class="block text-sm font-semibold text-text-primary mb-1.5">
                     Сообщение *
                   </label>
                   <textarea
@@ -177,18 +167,18 @@ const handleSubmit = async () => {
                     v-model="formData.message"
                     required
                     rows="5"
-                    class="form-input w-full resize-none"
+                    class="form-input resize-none"
                     placeholder="Опишите ваш вопрос или заказ"
                   ></textarea>
                 </div>
-                <AppButton 
-                  type="submit" 
-                  size="lg" 
+                <AppButton
+                  type="submit"
+                  size="lg"
                   variant="modern"
                   class="w-full"
                   :disabled="isSubmitting"
                 >
-                  <Send v-if="!isSubmitting" class="mr-2 w-5 h-5" />
+                  <Send v-if="!isSubmitting" class="mr-2 w-4 h-4" />
                   {{ isSubmitting ? 'Отправка...' : 'Отправить сообщение' }}
                 </AppButton>
               </form>
