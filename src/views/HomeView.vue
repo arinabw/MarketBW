@@ -19,20 +19,19 @@ const featuredReviews = computed(() => reviews.slice(0, 3))
           <div class="space-y-7 animate-fade-in-up">
             <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-primary-200/60 shadow-soft">
               <Sparkles class="w-4 h-4 text-primary-500" />
-              <span class="text-sm font-medium text-text-secondary">Ручная работа с любовью</span>
+              <span class="text-sm font-medium text-text-secondary">Bead Wonder — бисерные чудеса</span>
             </div>
             <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-bold leading-tight text-text-primary">
-              Уникальные украшения
+              Маленькие чудеса
               <span class="text-gradient">из бисера</span>
             </h1>
             <p class="text-lg text-text-secondary leading-relaxed max-w-lg">
-              Каждое изделие создано с вниманием к деталям.
-              Откройте для себя мир нежной красоты и элегантности.
+              Каждая бусина — произведение искусства. Уникальные украшения ручной работы, созданные с любовью и вниманием к каждой детали.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 pt-2">
               <RouterLink to="/catalog" custom v-slot="{ navigate }">
                 <AppButton size="lg" variant="modern" @click="navigate">
-                  Смотреть каталог
+                  Открыть каталог
                   <ArrowRight class="ml-2 w-5 h-5" />
                 </AppButton>
               </RouterLink>
@@ -47,7 +46,7 @@ const featuredReviews = computed(() => reviews.slice(0, 3))
             <div class="rounded-3xl overflow-hidden shadow-soft-xl">
               <img
                 src="/images/hero-beadwork.svg"
-                alt="Украшения из бисера"
+                alt="Bead Wonder — украшения из бисера"
                 class="w-full h-auto object-cover"
               />
             </div>
@@ -64,7 +63,7 @@ const featuredReviews = computed(() => reviews.slice(0, 3))
         <div class="text-center mb-14">
           <h2 class="section-title">Категории изделий</h2>
           <p class="text-text-secondary max-w-xl mx-auto">
-            Выберите категорию для просмотра коллекции
+            Выберите категорию и откройте для себя чудо бисерного искусства
           </p>
         </div>
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
@@ -103,7 +102,7 @@ const featuredReviews = computed(() => reviews.slice(0, 3))
         <div class="text-center mb-14">
           <h2 class="section-title">Популярные изделия</h2>
           <p class="text-text-secondary max-w-xl mx-auto">
-            Самые любимые работы наших клиентов
+            Самые любимые чудеса наших клиентов
           </p>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -144,7 +143,7 @@ const featuredReviews = computed(() => reviews.slice(0, 3))
         <div class="text-center mt-12">
           <RouterLink to="/catalog" custom v-slot="{ navigate }">
             <AppButton variant="outline" size="lg" @click="navigate">
-              Смотреть все изделия
+              Все изделия
               <ArrowRight class="ml-2 w-5 h-5" />
             </AppButton>
           </RouterLink>
@@ -158,7 +157,7 @@ const featuredReviews = computed(() => reviews.slice(0, 3))
         <div class="text-center mb-14">
           <h2 class="section-title">Отзывы клиентов</h2>
           <p class="text-text-secondary max-w-xl mx-auto">
-            Что говорят о наших изделиях
+            Что говорят о наших бисерных чудесах
           </p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -192,11 +191,11 @@ const featuredReviews = computed(() => reviews.slice(0, 3))
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.08),transparent_60%)]"></div>
       <div class="container-custom text-center relative z-10">
         <h2 class="text-3xl md:text-4xl font-display font-bold mb-4 text-white">
-          Не нашли то, что искали?
+          Создадим ваше собственное чудо?
         </h2>
         <p class="text-lg mb-8 max-w-xl mx-auto text-white/85">
           Я создаю украшения на заказ по вашим индивидуальным пожеланиям.
-          Свяжитесь со мной, и мы вместе создадим уникальное изделие!
+          Каждое изделие Bead Wonder — это уникальная история.
         </p>
         <RouterLink to="/contact" custom v-slot="{ navigate }">
           <AppButton size="lg" variant="secondary" @click="navigate">

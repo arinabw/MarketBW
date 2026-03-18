@@ -117,10 +117,10 @@ const toggleFAQ = (id: string) => {
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.08),transparent_60%)]"></div>
       <div class="container-custom text-center relative z-10">
         <h2 class="text-3xl md:text-4xl font-display font-bold mb-4 text-white">
-          Не нашли ответ на свой вопрос?
+          Остались вопросы?
         </h2>
         <p class="text-lg mb-8 max-w-xl mx-auto text-white/85">
-          Свяжитесь со мной, и я с радостью отвечу на все ваши вопросы
+          Свяжитесь со мной, и я с радостью расскажу больше о мире Bead Wonder
         </p>
         <RouterLink to="/contact" custom v-slot="{ navigate }">
           <AppButton size="lg" variant="secondary" @click="navigate">

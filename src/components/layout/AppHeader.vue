@@ -41,7 +41,10 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
           <div class="w-9 h-9 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center shadow-glow group-hover:shadow-glow-lg transition-shadow duration-300">
             <span class="text-white font-bold text-base">BW</span>
           </div>
-          <span class="font-display text-lg font-bold text-text-primary">{{ env.siteName }}</span>
+          <div class="flex items-baseline gap-1.5">
+            <span class="font-display text-lg text-text-secondary font-normal">Bead</span>
+            <span class="font-display text-lg font-bold text-gradient">Wonder</span>
+          </div>
         </RouterLink>
 
         <nav class="hidden md:flex items-center gap-8">

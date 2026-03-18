@@ -28,10 +28,13 @@ const socialLinks = [
             <div class="w-9 h-9 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg flex items-center justify-center">
               <span class="text-white font-bold text-base">BW</span>
             </div>
-            <span class="font-display text-lg font-bold">{{ env.siteName }}</span>
+            <div class="flex items-baseline gap-1.5">
+              <span class="font-display text-lg text-surface-400 font-normal">Bead</span>
+              <span class="font-display text-lg font-bold text-primary-400">Wonder</span>
+            </div>
           </div>
           <p class="text-surface-400 text-sm leading-relaxed">
-            Уникальные украшения из бисера ручной работы. Каждое изделие создано с любовью.
+            Бисерные чудеса ручной работы — каждое изделие создано с любовью и вниманием к каждой бусине.
           </p>
         </div>
 
@@ -96,8 +99,8 @@ const socialLinks = [
         <p class="text-surface-500 text-xs">
           &copy; {{ currentYear }} {{ env.siteName }}. Все права защищены.
         </p>
-        <p class="text-surface-600 text-xs">
-          Сделано с любовью
+        <p class="text-surface-600 text-xs italic">
+          Где каждая бусина — маленькое чудо
         </p>
       </div>
     </div>

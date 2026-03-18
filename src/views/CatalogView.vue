@@ -121,11 +121,11 @@ const selectedCategoryName = computed(() => {
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.08),transparent_60%)]"></div>
       <div class="container-custom text-center relative z-10">
         <h2 class="text-3xl md:text-4xl font-display font-bold mb-4 text-white">
-          Не нашли то, что искали?
+          Создадим ваше собственное чудо?
         </h2>
         <p class="text-lg mb-8 max-w-xl mx-auto text-white/85">
-          Я создаю украшения на заказ по вашим индивидуальным пожеланиям.
-          Свяжитесь со мной, и мы вместе создадим уникальное изделие!
+          Каждое изделие Bead Wonder — уникальная история.
+          Свяжитесь со мной, и мы вместе создадим ваше украшение!
         </p>
         <RouterLink to="/contact" custom v-slot="{ navigate }">
           <AppButton size="lg" variant="secondary" @click="navigate">
