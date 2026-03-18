@@ -1,15 +1,15 @@
 <script setup lang="ts">
 interface Props {
-  class?: string
+  customClass?: string
 }
 
 withDefaults(defineProps<Props>(), {
-  class: '',
+  customClass: '',
 })
 </script>
 
 <template>
-  <div :class="['p-6', class]">
+  <div :class="['p-6', customClass]">
     <slot />
   </div>
 </template>
