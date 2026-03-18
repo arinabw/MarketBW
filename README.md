@@ -65,13 +65,7 @@ cd marketbw
    npm install
    ```
 
-2. **Настройка переменных окружения**
-   ```bash
-   cp .env.example .env
-   # Отредактируйте .env файл с вашими данными
-   ```
-
-3. **Запуск в режиме разработки**
+2. **Запуск в режиме разработки**
    ```bash
    npm run dev
    ```
@@ -149,18 +143,7 @@ cd marketbw
 
 ## 🔧 Конфигурация
 
-### Переменные окружения
-
-```env
-NODE_ENV=production
-VITE_SITE_NAME=MarketBW
-VITE_SITE_URL=http://marketbw.ru
-VITE_CONTACT_EMAIL=your-email@example.com
-VITE_CONTACT_PHONE=+7 (999) 123-45-67
-VITE_INSTAGRAM=https://instagram.com/your-profile
-VITE_TELEGRAM=https://t.me/your-profile
-VITE_VK=https://vk.com/your-profile
-```
+Конфигурация сайта находится в файле `src/lib/env.ts`. Для изменения параметров сайта отредактируйте этот файл.
 
 ## 📝 Лицензия
 

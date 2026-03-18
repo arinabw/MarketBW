@@ -22,23 +22,6 @@ cd marketbw
 npm install
 ```
 
-#### Настройка переменных окружения
-```bash
-cp .env.example .env
-```
-
-Отредактируйте файл `.env` с вашими данными:
-```env
-NODE_ENV=development
-VITE_SITE_NAME=MarketBW
-VITE_SITE_URL=http://localhost:3000
-VITE_CONTACT_EMAIL=your-email@example.com
-VITE_CONTACT_PHONE=+7 (999) 123-45-67
-VITE_INSTAGRAM=https://instagram.com/your-profile
-VITE_TELEGRAM=https://t.me/your-profile
-VITE_VK=https://vk.com/your-profile
-```
-
 #### Запуск в режиме разработки
 ```bash
 npm run dev
@@ -124,6 +107,9 @@ marketbw/
 
 ## 🎨 Кастомизация
 
+### Конфигурация сайта
+Параметры сайта (название, URL, контакты, социальные сети) находятся в файле `src/lib/env.ts`. Отредактируйте этот файл для изменения настроек.
+
 ### Цветовая палитра
 Цвета определены в `tailwind.config.js`:
 - Основной фон: `#FFF5F5` (Очень светлый розовый)
@@ -184,7 +170,6 @@ MIT License
 1. Проверьте версию Node.js (`node --version`)
 2. Очистите кэш npm (`npm cache clean --force`)
 3. Удалите `node_modules` и переустановите зависимости
-4. Проверьте правильность переменных окружения
 
 ---
 
