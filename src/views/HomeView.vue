@@ -46,7 +46,7 @@ const featuredReviews = computed(() => reviews.slice(0, 3))
           <div class="relative hidden lg:block">
             <div class="rounded-3xl overflow-hidden shadow-soft-xl">
               <img
-                src="/images/hero-beadwork.jpg"
+                src="/images/hero-beadwork.svg"
                 alt="Украшения из бисера"
                 class="w-full h-auto object-cover"
               />

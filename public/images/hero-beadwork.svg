@@ -1,0 +1,36 @@
+<svg width="1400" height="800" viewBox="0 0 1400 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1400" y2="800" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDF9F0"/>
+      <stop offset=".5" stop-color="#F5ECDA"/>
+      <stop offset="1" stop-color="#EAD5BC"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="700" cy="380" r="320" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D99A36" stop-opacity=".1"/>
+      <stop offset="1" stop-color="#D99A36" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1400" height="800" fill="url(#bg)"/>
+  <circle cx="700" cy="380" r="320" fill="url(#glow)"/>
+  <g opacity=".18" fill="#D99A36">
+    <circle cx="700" cy="230" r="14"/><circle cx="765" cy="238" r="11"/><circle cx="826" cy="260" r="14"/>
+    <circle cx="878" cy="296" r="11"/><circle cx="916" cy="344" r="14"/><circle cx="936" cy="400" r="11"/>
+    <circle cx="935" cy="458" r="14"/><circle cx="914" cy="510" r="11"/>
+    <circle cx="635" cy="238" r="11"/><circle cx="574" cy="260" r="14"/><circle cx="522" cy="296" r="11"/>
+    <circle cx="484" cy="344" r="14"/><circle cx="464" cy="400" r="11"/><circle cx="465" cy="458" r="14"/>
+    <circle cx="486" cy="510" r="11"/>
+  </g>
+  <g opacity=".1" fill="#C1854E">
+    <circle cx="700" cy="290" r="8"/><circle cx="748" cy="296" r="6"/><circle cx="790" cy="312" r="8"/>
+    <circle cx="824" cy="340" r="6"/><circle cx="844" cy="376" r="8"/><circle cx="850" cy="416" r="6"/>
+    <circle cx="652" cy="296" r="6"/><circle cx="610" cy="312" r="8"/><circle cx="576" cy="340" r="6"/>
+    <circle cx="556" cy="376" r="8"/><circle cx="550" cy="416" r="6"/>
+  </g>
+  <g transform="translate(700,380)" opacity=".12">
+    <rect x="-25" y="-25" width="50" height="50" rx="8" fill="#D99A36" transform="rotate(45)"/>
+  </g>
+  <g opacity=".06" fill="#C1854E">
+    <circle cx="200" cy="150" r="40"/><circle cx="1200" cy="650" r="50"/>
+    <circle cx="1100" cy="120" r="30"/><circle cx="300" cy="680" r="35"/>
+  </g>
+</svg>

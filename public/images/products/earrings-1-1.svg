@@ -1,9 +1,30 @@
-<svg width="800" height="800" xmlns="http://www.w3.org/2000/svg">
-  <rect width="800" height="800" fill="#DDA0DD"/>
-  <text x="400" y="400" font-family="Arial" font-size="24" fill="#333" text-anchor="middle" dominant-baseline="middle">
-    earrings-1-1
-  </text>
-  <text x="400" y="440" font-family="Arial" font-size="16" fill="#666" text-anchor="middle" dominant-baseline="middle">
-    Заглушка изображения
-  </text>
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="800" y2="800" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EFF4FB"/><stop offset="1" stop-color="#DDE8F5"/>
+    </linearGradient>
+    <radialGradient id="gl" cx="400" cy="400" r="200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8BA8C4" stop-opacity=".1"/><stop offset="1" stop-color="#8BA8C4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#bg)"/>
+  <circle cx="400" cy="400" r="200" fill="url(#gl)"/>
+  <g opacity=".32">
+    <line x1="300" y1="260" x2="300" y2="290" stroke="#8BA8C4" stroke-width="2"/>
+    <circle cx="300" cy="316" r="10" fill="#8BA8C4"/><circle cx="300" cy="350" r="12" fill="#8BA8C4"/>
+    <circle cx="300" cy="390" r="14" fill="#8BA8C4"/><circle cx="300" cy="432" r="16" fill="#8BA8C4"/>
+    <circle cx="300" cy="474" r="12" fill="#8BA8C4"/><circle cx="300" cy="504" r="8" fill="#8BA8C4"/>
+  </g>
+  <g opacity=".32">
+    <line x1="500" y1="260" x2="500" y2="290" stroke="#8BA8C4" stroke-width="2"/>
+    <circle cx="500" cy="316" r="10" fill="#8BA8C4"/><circle cx="500" cy="350" r="12" fill="#8BA8C4"/>
+    <circle cx="500" cy="390" r="14" fill="#8BA8C4"/><circle cx="500" cy="432" r="16" fill="#8BA8C4"/>
+    <circle cx="500" cy="474" r="12" fill="#8BA8C4"/><circle cx="500" cy="504" r="8" fill="#8BA8C4"/>
+  </g>
+  <g opacity=".15" fill="#A8C0D8">
+    <circle cx="286" cy="370" r="5"/><circle cx="314" cy="370" r="5"/>
+    <circle cx="286" cy="430" r="6"/><circle cx="314" cy="430" r="6"/>
+    <circle cx="486" cy="370" r="5"/><circle cx="514" cy="370" r="5"/>
+    <circle cx="486" cy="430" r="6"/><circle cx="514" cy="430" r="6"/>
+  </g>
 </svg>

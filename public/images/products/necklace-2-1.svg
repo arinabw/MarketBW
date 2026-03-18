@@ -1,9 +1,28 @@
-<svg width="800" height="800" xmlns="http://www.w3.org/2000/svg">
-  <rect width="800" height="800" fill="#DEB887"/>
-  <text x="400" y="400" font-family="Arial" font-size="24" fill="#333" text-anchor="middle" dominant-baseline="middle">
-    necklace-2-1
-  </text>
-  <text x="400" y="440" font-family="Arial" font-size="16" fill="#666" text-anchor="middle" dominant-baseline="middle">
-    Заглушка изображения
-  </text>
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="800" y2="800" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7EFF2"/><stop offset="1" stop-color="#EDDCE2"/>
+    </linearGradient>
+    <radialGradient id="gl" cx="400" cy="380" r="220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B88895" stop-opacity=".1"/><stop offset="1" stop-color="#B88895" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#bg)"/>
+  <circle cx="400" cy="380" r="220" fill="url(#gl)"/>
+  <path d="M180 210 Q400 560 620 210" fill="none" stroke="#B88895" stroke-width="1.5" opacity=".18"/>
+  <g opacity=".35" fill="#B88895">
+    <circle cx="180" cy="210" r="12"/><circle cx="218" cy="260" r="10"/><circle cx="262" cy="310" r="12"/>
+    <circle cx="312" cy="354" r="10"/><circle cx="364" cy="386" r="12"/><circle cx="400" cy="396" r="15"/>
+    <circle cx="436" cy="386" r="12"/><circle cx="488" cy="354" r="10"/><circle cx="538" cy="310" r="12"/>
+    <circle cx="582" cy="260" r="10"/><circle cx="620" cy="210" r="12"/>
+  </g>
+  <g opacity=".18" fill="#D0A4AE">
+    <circle cx="200" cy="234" r="6"/><circle cx="240" cy="284" r="5"/><circle cx="286" cy="332" r="6"/>
+    <circle cx="336" cy="370" r="5"/><circle cx="384" cy="392" r="6"/><circle cx="416" cy="392" r="6"/>
+    <circle cx="464" cy="370" r="5"/><circle cx="514" cy="332" r="6"/><circle cx="560" cy="284" r="5"/>
+    <circle cx="600" cy="234" r="6"/>
+  </g>
+  <g transform="translate(400,408)" opacity=".25">
+    <path d="M-18-12 L0-28 L18-12 L12 12 L-12 12Z" fill="#B88895"/>
+  </g>
 </svg>

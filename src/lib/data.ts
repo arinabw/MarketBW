@@ -44,25 +44,25 @@ export const categories: Category[] = [
     id: 'bracelet',
     name: 'Браслеты',
     description: 'Элегантные браслеты из бисера ручной работы',
-    image: '/images/categories/bracelets.jpg'
+    image: '/images/categories/bracelets.svg'
   },
   {
     id: 'necklace',
     name: 'Колье',
     description: 'Уникальные колье и ожерелья из бисера',
-    image: '/images/categories/necklaces.jpg'
+    image: '/images/categories/necklaces.svg'
   },
   {
     id: 'earrings',
     name: 'Серьги',
     description: 'Нежные серьги из бисера для любого образа',
-    image: '/images/categories/earrings.jpg'
+    image: '/images/categories/earrings.svg'
   },
   {
     id: 'brooch',
     name: 'Броши',
     description: 'Декоративные броши из бисера ручной работы',
-    image: '/images/categories/brooches.jpg'
+    image: '/images/categories/brooches.svg'
   }
 ]
 

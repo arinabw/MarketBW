@@ -1,9 +1,30 @@
-<svg width="800" height="800" xmlns="http://www.w3.org/2000/svg">
-  <rect width="800" height="800" fill="#FFB6C1"/>
-  <text x="400" y="400" font-family="Arial" font-size="24" fill="#333" text-anchor="middle" dominant-baseline="middle">
-    bracelet-1-1
-  </text>
-  <text x="400" y="440" font-family="Arial" font-size="16" fill="#666" text-anchor="middle" dominant-baseline="middle">
-    Заглушка изображения
-  </text>
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="800" y2="800" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FBF0F0"/><stop offset="1" stop-color="#F5DDE0"/>
+    </linearGradient>
+    <radialGradient id="gl" cx="400" cy="400" r="220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D4918E" stop-opacity=".12"/><stop offset="1" stop-color="#D4918E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#bg)"/>
+  <circle cx="400" cy="400" r="220" fill="url(#gl)"/>
+  <g fill="none" stroke="#D4918E" stroke-width="2" opacity=".2">
+    <circle cx="400" cy="400" r="150"/><circle cx="400" cy="400" r="130"/>
+  </g>
+  <g opacity=".35" fill="#D4918E">
+    <circle cx="400" cy="250" r="13"/><circle cx="456" cy="256" r="11"/><circle cx="506" cy="276" r="13"/>
+    <circle cx="544" cy="308" r="11"/><circle cx="550" cy="492" r="11"/><circle cx="506" cy="524" r="13"/>
+    <circle cx="456" cy="544" r="11"/><circle cx="400" cy="550" r="13"/><circle cx="344" cy="544" r="11"/>
+    <circle cx="294" cy="524" r="13"/><circle cx="256" cy="492" r="11"/><circle cx="256" cy="308" r="11"/>
+    <circle cx="294" cy="276" r="13"/><circle cx="344" cy="256" r="11"/>
+  </g>
+  <g opacity=".2" fill="#E8B4B1">
+    <circle cx="400" cy="270" r="7"/><circle cx="444" cy="274" r="6"/><circle cx="484" cy="290" r="7"/>
+    <circle cx="516" cy="316" r="6"/><circle cx="520" cy="484" r="6"/><circle cx="484" cy="510" r="7"/>
+    <circle cx="444" cy="526" r="6"/><circle cx="400" cy="530" r="7"/><circle cx="356" cy="526" r="6"/>
+    <circle cx="316" cy="510" r="7"/><circle cx="280" cy="484" r="6"/><circle cx="280" cy="316" r="6"/>
+    <circle cx="316" cy="290" r="7"/><circle cx="356" cy="274" r="6"/>
+  </g>
+  <circle cx="400" cy="400" r="16" fill="#D4918E" opacity=".25"/>
 </svg>

@@ -1,9 +1,22 @@
-<svg width="800" height="800" xmlns="http://www.w3.org/2000/svg">
-  <rect width="800" height="800" fill="#FFC0CB"/>
-  <text x="400" y="400" font-family="Arial" font-size="24" fill="#333" text-anchor="middle" dominant-baseline="middle">
-    bracelet-1-2
-  </text>
-  <text x="400" y="440" font-family="Arial" font-size="16" fill="#666" text-anchor="middle" dominant-baseline="middle">
-    Заглушка изображения
-  </text>
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="800" y1="0" x2="0" y2="800" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FBF0F0"/><stop offset="1" stop-color="#F2D8DC"/>
+    </linearGradient>
+    <radialGradient id="gl" cx="400" cy="380" r="200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D4918E" stop-opacity=".1"/><stop offset="1" stop-color="#D4918E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#bg)"/>
+  <circle cx="400" cy="380" r="200" fill="url(#gl)"/>
+  <g opacity=".3" fill="#D4918E">
+    <circle cx="400" cy="240" r="11"/><circle cx="460" cy="250" r="9"/><circle cx="512" cy="280" r="11"/>
+    <circle cx="548" cy="324" r="9"/><circle cx="560" cy="380" r="11"/><circle cx="548" cy="436" r="9"/>
+    <circle cx="512" cy="480" r="11"/><circle cx="460" cy="510" r="9"/><circle cx="400" cy="520" r="11"/>
+    <circle cx="340" cy="510" r="9"/><circle cx="288" cy="480" r="11"/><circle cx="252" cy="436" r="9"/>
+    <circle cx="240" cy="380" r="11"/><circle cx="252" cy="324" r="9"/><circle cx="288" cy="280" r="11"/>
+    <circle cx="340" cy="250" r="9"/>
+  </g>
+  <ellipse cx="400" cy="380" rx="90" ry="85" fill="none" stroke="#E8B4B1" stroke-width="1.5" opacity=".2"/>
+  <circle cx="400" cy="380" r="12" fill="#D4918E" opacity=".3"/>
 </svg>

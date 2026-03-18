@@ -1,9 +1,22 @@
-<svg width="800" height="800" xmlns="http://www.w3.org/2000/svg">
-  <rect width="800" height="800" fill="#CD853F"/>
-  <text x="400" y="400" font-family="Arial" font-size="24" fill="#333" text-anchor="middle" dominant-baseline="middle">
-    necklace-2-3
-  </text>
-  <text x="400" y="440" font-family="Arial" font-size="16" fill="#666" text-anchor="middle" dominant-baseline="middle">
-    Заглушка изображения
-  </text>
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="800" x2="800" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4EAF0"/><stop offset="1" stop-color="#EADAE2"/>
+    </linearGradient>
+    <radialGradient id="gl" cx="400" cy="380" r="200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#B88895" stop-opacity=".12"/><stop offset="1" stop-color="#B88895" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#bg)"/>
+  <circle cx="400" cy="380" r="200" fill="url(#gl)"/>
+  <path d="M240 260 Q400 480 560 260" fill="none" stroke="#B88895" stroke-width="1.5" opacity=".15"/>
+  <path d="M200 230 Q400 520 600 230" fill="none" stroke="#B88895" stroke-width="1" opacity=".1"/>
+  <g opacity=".28" fill="#B88895">
+    <circle cx="240" cy="260" r="9"/><circle cx="280" cy="304" r="7"/><circle cx="324" cy="342" r="9"/>
+    <circle cx="370" cy="368" r="7"/><circle cx="400" cy="376" r="11"/><circle cx="430" cy="368" r="7"/>
+    <circle cx="476" cy="342" r="9"/><circle cx="520" cy="304" r="7"/><circle cx="560" cy="260" r="9"/>
+  </g>
+  <g transform="translate(400,390)" opacity=".2">
+    <circle r="20" fill="#B88895"/><circle r="8" fill="#D0A4AE"/>
+  </g>
 </svg>
