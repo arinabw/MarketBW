@@ -6,7 +6,8 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json ./
-RUN npm ci
+# Без package-lock.json используем npm install (для npm ci добавьте lock-файл в репозиторий)
+RUN npm install
 
 FROM base AS builder
 WORKDIR /app
