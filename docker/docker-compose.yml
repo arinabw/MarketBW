@@ -1,5 +1,6 @@
 services:
   web:
+    container_name: marketbw
     build:
       context: ..
       dockerfile: docker/Dockerfile
