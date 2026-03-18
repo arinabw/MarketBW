@@ -5,7 +5,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     ports:
-      - "4173:4173"
+      - "3000:3000"
     environment:
       - NODE_ENV=production
       - VITE_SITE_NAME=MarketBW

@@ -68,7 +68,7 @@ EOF
     docker-compose up -d
 
     log_info "✅ Сайт успешно установлен и запущен!"
-    log_info "Сайт доступен по адресу: http://localhost:4173"
+    log_info "Сайт доступен по адресу: http://localhost:3000"
 }
 
 # Обновление сайта
