@@ -1,5 +1,5 @@
-/* Импорт шрифтов */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap');
+/* Импорт современных шрифтов */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -64,43 +64,52 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-dusty-rose hover:bg-opacity-90 text-white px-6 py-3 rounded-lg transition-all duration-300 shadow-soft hover:shadow-soft-lg;
+    @apply bg-gradient-to-r from-primary-500 to-accent-500 hover:from-primary-600 hover:to-accent-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-modern hover:shadow-modern-lg hover:-translate-y-0.5;
   }
   
   .btn-secondary {
-    @apply bg-lavender hover:bg-opacity-90 text-text-dark px-6 py-3 rounded-lg transition-all duration-300 shadow-soft hover:shadow-soft-lg;
+    @apply bg-white hover:bg-surface-50 text-text-primary border-2 border-surface-200 px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-modern hover:shadow-modern-lg;
   }
   
-  .card-romantic {
-    @apply bg-ghost-white rounded-xl shadow-soft hover:shadow-soft-lg transition-all duration-300;
+  .card-modern {
+    @apply bg-white rounded-2xl shadow-modern hover:shadow-modern-xl transition-all duration-300 border border-surface-100 hover:border-primary-200;
   }
   
   .text-gradient {
-    @apply bg-gradient-to-r from-dusty-rose to-pastel-purple bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent;
   }
   
   .container-custom {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
+  
+  .glass-effect {
+    @apply bg-white/70 backdrop-blur-xl border border-white/20;
+  }
+  
+  .gradient-bg {
+    @apply bg-gradient-to-br from-primary-50 via-white to-accent-50;
+  }
 }
 
-/* Кастомные стили для романтичного дизайна */
+/* Современные стили */
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  font-family: 'Lato', sans-serif;
-  background-color: #FFF5F5;
-  color: #4A4A4A;
+  font-family: 'Inter', sans-serif;
+  background-color: #FAFAFA;
+  color: #0F172A;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', serif;
-  color: #D4A5A5;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #0F172A;
+  font-weight: 700;
 }
 
-/* Анимации при скролле */
+/* Современные анимации */
 .fade-in-up {
   opacity: 0;
   transform: translateY(30px);
@@ -112,92 +121,102 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(0);
 }
 
-/* Стили для изображений */
+/* Современные стили для изображений */
 .image-hover {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .image-hover:hover {
   transform: scale(1.05);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
 }
 
-/* Стили для карточек изделий */
+/* Современные стили для карточек изделий */
 .product-card {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
 }
 
-/* Стили для кнопок */
-.btn-romantic {
-  background: linear-gradient(135deg, #C9A9A6 0%, #B8A9C9 100%);
+/* Современные стили для кнопок */
+.btn-modern {
+  background: linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%);
   color: white;
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(201, 169, 166, 0.3);
+  padding: 14px 28px;
+  border-radius: 16px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+  border: none;
+  cursor: pointer;
 }
 
-.btn-romantic:hover {
+.btn-modern:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 30px rgba(201, 169, 166, 0.4);
+  box-shadow: 0 8px 25px rgba(236, 72, 153, 0.4);
 }
 
-/* Стили для навигации */
+/* Современные стили для навигации */
 .nav-link {
   position: relative;
   transition: color 0.3s ease;
+  font-weight: 500;
 }
 
 .nav-link::after {
   content: '';
   position: absolute;
-  bottom: -2px;
+  bottom: -4px;
   left: 0;
   width: 0;
   height: 2px;
-  background: linear-gradient(90deg, #C9A9A6, #B8A9C9);
+  background: linear-gradient(90deg, #EC4899, #8B5CF6);
   transition: width 0.3s ease;
+  border-radius: 2px;
 }
 
 .nav-link:hover::after {
   width: 100%;
 }
 
-/* Стили для форм */
+/* Современные стили для форм */
 .form-input {
-  background: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(212, 165, 165, 0.3);
+  background: white;
+  border: 2px solid #E5E5E5;
   border-radius: 12px;
-  padding: 12px 16px;
+  padding: 14px 16px;
   transition: all 0.3s ease;
+  font-size: 15px;
 }
 
 .form-input:focus {
-  border-color: #C9A9A6;
-  box-shadow: 0 0 0 3px rgba(201, 169, 166, 0.1);
+  border-color: #EC4899;
+  box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.1);
   outline: none;
 }
 
-/* Стили для секций */
+.form-input::placeholder {
+  color: #94A3B8;
+}
+
+/* Современные стили для секций */
 .section-padding {
-  padding: 80px 0;
+  padding: 100px 0;
 }
 
 .section-title {
-  font-size: 2.5rem;
-  font-weight: 600;
+  font-size: 2.75rem;
+  font-weight: 800;
   text-align: center;
-  margin-bottom: 3rem;
-  background: linear-gradient(135deg, #D4A5A5 0%, #B8A9C9 100%);
+  margin-bottom: 3.5rem;
+  background: linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  letter-spacing: -0.02em;
 }
 
 /* Адаптивность */

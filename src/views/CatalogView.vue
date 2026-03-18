@@ -27,13 +27,13 @@ const selectedCategoryName = computed(() => {
 <template>
   <div class="min-h-screen">
     <!-- Header Section -->
-    <section class="section-padding bg-gradient-to-br from-rose-light via-white to-lavender/20">
+    <section class="section-padding gradient-bg">
       <div class="container-custom">
         <div class="text-center">
-          <h1 class="text-4xl md:text-5xl font-playfair font-bold text-gradient mb-4">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-gradient mb-4">
             {{ selectedCategoryName }}
           </h1>
-          <p class="text-lg text-text-medium max-w-2xl mx-auto">
+          <p class="text-lg text-text-secondary max-w-2xl mx-auto">
             Выберите уникальное украшение из бисера ручной работы
           </p>
         </div>
@@ -41,13 +41,13 @@ const selectedCategoryName = computed(() => {
     </section>
 
     <!-- Category Filter -->
-    <section class="py-8 bg-white border-b border-lavender/20">
+    <section class="py-8 bg-white border-b border-surface-200">
       <div class="container-custom">
-        <div class="flex flex-wrap justify-center gap-4">
+        <div class="flex flex-wrap justify-center gap-3">
           <RouterLink
             to="/catalog"
-            class="px-6 py-2 rounded-full transition-all duration-300"
-            :class="!selectedCategory ? 'bg-dusty-rose text-white shadow-soft' : 'bg-rose-light text-text-medium hover:bg-dusty-rose hover:text-white'"
+            class="px-6 py-2.5 rounded-full transition-all duration-300 font-medium"
+            :class="!selectedCategory ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-glow' : 'bg-surface-100 text-text-secondary hover:bg-primary-50 hover:text-primary-500'"
           >
             Все
           </RouterLink>
@@ -55,8 +55,8 @@ const selectedCategoryName = computed(() => {
             v-for="category in categories"
             :key="category.id"
             :to="`/catalog?category=${category.id}`"
-            class="px-6 py-2 rounded-full transition-all duration-300"
-            :class="selectedCategory === category.id ? 'bg-dusty-rose text-white shadow-soft' : 'bg-rose-light text-text-medium hover:bg-dusty-rose hover:text-white'"
+            class="px-6 py-2.5 rounded-full transition-all duration-300 font-medium"
+            :class="selectedCategory === category.id ? 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-glow' : 'bg-surface-100 text-text-secondary hover:bg-primary-50 hover:text-primary-500'"
           >
             {{ category.name }}
           </RouterLink>
@@ -74,34 +74,34 @@ const selectedCategoryName = computed(() => {
             :to="`/product/${product.id}`"
             class="group block"
           >
-            <AppCard class="card-romantic overflow-hidden product-card">
+            <AppCard class="card-modern overflow-hidden product-card">
               <div class="aspect-square relative overflow-hidden">
                 <img
                   :src="product.images[0]"
                   :alt="product.name"
                   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
-                <div v-if="product.featured" class="absolute top-4 right-4 bg-dusty-rose text-white px-3 py-1 rounded-full text-xs font-medium">
+                <div v-if="product.featured" class="absolute top-4 right-4 bg-gradient-to-r from-primary-500 to-accent-500 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-glow">
                   Хит
                 </div>
-                <div v-if="!product.inStock" class="absolute top-4 left-4 bg-gray-500 text-white px-3 py-1 rounded-full text-xs font-medium">
+                <div v-if="!product.inStock" class="absolute top-4 left-4 bg-surface-500 text-white px-4 py-1.5 rounded-full text-xs font-bold">
                   Нет в наличии
                 </div>
               </div>
               <AppCardContent class="p-6">
-                <h3 class="font-playfair text-xl text-text-rose mb-2 group-hover:text-dusty-rose transition-colors">
+                <h3 class="font-display text-xl font-bold text-text-primary mb-2 group-hover:text-primary-500 transition-colors">
                   {{ product.name }}
                 </h3>
-                <p class="text-text-medium text-sm mb-4 line-clamp-2">
+                <p class="text-text-secondary text-sm mb-4 line-clamp-2">
                   {{ product.description }}
                 </p>
                 <div class="flex items-center justify-between">
-                  <span class="text-lg font-semibold text-text-dark">
+                  <span class="text-lg font-bold text-text-primary">
                     {{ formatPrice(product.price) }}
                   </span>
                   <div class="flex items-center space-x-1">
-                    <Heart class="w-4 h-4 text-dusty-rose" />
-                    <span class="text-sm text-text-medium">В избранное</span>
+                    <Heart class="w-4 h-4 text-primary-500" />
+                    <span class="text-sm text-text-secondary">В избранное</span>
                   </div>
                 </div>
               </AppCardContent>
@@ -109,9 +109,9 @@ const selectedCategoryName = computed(() => {
           </RouterLink>
         </div>
         <div v-else class="text-center py-12">
-          <p class="text-text-medium text-lg">В этой категории пока нет изделий</p>
+          <p class="text-text-secondary text-lg">В этой категории пока нет изделий</p>
           <RouterLink to="/catalog" class="inline-block mt-4">
-            <AppButton variant="outline" class="border-dusty-rose text-dusty-rose hover:bg-dusty-rose hover:text-white">
+            <AppButton variant="outline" class="border-2 border-surface-200 hover:border-primary-500 hover:text-primary-500">
               Смотреть все изделия
             </AppButton>
           </RouterLink>
@@ -120,12 +120,13 @@ const selectedCategoryName = computed(() => {
     </section>
 
     <!-- CTA Section -->
-    <section class="section-padding bg-gradient-to-r from-dusty-rose to-pastel-purple text-white">
-      <div class="container-custom text-center">
-        <h2 class="text-3xl md:text-4xl font-playfair font-bold mb-6">
+    <section class="section-padding bg-gradient-to-r from-primary-500 to-accent-500 text-white relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-primary-600 to-accent-600 opacity-50"></div>
+      <div class="container-custom text-center relative z-10">
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-6">
           Не нашли то, что искали?
         </h2>
-        <p class="text-lg mb-8 max-w-2xl mx-auto">
+        <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto opacity-90">
           Я создаю украшения на заказ по вашим индивидуальным пожеланиям. 
           Свяжитесь со мной, и мы вместе создадим уникальное изделие!
         </p>
@@ -133,7 +134,7 @@ const selectedCategoryName = computed(() => {
           <AppButton 
             size="lg" 
             variant="secondary"
-            class="bg-white text-dusty-rose hover:bg-ghost-white"
+            class="bg-white text-primary-500 hover:bg-surface-50 shadow-glow hover:shadow-glow-lg"
             @click="navigate"
           >
             Заказать индивидуальное изделие

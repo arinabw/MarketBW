@@ -38,13 +38,13 @@ const handleSubmit = async () => {
 <template>
   <div class="min-h-screen">
     <!-- Header Section -->
-    <section class="section-padding bg-gradient-to-br from-rose-light via-white to-lavender/20">
+    <section class="section-padding gradient-bg">
       <div class="container-custom">
         <div class="text-center">
-          <h1 class="text-4xl md:text-5xl font-playfair font-bold text-gradient mb-4">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-gradient mb-4">
             Свяжитесь со мной
           </h1>
-          <p class="text-lg text-text-medium max-w-2xl mx-auto">
+          <p class="text-lg text-text-secondary max-w-2xl mx-auto">
             Я всегда рада ответить на ваши вопросы и помочь с выбором уникального украшения
           </p>
         </div>
@@ -57,7 +57,7 @@ const handleSubmit = async () => {
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <!-- Contact Info -->
           <div class="space-y-6">
-            <AppCard class="card-romantic">
+            <AppCard class="card-modern">
               <AppCardHeader>
                 <AppCardTitle>Контактная информация</AppCardTitle>
               </AppCardHeader>
@@ -65,58 +65,58 @@ const handleSubmit = async () => {
                 <div class="space-y-4">
                   <a
                     :href="`tel:${env.contactPhone}`"
-                    class="flex items-center space-x-3 text-text-medium hover:text-text-rose transition-colors"
+                    class="flex items-center space-x-4 text-text-secondary hover:text-primary-500 transition-colors group"
                   >
-                    <div class="w-10 h-10 bg-dusty-rose/10 rounded-full flex items-center justify-center">
-                      <Phone class="w-5 h-5 text-dusty-rose" />
+                    <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center group-hover:bg-primary-100 transition-colors">
+                      <Phone class="w-5 h-5 text-primary-500" />
                     </div>
                     <div>
-                      <p class="text-sm text-text-medium">Телефон</p>
-                      <p class="font-medium">{{ env.contactPhone }}</p>
+                      <p class="text-sm text-text-secondary font-medium">Телефон</p>
+                      <p class="font-bold text-text-primary">{{ env.contactPhone }}</p>
                     </div>
                   </a>
                   <a
                     :href="`mailto:${env.contactEmail}`"
-                    class="flex items-center space-x-3 text-text-medium hover:text-text-rose transition-colors"
+                    class="flex items-center space-x-4 text-text-secondary hover:text-primary-500 transition-colors group"
                   >
-                    <div class="w-10 h-10 bg-dusty-rose/10 rounded-full flex items-center justify-center">
-                      <Mail class="w-5 h-5 text-dusty-rose" />
+                    <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center group-hover:bg-primary-100 transition-colors">
+                      <Mail class="w-5 h-5 text-primary-500" />
                     </div>
                     <div>
-                      <p class="text-sm text-text-medium">Email</p>
-                      <p class="font-medium">{{ env.contactEmail }}</p>
+                      <p class="text-sm text-text-secondary font-medium">Email</p>
+                      <p class="font-bold text-text-primary">{{ env.contactEmail }}</p>
                     </div>
                   </a>
-                  <div class="flex items-center space-x-3 text-text-medium">
-                    <div class="w-10 h-10 bg-dusty-rose/10 rounded-full flex items-center justify-center">
-                      <MapPin class="w-5 h-5 text-dusty-rose" />
+                  <div class="flex items-center space-x-4 text-text-secondary">
+                    <div class="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center">
+                      <MapPin class="w-5 h-5 text-primary-500" />
                     </div>
                     <div>
-                      <p class="text-sm text-text-medium">Адрес</p>
-                      <p class="font-medium">Россия, доставка по всей стране</p>
+                      <p class="text-sm text-text-secondary font-medium">Адрес</p>
+                      <p class="font-bold text-text-primary">Россия, доставка по всей стране</p>
                     </div>
                   </div>
                 </div>
               </AppCardContent>
             </AppCard>
 
-            <AppCard class="card-romantic">
+            <AppCard class="card-modern">
               <AppCardHeader>
                 <AppCardTitle>Режим работы</AppCardTitle>
               </AppCardHeader>
               <AppCardContent>
-                <div class="space-y-2">
-                  <div class="flex justify-between">
-                    <span class="text-text-medium">Понедельник - Пятница</span>
-                    <span class="font-medium">9:00 - 18:00</span>
+                <div class="space-y-3">
+                  <div class="flex justify-between py-2 border-b border-surface-100">
+                    <span class="text-text-secondary font-medium">Понедельник - Пятница</span>
+                    <span class="font-bold text-text-primary">9:00 - 18:00</span>
                   </div>
-                  <div class="flex justify-between">
-                    <span class="text-text-medium">Суббота</span>
-                    <span class="font-medium">10:00 - 16:00</span>
+                  <div class="flex justify-between py-2 border-b border-surface-100">
+                    <span class="text-text-secondary font-medium">Суббота</span>
+                    <span class="font-bold text-text-primary">10:00 - 16:00</span>
                   </div>
-                  <div class="flex justify-between">
-                    <span class="text-text-medium">Воскресенье</span>
-                    <span class="font-medium">Выходной</span>
+                  <div class="flex justify-between py-2">
+                    <span class="text-text-secondary font-medium">Воскресенье</span>
+                    <span class="font-bold text-text-primary">Выходной</span>
                   </div>
                 </div>
               </AppCardContent>
@@ -124,14 +124,14 @@ const handleSubmit = async () => {
           </div>
 
           <!-- Contact Form -->
-          <AppCard class="card-romantic">
+          <AppCard class="card-modern">
             <AppCardHeader>
               <AppCardTitle>Напишите мне</AppCardTitle>
             </AppCardHeader>
             <AppCardContent>
-              <form @submit.prevent="handleSubmit" class="space-y-4">
+              <form @submit.prevent="handleSubmit" class="space-y-5">
                 <div>
-                  <label for="name" class="block text-sm font-medium text-text-medium mb-2">
+                  <label for="name" class="block text-sm font-bold text-text-primary mb-2">
                     Ваше имя *
                   </label>
                   <input
@@ -144,7 +144,7 @@ const handleSubmit = async () => {
                   />
                 </div>
                 <div>
-                  <label for="email" class="block text-sm font-medium text-text-medium mb-2">
+                  <label for="email" class="block text-sm font-bold text-text-primary mb-2">
                     Email *
                   </label>
                   <input
@@ -157,7 +157,7 @@ const handleSubmit = async () => {
                   />
                 </div>
                 <div>
-                  <label for="phone" class="block text-sm font-medium text-text-medium mb-2">
+                  <label for="phone" class="block text-sm font-bold text-text-primary mb-2">
                     Телефон
                   </label>
                   <input
@@ -169,7 +169,7 @@ const handleSubmit = async () => {
                   />
                 </div>
                 <div>
-                  <label for="message" class="block text-sm font-medium text-text-medium mb-2">
+                  <label for="message" class="block text-sm font-bold text-text-primary mb-2">
                     Сообщение *
                   </label>
                   <textarea
@@ -184,7 +184,8 @@ const handleSubmit = async () => {
                 <AppButton 
                   type="submit" 
                   size="lg" 
-                  class="btn-romantic w-full"
+                  variant="modern"
+                  class="w-full"
                   :disabled="isSubmitting"
                 >
                   <Send v-if="!isSubmitting" class="mr-2 w-5 h-5" />
