@@ -2,6 +2,8 @@
 
 Этот документ описывает, как запустить сайт MarketBW в Docker контейнере.
 
+**На сервере репозиторий:** `/opt/MarketBW`.
+
 ## Требования
 
 - Docker (версия 20.10 или выше)
@@ -99,6 +101,40 @@ docker compose up -d --build
 ./deploy.sh update
 ```
 
+## Автообновление по cron
+
+Скрипт `docker/auto-update.sh` раз в запуск проверяет, появились ли новые коммиты на `origin`, и при наличии изменений выполняет `deploy.sh update` (pull + пересборка контейнера).
+
+**На сервере один раз (репозиторий в `/opt/MarketBW`):**
+
+```bash
+chmod +x /opt/MarketBW/docker/auto-update.sh
+```
+
+**Добавить в crontab (проверка каждую минуту):**
+
+```bash
+crontab -e
+```
+
+Строка для вставки (ветка по умолчанию — `main`):
+
+```cron
+* * * * * /opt/MarketBW/docker/auto-update.sh >> /var/log/marketbw-auto-update.log 2>&1
+```
+
+Если у вас ветка `master`, а не `main`:
+
+```cron
+* * * * * BRANCH=master /opt/MarketBW/docker/auto-update.sh >> /var/log/marketbw-auto-update.log 2>&1
+```
+
+Без записи в лог:
+
+```cron
+* * * * * /opt/MarketBW/docker/auto-update.sh
+```
+
 ## Решение проблем
 
 ### 502 Bad Gateway (Caddy проксирует на MarketBW)
@@ -114,7 +150,7 @@ docker compose up -d --build
    ```bash
    docker exec marketbw-app wget -qO- http://127.0.0.1:3000/ | head -5
    ```
-   Должен вернуться HTML. Если нет — перезапустите: `docker compose restart` (из папки проекта MarketBW).
+   Должен вернуться HTML. Если нет — перезапустите: `cd /opt/MarketBW/docker && docker compose restart`.
 
 2. **Caddy в Docker и `reverse_proxy marketbw:3000`**
    Имя `marketbw` должно резолвиться из контейнера Caddy. Контейнеры должны быть в **одной Docker-сети**:
@@ -124,7 +160,7 @@ docker compose up -d --build
    ```
    В списке контейнеров сети должен быть контейнер MarketBW. Если его нет — добавьте в `docker-compose.yml` MarketBW внешнюю сеть Caddy (см. блок «Если Caddy в Docker» выше) и выполните:
    ```bash
-   docker compose up -d
+   cd /opt/MarketBW/docker && docker compose up -d
    ```
    После этого перезапустите Caddy.
 
