@@ -1,5 +1,5 @@
 # Базовый образ Node.js
-FROM node:22-alpine AS base
+FROM node:25-alpine AS base
 
 # Установка зависимостей для сборки
 FROM base AS deps

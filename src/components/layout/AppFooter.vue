@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-import { Phone, Mail, MapPin, Instagram, Telegram, Vk } from 'lucide-vue-next'
+import { Phone, Mail, MapPin, Instagram, Send, MessageCircle } from 'lucide-vue-next'
 import { env } from '@/lib/env'
 
 const currentYear = new Date().getFullYear()
@@ -22,12 +22,12 @@ const socialLinks = [
   {
     name: 'Telegram',
     href: env.telegram,
-    icon: Telegram,
+    icon: Send,
   },
   {
     name: 'VK',
     href: env.vk,
-    icon: Vk,
+    icon: MessageCircle,
   },
 ]
 </script>
