@@ -32,7 +32,7 @@ const buttonVariants = cva(
   }
 )
 
-interface Props extends VariantProps<typeof buttonVariants> {
+interface Props extends /* @vue-ignore */ VariantProps<typeof buttonVariants> {
   asChild?: boolean
   class?: string
 }
