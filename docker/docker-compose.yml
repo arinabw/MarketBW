@@ -17,8 +17,8 @@ services:
       - VITE_VK=https://vk.com/your-profile
     restart: unless-stopped
     networks:
-      - app-network
+      - marketbw
 
 networks:
-  app-network:
+  marketbw:
     driver: bridge
