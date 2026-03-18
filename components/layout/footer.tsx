@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Phone, Mail, MapPin, Instagram, Telegram, Vk } from 'lucide-react'
+import { env } from '@/lib/env'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -17,17 +18,17 @@ export function Footer() {
   const socialLinks = [
     {
       name: 'Instagram',
-      href: process.env.NEXT_PUBLIC_INSTAGRAM || '#',
+      href: env.instagram,
       icon: Instagram,
     },
     {
       name: 'Telegram',
-      href: process.env.NEXT_PUBLIC_TELEGRAM || '#',
+      href: env.telegram,
       icon: Telegram,
     },
     {
       name: 'VK',
-      href: process.env.NEXT_PUBLIC_VK || '#',
+      href: env.vk,
       icon: Vk,
     },
   ]
@@ -71,18 +72,18 @@ export function Footer() {
             <h3 className="font-playfair text-lg text-text-rose">Контакты</h3>
             <div className="space-y-3">
               <a
-                href={`tel:${process.env.NEXT_PUBLIC_CONTACT_PHONE}`}
+                href={`tel:${env.contactPhone}`}
                 className="flex items-center space-x-2 text-text-medium hover:text-text-rose transition-colors text-sm"
               >
                 <Phone className="w-4 h-4" />
-                <span>{process.env.NEXT_PUBLIC_CONTACT_PHONE}</span>
+                <span>{env.contactPhone}</span>
               </a>
               <a
-                href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
+                href={`mailto:${env.contactEmail}`}
                 className="flex items-center space-x-2 text-text-medium hover:text-text-rose transition-colors text-sm"
               >
                 <Mail className="w-4 h-4" />
-                <span>{process.env.NEXT_PUBLIC_CONTACT_EMAIL}</span>
+                <span>{env.contactEmail}</span>
               </a>
             </div>
           </div>

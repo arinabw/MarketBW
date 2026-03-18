@@ -72,9 +72,9 @@ export const products: Product[] = [
     price: 2500,
     category: 'bracelet',
     images: [
-      '/images/products/bracelet-1-1.jpg',
-      '/images/products/bracelet-1-2.jpg',
-      '/images/products/bracelet-1-3.jpg'
+      '/images/products/bracelet-1-1.svg',
+      '/images/products/bracelet-1-2.svg',
+      '/images/products/bracelet-1-3.svg'
     ],
     materials: ['Чешский бисер', 'Нитки мулине', 'Застежка из ювелирного сплава'],
     size: 'Обхват 16-18 см',
@@ -90,8 +90,8 @@ export const products: Product[] = [
     price: 4500,
     category: 'necklace',
     images: [
-      '/images/products/necklace-1-1.jpg',
-      '/images/products/necklace-1-2.jpg'
+      '/images/products/necklace-1-1.svg',
+      '/images/products/necklace-1-2.svg'
     ],
     materials: ['Японский бисер TOHO', 'Серебряная фурнитура'],
     size: 'Длина 45 см',
@@ -107,8 +107,8 @@ export const products: Product[] = [
     price: 1800,
     category: 'earrings',
     images: [
-      '/images/products/earrings-1-1.jpg',
-      '/images/products/earrings-1-2.jpg'
+      '/images/products/earrings-1-1.svg',
+      '/images/products/earrings-1-2.svg'
     ],
     materials: ['Бисер PRECIOSA', 'Серебряные крючки'],
     size: 'Длина 4 см',
@@ -124,8 +124,8 @@ export const products: Product[] = [
     price: 2200,
     category: 'brooch',
     images: [
-      '/images/products/brooch-1-1.jpg',
-      '/images/products/brooch-1-2.jpg'
+      '/images/products/brooch-1-1.svg',
+      '/images/products/brooch-1-2.svg'
     ],
     materials: ['Бисер разных размеров', 'Фетровая основа', 'Застежка-булавка'],
     size: 'Диаметр 5 см',
@@ -141,8 +141,8 @@ export const products: Product[] = [
     price: 2800,
     category: 'bracelet',
     images: [
-      '/images/products/bracelet-2-1.jpg',
-      '/images/products/bracelet-2-2.jpg'
+      '/images/products/bracelet-2-1.svg',
+      '/images/products/bracelet-2-2.svg'
     ],
     materials: ['Бисер разных оттенков синего', 'Эластичная нить'],
     size: 'Обхват 17-19 см',
@@ -158,9 +158,9 @@ export const products: Product[] = [
     price: 6500,
     category: 'necklace',
     images: [
-      '/images/products/necklace-2-1.jpg',
-      '/images/products/necklace-2-2.jpg',
-      '/images/products/necklace-2-3.jpg'
+      '/images/products/necklace-2-1.svg',
+      '/images/products/necklace-2-2.svg',
+      '/images/products/necklace-2-3.svg'
     ],
     materials: ['Бисер PRECIOSA', 'Россыпи кристаллов', 'Бронзовая фурнитура'],
     size: 'Длина 50 см',

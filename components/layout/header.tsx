@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Menu, X, ShoppingBag, Phone, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { env } from '@/lib/env'
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -24,7 +25,7 @@ export function Header() {
             <div className="w-8 h-8 bg-gradient-to-r from-dusty-rose to-pastel-purple rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-sm">BW</span>
             </div>
-            <span className="font-playfair text-xl text-text-rose">MarketBW</span>
+            <span className="font-playfair text-xl text-text-rose">{env.siteName}</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -43,18 +44,18 @@ export function Header() {
           {/* Contact Info */}
           <div className="hidden lg:flex items-center space-x-4">
             <a
-              href={`tel:${process.env.NEXT_PUBLIC_CONTACT_PHONE}`}
+              href={`tel:${env.contactPhone}`}
               className="flex items-center space-x-1 text-text-medium hover:text-text-rose transition-colors"
             >
               <Phone className="w-4 h-4" />
-              <span className="text-sm">{process.env.NEXT_PUBLIC_CONTACT_PHONE}</span>
+              <span className="text-sm">{env.contactPhone}</span>
             </a>
             <a
-              href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
+              href={`mailto:${env.contactEmail}`}
               className="flex items-center space-x-1 text-text-medium hover:text-text-rose transition-colors"
             >
               <Mail className="w-4 h-4" />
-              <span className="text-sm hidden xl:inline">{process.env.NEXT_PUBLIC_CONTACT_EMAIL}</span>
+              <span className="text-sm hidden xl:inline">{env.contactEmail}</span>
             </a>
           </div>
 
@@ -85,18 +86,18 @@ export function Header() {
               ))}
               <div className="pt-4 pb-2 border-t border-lavender/20">
                 <a
-                  href={`tel:${process.env.NEXT_PUBLIC_CONTACT_PHONE}`}
+                  href={`tel:${env.contactPhone}`}
                   className="flex items-center space-x-2 px-3 py-2 text-text-medium hover:text-text-rose transition-colors"
                 >
                   <Phone className="w-4 h-4" />
-                  <span>{process.env.NEXT_PUBLIC_CONTACT_PHONE}</span>
+                  <span>{env.contactPhone}</span>
                 </a>
                 <a
-                  href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`}
+                  href={`mailto:${env.contactEmail}`}
                   className="flex items-center space-x-2 px-3 py-2 text-text-medium hover:text-text-rose transition-colors"
                 >
                   <Mail className="w-4 h-4" />
-                  <span>{process.env.NEXT_PUBLIC_CONTACT_EMAIL}</span>
+                  <span>{env.contactEmail}</span>
                 </a>
               </div>
             </div>
