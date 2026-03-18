@@ -13,8 +13,10 @@ export interface Product {
   createdAt: Date
 }
 
+export type ProductCategory = Product['category']
+
 export interface Category {
-  id: string
+  id: ProductCategory
   name: string
   description: string
   image: string
@@ -36,16 +38,16 @@ export interface FAQ {
   category: 'order' | 'care' | 'materials' | 'shipping'
 }
 
-// Моковые данные для демонстрации
+// id категорий должны совпадать с Product.category для фильтра каталога и отображения на странице товара
 export const categories: Category[] = [
   {
-    id: 'bracelets',
+    id: 'bracelet',
     name: 'Браслеты',
     description: 'Элегантные браслеты из бисера ручной работы',
     image: '/images/categories/bracelets.jpg'
   },
   {
-    id: 'necklaces',
+    id: 'necklace',
     name: 'Колье',
     description: 'Уникальные колье и ожерелья из бисера',
     image: '/images/categories/necklaces.jpg'
@@ -57,7 +59,7 @@ export const categories: Category[] = [
     image: '/images/categories/earrings.jpg'
   },
   {
-    id: 'brooches',
+    id: 'brooch',
     name: 'Броши',
     description: 'Декоративные броши из бисера ручной работы',
     image: '/images/categories/brooches.jpg'

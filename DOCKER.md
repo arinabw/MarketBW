@@ -15,8 +15,10 @@
 
 ```bash
 cd docker
-docker-compose up -d --build
+docker compose up -d --build
 ```
+
+(На старых системах может быть команда `docker-compose` вместо `docker compose`.)
 
 Эта команда:
 - Соберет Docker образ
@@ -26,13 +28,15 @@ docker-compose up -d --build
 ### 2. Просмотр логов
 
 ```bash
-docker-compose logs -f
+docker compose logs -f
 ```
+
+(Выполнять из папки `docker`.)
 
 ### 3. Остановка контейнера
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ## Использование скрипта развертывания
@@ -59,13 +63,13 @@ chmod +x deploy.sh
 
 Сайт использует многоступенчатую сборку (multi-stage build):
 
-1. **deps** - Установка зависимостей
-2. **builder** - Сборка Vite приложения
-3. **runner** - Финальный образ для запуска
+1. **deps** — установка зависимостей;
+2. **builder** — сборка Vite-приложения (`npm run build`);
+3. **runner** — production-образ на **nginx**: раздача статики из `dist/`, без Node.js.
 
 Преимущества:
-- Минимальный размер финального образа
-- Оптимизация для production
+- минимальный и безопасный образ (только nginx + статика);
+- типичный production-подход для SPA.
 
 ## Порты
 
@@ -85,8 +89,8 @@ ports:
 
 ```bash
 cd docker
-docker-compose down
-docker-compose up -d --build
+docker compose down
+docker compose up -d --build
 ```
 
 Или используйте скрипт:
@@ -102,7 +106,7 @@ docker-compose up -d --build
 Проверьте логи:
 
 ```bash
-docker-compose logs
+docker compose logs
 ```
 
 ### Ошибки сборки
@@ -113,12 +117,78 @@ docker-compose logs
 
 Если порт 3000 уже занят, измените его в `docker-compose.yml`.
 
+## Домен marketbw.ru и порт 80 занят
+
+**Важно:** в DNS нельзя «указать порт». DNS только связывает домен с IP (запись A: `marketbw.ru` → IP сервера). Порт 80/443 браузер подставляет сам при открытии `http://marketbw.ru` или `https://marketbw.ru`.
+
+Если на сервере порт 80 уже занят (другой сайт или сервис), есть два варианта.
+
+### Вариант 1: Обратный прокси (рекомендуется)
+
+На сервере на порту 80 уже слушает Caddy (или nginx). Добавьте виртуальный хост для `marketbw.ru`.
+
+**Caddy** — в Caddyfile рядом с остальными сайтами:
+
+```caddy
+marketbw.ru www.marketbw.ru {
+	reverse_proxy marketbw:3000
+	encode gzip zstd
+}
+```
+
+Контейнер MarketBW должен быть в той же Docker-сети, что и Caddy, чтобы имя `marketbw` резолвилось. Если Caddy запущен на хосте (не в Docker), укажите `127.0.0.1:3000` вместо `marketbw:3000`.
+
+**Если Caddy в Docker:** подключите сервис MarketBW к сети Caddy. В `docker-compose.yml` проекта MarketBW добавьте внешнюю сеть и привязку к ней:
+
+```yaml
+services:
+  marketbw:
+    # ... остальное без изменений ...
+    networks:
+      - marketbw-stack-net
+      - caddy_net   # имя сети, где крутится Caddy (уточните через docker network ls)
+
+networks:
+  marketbw-stack-net:
+    driver: bridge
+    name: marketbw-stack-net
+  caddy_net:
+    external: true
+```
+
+Имя сети (`caddy_net`) посмотрите командой `docker network ls` в том проекте, где запущен Caddy.
+
+**Nginx** (если вдруг используете):
+
+```nginx
+server {
+    listen 80;
+    server_name marketbw.ru www.marketbw.ru;
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+В DNS у домена должна быть A-запись на IP этого сервера. Тогда пользователи открывают **http://marketbw.ru** (без порта).
+
+### Вариант 2: Открыть сайт по порту в URL
+
+Контейнер маппится на порт 3000, в DNS — только A-запись на сервер. Сайт доступен по адресу **http://marketbw.ru:3000**. Минус: некрасиво, порт виден в ссылках и часто блокируется файрволами.
+
+---
+
 ## Production развертывание
 
 Для production развертывания рекомендуется:
 
-1. Использовать обратный прокси (nginx, traefik)
-2. Настроить HTTPS (Let's Encrypt)
+1. Использовать обратный прокси на порту 80/443 (как выше для marketbw.ru)
+2. Настроить HTTPS (Let's Encrypt) в этом же nginx
 3. Использовать volumes для персистентности (если нужно)
 4. Настроить мониторинг и логирование
 
@@ -129,13 +199,14 @@ docker-compose logs
 docker ps
 
 # Вход в контейнер
-docker-compose exec web sh
+docker compose exec marketbw sh
+# или (если используется docker-compose v1): docker-compose exec marketbw sh
 
 # Перезапуск контейнера
-docker-compose restart
+docker compose restart
 
 # Удаление контейнеров и образов
-docker-compose down -v --rmi all
+docker compose down -v --rmi all
 ```
 
 ## Поддержка

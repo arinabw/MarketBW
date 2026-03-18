@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { ArrowRight, Heart } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'

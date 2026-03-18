@@ -25,11 +25,10 @@ const filteredFAQs = computed(() => {
 const openFAQs = ref<Set<string>>(new Set())
 
 const toggleFAQ = (id: string) => {
-  if (openFAQs.value.has(id)) {
-    openFAQs.value.delete(id)
-  } else {
-    openFAQs.value.add(id)
-  }
+  const next = new Set(openFAQs.value)
+  if (next.has(id)) next.delete(id)
+  else next.add(id)
+  openFAQs.value = next
 }
 </script>
 

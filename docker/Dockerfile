@@ -1,40 +1,23 @@
-# Базовый образ Node.js
-FROM node:25-alpine AS base
-
-# Обновление пакетов Alpine
+# Сборка: Node.js
+FROM node:20-alpine AS base
 RUN apk update && apk upgrade --no-cache
 
-# Установка зависимостей для сборки
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
-
-# Копирование файлов зависимостей
 COPY package.json ./
-RUN npm install
+RUN npm ci
 
-# Сборка приложения
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-# Установка переменных окружения для сборки
 ENV NODE_ENV=production
-
-# Сборка Vite приложения
 RUN npm run build
 
-# Финальный образ для запуска
-FROM base AS runner
-WORKDIR /app
-
-ENV NODE_ENV=production
-
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
-
+# Production: только nginx и статика, без Node
+FROM nginx:alpine AS runner
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 3000
-
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
+CMD ["nginx", "-g", "daemon off;"]

@@ -19,9 +19,8 @@ const isSubmitting = ref(false)
 
 const handleSubmit = async () => {
   isSubmitting.value = true
-  // Здесь будет логика отправки формы
-  console.log('Form submitted:', formData.value)
-  
+  // TODO: подключить отправку формы (backend/API)
+
   // Имитация отправки
   await new Promise(resolve => setTimeout(resolve, 1000))
   

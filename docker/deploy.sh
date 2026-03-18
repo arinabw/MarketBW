@@ -24,6 +24,18 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# Определение команды Docker Compose (v2: "docker compose", v1: "docker-compose")
+set_compose_cmd() {
+    if docker compose version &> /dev/null; then
+        COMPOSE_CMD="docker compose"
+    elif command -v docker-compose &> /dev/null; then
+        COMPOSE_CMD="docker-compose"
+    else
+        log_error "Docker Compose не найден. Установите Docker Compose (или плагин 'docker compose') перед запуском скрипта."
+        exit 1
+    fi
+}
+
 # Проверка наличия Docker
 check_docker() {
     if ! command -v docker &> /dev/null; then
@@ -31,12 +43,8 @@ check_docker() {
         exit 1
     fi
 
-    if ! command -v docker-compose &> /dev/null; then
-        log_error "Docker Compose не установлен. Установите Docker Compose перед запуском скрипта."
-        exit 1
-    fi
-
-    log_info "Docker и Docker Compose установлены"
+    set_compose_cmd
+    log_info "Docker и Docker Compose установлены ($COMPOSE_CMD)"
 }
 
 # Установка сайта
@@ -51,11 +59,11 @@ install() {
 
     # Сборка Docker образа (включая установку зависимостей и сборку)
     log_info "Сборка Docker образа..."
-    docker-compose -p marketbw-stack build
+    $COMPOSE_CMD -p marketbw-stack build
 
     # Запуск контейнера
     log_info "Запуск контейнера..."
-    docker-compose -p marketbw-stack up -d
+    $COMPOSE_CMD -p marketbw-stack up -d
 
     log_info "✅ Сайт успешно установлен и запущен!"
     log_info "Сайт доступен по адресу: http://localhost:3000"
@@ -67,7 +75,7 @@ update() {
 
     # Остановка контейнера
     log_info "Остановка контейнера..."
-    docker-compose -p marketbw-stack down
+    $COMPOSE_CMD -p marketbw-stack down
 
     # Получение последних изменений (если используется git)
     if [ -d "../.git" ]; then
@@ -79,11 +87,11 @@ update() {
 
     # Пересборка Docker образа (включая установку зависимостей и сборку)
     log_info "Пересборка Docker образа..."
-    docker-compose -p marketbw-stack build
+    $COMPOSE_CMD -p marketbw-stack build
 
     # Запуск контейнера
     log_info "Запуск контейнера..."
-    docker-compose -p marketbw-stack up -d
+    $COMPOSE_CMD -p marketbw-stack up -d
 
     log_info "✅ Сайт успешно обновлен и запущен!"
 }
@@ -91,27 +99,27 @@ update() {
 # Перезапуск сайта
 restart() {
     log_info "Перезапуск сайта..."
-    docker-compose -p marketbw-stack restart
+    $COMPOSE_CMD -p marketbw-stack restart
     log_info "✅ Сайт успешно перезапущен!"
 }
 
 # Остановка сайта
 stop() {
     log_info "Остановка сайта..."
-    docker-compose -p marketbw-stack down
+    $COMPOSE_CMD -p marketbw-stack down
     log_info "✅ Сайт успешно остановлен!"
 }
 
 # Просмотр логов
 logs() {
     log_info "Просмотр логов (Ctrl+C для выхода)..."
-    docker-compose -p marketbw-stack logs -f
+    $COMPOSE_CMD -p marketbw-stack logs -f
 }
 
 # Проверка статуса
 status() {
     log_info "Статус контейнеров:"
-    docker-compose -p marketbw-stack ps
+    $COMPOSE_CMD -p marketbw-stack ps
 }
 
 # Очистка (удаление контейнеров и образов)
@@ -120,7 +128,7 @@ clean() {
     read -r response
     if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
         log_info "Остановка и удаление контейнеров..."
-        docker-compose -p marketbw-stack down -v --rmi all
+        $COMPOSE_CMD -p marketbw-stack down -v --rmi all
         log_info "✅ Очистка завершена!"
     else
         log_info "Очистка отменена."
