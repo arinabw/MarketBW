@@ -39,9 +39,10 @@ marketbw/
 ├── lib/                   # Утилиты и данные
 ├── public/                # Статические файлы
 ├── plans/                 # Планирование проекта
-├── Dockerfile             # Docker конфигурация
-├── docker-compose.yml     # Docker Compose конфигурация
-└── deploy.sh              # Скрипт деплоя
+└── docker/                # Docker конфигурация
+    ├── Dockerfile         # Docker конфигурация
+    ├── docker-compose.yml # Docker Compose конфигурация
+    └── deploy.sh          # Скрипт деплоя
 ```
 
 ## 🚀 Быстрый старт
@@ -80,18 +81,23 @@ cd marketbw
 
 ### Продакшн развёртывание с Docker
 
-1. **Первичная установка**
+1. **Переход в папку docker**
+   ```bash
+   cd docker
+   ```
+
+2. **Первичная установка**
    ```bash
    chmod +x deploy.sh
    ./deploy.sh install
    ```
 
-2. **Обновление сайта**
+3. **Обновление сайта**
    ```bash
    ./deploy.sh update
    ```
 
-3. **Другие команды**
+4. **Другие команды**
    ```bash
    ./deploy.sh restart    # Перезапуск
    ./deploy.sh stop       # Остановка

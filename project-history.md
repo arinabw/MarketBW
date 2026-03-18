@@ -24,9 +24,10 @@
 
 ### Реализация (режим Code)
 1. ✅ Создана Docker конфигурация для развёртывания на Ubuntu:
-   - [`Dockerfile`](Dockerfile) - многоэтапная сборка
-   - [`docker-compose.yml`](docker-compose.yml) - конфигурация запуска
-   - [`deploy.sh`](deploy.sh) - скрипт установки/обновления
+   - [`docker/Dockerfile`](docker/Dockerfile) - многоэтапная сборка
+   - [`docker/docker-compose.yml`](docker/docker-compose.yml) - конфигурация запуска
+   - [`docker/deploy.sh`](docker/deploy.sh) - скрипт установки/обновления
+   - Сайт собирается полностью в Docker, без локальной сборки
 
 2. ✅ Инициализирован Next.js проект:
    - [`package.json`](package.json) - зависимости проекта
@@ -70,6 +71,13 @@
 - [`public/images/categories/brooches.jpg`](public/images/categories/brooches.jpg) - Категория брошей
 - [`public/images/products/README.md`](public/images/products/README.md) - Инструкция по изображениям продуктов
 
+### Организация Docker файлов:
+- Docker файлы перемещены в отдельную папку [`docker/`](docker/)
+- [`docker/Dockerfile`](docker/Dockerfile) - многоэтапная сборка
+- [`docker/docker-compose.yml`](docker/docker-compose.yml) - конфигурация запуска
+- [`docker/deploy.sh`](docker/deploy.sh) - скрипт деплоя (сборка происходит в Docker)
+- Обновлена документация с учетом новой структуры
+
 ### Следующие шаги
 1. Установить зависимости (npm install)
 2. Реализовать страницу каталога
@@ -82,6 +90,12 @@
 ### Правила работы (установлено пользователем)
 - Сохранять все выполненные действия в этом файле истории
 - При каждом запуске читать историю нашей работы для контекста
+- Всегда делать после задачи коммит и пуш самостоятельно
+- Вести версию сайта и указывать ее в футере
+- Каждый комментарий к коммиту начинать с версии
+
+### Версии сайта
+- **v1.0.0** - Первоначальная версия сайта с базовым функционалом
 
 ---
 

@@ -11,7 +11,7 @@
 ### 1. Клонирование репозитория
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/arinabw/marketbw.git
 cd marketbw
 ```
 
@@ -53,6 +53,11 @@ npm start
 ```
 
 ### 3. Продакшн-развертывание с Docker
+
+#### Переход в папку docker
+```bash
+cd docker
+```
 
 #### Первичная установка
 ```bash

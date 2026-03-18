@@ -5,6 +5,7 @@ import { Phone, Mail, MapPin, Instagram, Telegram, Vk } from 'lucide-react'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
+  const version = "v1.0.0"
 
   const navigation = [
     { name: 'Главная', href: '/' },
@@ -118,9 +119,14 @@ export function Footer() {
             <p className="text-text-medium text-sm">
               © {currentYear} MarketBW. Все права защищены.
             </p>
-            <p className="text-text-medium text-sm">
-              Создано с ❤️ для ценителей бисерного искусства
-            </p>
+            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-4">
+              <p className="text-text-medium text-sm">
+                Создано с ❤️ для ценителей бисерного искусства
+              </p>
+              <p className="text-text-medium text-xs opacity-75">
+                Версия: {version}
+              </p>
+            </div>
           </div>
         </div>
       </div>

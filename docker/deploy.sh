@@ -44,30 +44,22 @@ install() {
     log_info "Начинаю установку сайта MarketBW..."
 
     # Проверка наличия необходимых файлов
-    if [ ! -f "package.json" ]; then
-        log_error "Файл package.json не найден. Убедитесь, что вы находитесь в корневой директории проекта."
+    if [ ! -f "../package.json" ]; then
+        log_error "Файл package.json не найден. Убедитесь, что вы находитесь в папке docker и проект настроен правильно."
         exit 1
     fi
 
-    # Установка зависимостей
-    log_info "Установка зависимостей..."
-    npm install
-
-    # Сборка проекта
-    log_info "Сборка проекта..."
-    npm run build
-
     # Создание .env файла, если его нет
-    if [ ! -f ".env" ]; then
+    if [ ! -f "../.env" ]; then
         log_warn "Файл .env не найден. Создаю базовый .env файл..."
-        cat > .env << EOF
+        cat > ../.env << EOF
 NODE_ENV=production
 NEXT_PUBLIC_SITE_NAME=MarketBW
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
 EOF
     fi
 
-    # Сборка Docker образа
+    # Сборка Docker образа (включая установку зависимостей и сборку)
     log_info "Сборка Docker образа..."
     docker-compose build
 
@@ -88,20 +80,14 @@ update() {
     docker-compose down
 
     # Получение последних изменений (если используется git)
-    if [ -d ".git" ]; then
+    if [ -d "../.git" ]; then
         log_info "Получение последних изменений из git..."
+        cd ..
         git pull origin main || git pull origin master
+        cd docker
     fi
 
-    # Установка зависимостей
-    log_info "Обновление зависимостей..."
-    npm install
-
-    # Сборка проекта
-    log_info "Пересборка проекта..."
-    npm run build
-
-    # Пересборка Docker образа
+    # Пересборка Docker образа (включая установку зависимостей и сборку)
     log_info "Пересборка Docker образа..."
     docker-compose build
 
