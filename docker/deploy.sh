@@ -133,8 +133,18 @@ update() {
   compose down
 
   if [ -d "$REPO_ROOT/.git" ]; then
-    log_info "git pull..."
-    git -C "$REPO_ROOT" pull origin main || git -C "$REPO_ROOT" pull origin master || true
+    # С auto-update.sh и cron: BRANCH=main|master|… (или GIT_BRANCH)
+    local branch="${GIT_BRANCH:-${BRANCH:-main}}"
+    log_info "git pull origin $branch..."
+    if git -C "$REPO_ROOT" pull origin "$branch"; then
+      :
+    elif [ "$branch" != main ] && git -C "$REPO_ROOT" pull origin main; then
+      log_warn "Ветка $branch недоступна, подтянут main."
+    elif git -C "$REPO_ROOT" pull origin master; then
+      log_warn "Подтянут master."
+    else
+      log_warn "git pull не удался (сеть или конфликт)."
+    fi
   else
     log_warn "Нет .git в $REPO_ROOT — пропускаю git pull."
   fi
