@@ -34,7 +34,7 @@
 
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, #BD7880 0%, #102B1F 50%, #4D0011 100%);
+    background-image: linear-gradient(135deg, #BD7880 0%, #102B1F 50%, #A24C61 100%);
   }
 
   .card-modern {

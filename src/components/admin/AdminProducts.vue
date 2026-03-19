@@ -1,12 +1,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useAdminStore } from '@/stores/useAdminStore'
-import { Plus, Trash2, Edit2, X, Image as ImageIcon } from 'lucide-vue-next'
+import { Plus, Trash2, Edit2, X, Image as ImageIcon, Upload } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
 
 const adminStore = useAdminStore()
 const isModalOpen = ref(false)
 const editingProduct = ref(null)
+const imageInputRef = ref(null)
 const formData = ref({
   name: '',
   description: '',
@@ -109,6 +110,22 @@ const addImage = () => {
   }
 }
 
+const handleImageUpload = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const base64 = e.target.result
+      if (!formData.value.images.includes(base64)) {
+        formData.value.images.push(base64)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+  // Сброс input для возможности загрузки того же файла
+  event.target.value = ''
+}
+
 const removeImage = (index) => {
   formData.value.images.splice(index, 1)
 }
@@ -132,13 +149,13 @@ const removeMaterial = (index) => {
       <div class="container-custom">
         <div class="flex items-center justify-between py-4">
           <div class="flex items-center gap-4">
-            <button @click="$router.back()" class="flex items-center gap-2 text-sm" style="color: #4D0011">
+            <button @click="$router.back()" class="flex items-center gap-2 text-sm" style="color: #A24C61">
               <X class="w-4 h-4" />
               Назад
             </button>
-            <h1 class="text-2xl font-bold" style="color: #4D0011">Товары</h1>
+            <h1 class="text-2xl font-bold" style="color: #A24C61">Товары</h1>
           </div>
-          <button @click="openModal()" class="flex items-center gap-2 text-sm" style="color: #4D0011">
+          <button @click="openModal()" class="flex items-center gap-2 text-sm" style="color: #A24C61">
             <Plus class="w-4 h-4" />
             Добавить товар
           </button>
@@ -148,11 +165,11 @@ const removeMaterial = (index) => {
 
     <!-- Content -->
     <main class="container-custom py-8">
-      <div v-if="adminStore.isLoading" class="text-center py-12" style="color: #4D0011">
+      <div v-if="adminStore.isLoading" class="text-center py-12" style="color: #A24C61">
         Загрузка...
       </div>
 
-      <div v-else-if="adminStore.products.length === 0" class="text-center py-12" style="color: #4D0011">
+      <div v-else-if="adminStore.products.length === 0" class="text-center py-12" style="color: #A24C61">
         Товары не найдены
       </div>
 
@@ -173,14 +190,14 @@ const removeMaterial = (index) => {
               <ImageIcon class="w-12 h-12" style="color: #BD7880" />
             </div>
           </div>
-          <h3 class="font-bold text-lg mb-1" style="color: #4D0011">{{ product.name }}</h3>
+          <h3 class="font-bold text-lg mb-1" style="color: #A24C61">{{ product.name }}</h3>
           <p class="text-sm mb-2" style="color: #611820">{{ product.price }} ₽</p>
           <p class="text-sm mb-4" style="color: #611820">{{ product.category }}</p>
           <div class="flex gap-2">
             <button
               @click="openModal(product)"
               class="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm"
-              style="background-color: #FFD9D9; color: #4D0011"
+              style="background-color: #FFD9D9; color: #A24C61"
             >
               <Edit2 class="w-4 h-4" />
               Редактировать
@@ -201,13 +218,13 @@ const removeMaterial = (index) => {
     <!-- Modal -->
     <div v-if="isModalOpen" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
       <div class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-soft-lg p-6 w-full max-w-2xl my-8 border border-white/20">
-        <h2 class="text-xl font-bold mb-6" style="color: #4D0011">
+        <h2 class="text-xl font-bold mb-6" style="color: #A24C61">
           {{ editingProduct ? 'Редактирование товара' : 'Добавление товара' }}
         </h2>
 
         <form @submit.prevent="handleSubmit" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
           <div>
-            <label class="block text-sm font-medium mb-2" style="color: #4D0011">Название *</label>
+            <label class="block text-sm font-medium mb-2" style="color: #A24C61">Название *</label>
             <input
               v-model="formData.name"
               type="text"
@@ -218,7 +235,7 @@ const removeMaterial = (index) => {
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-2" style="color: #4D0011">Описание *</label>
+            <label class="block text-sm font-medium mb-2" style="color: #A24C61">Описание *</label>
             <textarea
               v-model="formData.description"
               rows="3"
@@ -230,7 +247,7 @@ const removeMaterial = (index) => {
 
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium mb-2" style="color: #4D0011">Цена *</label>
+              <label class="block text-sm font-medium mb-2" style="color: #A24C61">Цена *</label>
               <input
                 v-model.number="formData.price"
                 type="number"
@@ -243,7 +260,7 @@ const removeMaterial = (index) => {
             </div>
 
             <div>
-              <label class="block text-sm font-medium mb-2" style="color: #4D0011">Категория *</label>
+              <label class="block text-sm font-medium mb-2" style="color: #A24C61">Категория *</label>
               <select
                 v-model="formData.category"
                 required
@@ -259,7 +276,7 @@ const removeMaterial = (index) => {
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-2" style="color: #4D0011">Размер</label>
+            <label class="block text-sm font-medium mb-2" style="color: #A24C61">Размер</label>
             <input
               v-model="formData.size"
               type="text"
@@ -269,7 +286,7 @@ const removeMaterial = (index) => {
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-2" style="color: #4D0011">Техника *</label>
+            <label class="block text-sm font-medium mb-2" style="color: #A24C61">Техника *</label>
             <input
               v-model="formData.technique"
               type="text"
@@ -288,7 +305,7 @@ const removeMaterial = (index) => {
                 class="w-5 h-5 rounded"
                 style="accent-color: #BD7880"
               />
-              <label for="inStock" class="text-sm" style="color: #4D0011">В наличии</label>
+              <label for="inStock" class="text-sm" style="color: #A24C61">В наличии</label>
             </div>
 
             <div class="flex items-center gap-2">
@@ -299,22 +316,38 @@ const removeMaterial = (index) => {
                 class="w-5 h-5 rounded"
                 style="accent-color: #BD7880"
               />
-              <label for="featured" class="text-sm" style="color: #4D0011">Хит</label>
+              <label for="featured" class="text-sm" style="color: #A24C61">Хит</label>
             </div>
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-2" style="color: #4D0011">Изображения</label>
+            <label class="block text-sm font-medium mb-2" style="color: #A24C61">Изображения</label>
             <div class="flex gap-2 mb-2">
               <button
                 type="button"
                 @click="addImage"
                 class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm"
-                style="background-color: #FFD9D9; color: #4D0011"
+                style="background-color: #FFD9D9; color: #A24C61"
               >
                 <Plus class="w-4 h-4" />
-                Добавить
+                Добавить URL
               </button>
+              <button
+                type="button"
+                @click="imageInputRef?.click()"
+                class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm"
+                style="background-color: #FFD9D9; color: #A24C61"
+              >
+                <Upload class="w-4 h-4" />
+                Загрузить файл
+              </button>
+              <input
+                ref="imageInputRef"
+                type="file"
+                accept="image/*"
+                class="hidden"
+                @change="handleImageUpload"
+              />
             </div>
             <div class="flex flex-wrap gap-2">
               <div
@@ -336,13 +369,13 @@ const removeMaterial = (index) => {
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-2" style="color: #4D0011">Материалы</label>
+            <label class="block text-sm font-medium mb-2" style="color: #A24C61">Материалы</label>
             <div class="flex gap-2 mb-2">
               <button
                 type="button"
                 @click="addMaterial"
                 class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm"
-                style="background-color: #FFD9D9; color: #4D0011"
+                style="background-color: #FFD9D9; color: #A24C61"
               >
                 <Plus class="w-4 h-4" />
                 Добавить
@@ -353,7 +386,7 @@ const removeMaterial = (index) => {
                 v-for="(mat, index) in formData.materials"
                 :key="index"
                 class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm"
-                style="background-color: #FFD9D9; color: #4D0011"
+                style="background-color: #FFD9D9; color: #A24C61"
               >
                 {{ mat }}
                 <button
@@ -379,7 +412,7 @@ const removeMaterial = (index) => {
             <button
               type="submit"
               class="flex-1 py-3 rounded-lg text-sm"
-              style="background-color: #FFD9D9; color: #4D0011"
+              style="background-color: #FFD9D9; color: #A24C61"
             >
               {{ editingProduct ? 'Сохранить' : 'Добавить' }}
             </button>

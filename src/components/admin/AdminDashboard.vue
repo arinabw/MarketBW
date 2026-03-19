@@ -26,13 +26,13 @@ const handleLogout = () => {
       <div class="container-custom">
         <div class="flex items-center justify-between py-4">
           <div class="flex items-center gap-4">
-            <button @click="router.push('/')" class="flex items-center gap-2 text-sm" style="color: #4D0011">
+            <button @click="router.push('/')" class="flex items-center gap-2 text-sm" style="color: #A24C61">
               <ArrowLeft class="w-4 h-4" />
               На сайт
             </button>
-            <h1 class="text-2xl font-bold" style="color: #4D0011">Панель управления</h1>
+            <h1 class="text-2xl font-bold" style="color: #A24C61">Панель управления</h1>
           </div>
-          <button @click="handleLogout" class="flex items-center gap-2 text-sm" style="color: #4D0011">
+          <button @click="handleLogout" class="flex items-center gap-2 text-sm" style="color: #A24C61">
             <LogOut class="w-4 h-4" />
             Выйти
           </button>
@@ -46,7 +46,7 @@ const handleLogout = () => {
         <div class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-soft p-6 border border-white/20">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm" style="color: #4D0011">Всего товаров</p>
+              <p class="text-sm" style="color: #A24C61">Всего товаров</p>
               <p class="text-3xl font-bold mt-1">{{ adminStore.products.length }}</p>
             </div>
             <div class="p-3 rounded-full" style="background-color: #FFD9D9">
@@ -58,7 +58,7 @@ const handleLogout = () => {
         <div class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-soft p-6 border border-white/20">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm" style="color: #4D0011">Категорий</p>
+              <p class="text-sm" style="color: #A24C61">Категорий</p>
               <p class="text-3xl font-bold mt-1">{{ adminStore.categories.length }}</p>
             </div>
             <div class="p-3 rounded-full" style="background-color: #FFD9D9">
@@ -70,7 +70,7 @@ const handleLogout = () => {
         <div class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-soft p-6 border border-white/20">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm" style="color: #4D0011">Пользователей</p>
+              <p class="text-sm" style="color: #A24C61">Пользователей</p>
               <p class="text-3xl font-bold mt-1">1</p>
             </div>
             <div class="p-3 rounded-full" style="background-color: #FFD9D9">
@@ -83,12 +83,12 @@ const handleLogout = () => {
       <!-- Quick Actions -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-soft p-6 border border-white/20">
-          <h2 class="text-lg font-bold mb-4" style="color: #4D0011">Быстрые действия</h2>
+          <h2 class="text-lg font-bold mb-4" style="color: #A24C61">Быстрые действия</h2>
           <div class="space-y-3">
             <button
               @click="router.push('/admin/categories')"
               class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-surface-50 transition-colors"
-              style="color: #4D0011"
+              style="color: #A24C61"
             >
               <Tag class="w-5 h-5" />
               <span>Управление категориями</span>
@@ -96,7 +96,7 @@ const handleLogout = () => {
             <button
               @click="router.push('/admin/products')"
               class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-surface-50 transition-colors"
-              style="color: #4D0011"
+              style="color: #A24C61"
             >
               <Package class="w-5 h-5" />
               <span>Управление товарами</span>
@@ -105,8 +105,8 @@ const handleLogout = () => {
         </div>
 
         <div class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-soft p-6 border border-white/20">
-          <h2 class="text-lg font-bold mb-4" style="color: #4D0011">Информация</h2>
-          <div class="space-y-3 text-sm" style="color: #4D0011">
+          <h2 class="text-lg font-bold mb-4" style="color: #A24C61">Информация</h2>
+          <div class="space-y-3 text-sm" style="color: #A24C61">
             <p>База данных: SQLite</p>
             <p>Пароль админа: admin123</p>
             <p>Данные хранятся в папке: data/</p>

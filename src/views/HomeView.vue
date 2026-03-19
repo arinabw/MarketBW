@@ -114,6 +114,13 @@ onMounted(async () => {
               </div>
             </div>
           </RouterLink>
+          <!-- Плейсхолдеры для симметрии -->
+          <div
+            v-for="i in (4 - (categories.length % 4)) % 4"
+            :key="`placeholder-${i}`"
+            class="hidden lg:block"
+            aria-hidden="true"
+          ></div>
         </div>
       </div>
     </section>

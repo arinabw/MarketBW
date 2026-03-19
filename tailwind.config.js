@@ -20,7 +20,7 @@ module.exports = {
           700: '#8F4850',
           800: '#783038',
           900: '#611820',
-          950: '#4D0011',
+          950: '#A24C61',
         },
         'accent': {
           50: '#E8F0EA',
@@ -75,7 +75,7 @@ module.exports = {
           950: '#0F1115',
         },
         'text': {
-          primary: '#4D0011',
+          primary: '#A24C61',
           secondary: '#611820',
           muted: '#783038',
           light: '#8F4850',

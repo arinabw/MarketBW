@@ -89,28 +89,6 @@ const handleSubmit = async () => {
                 </div>
               </AppCardContent>
             </AppCard>
-
-            <AppCard class="shadow-card">
-              <AppCardHeader>
-                <AppCardTitle>Режим работы</AppCardTitle>
-              </AppCardHeader>
-              <AppCardContent>
-                <div class="space-y-2">
-                  <div class="flex justify-between py-2 border-b border-surface-100">
-                    <span class="text-text-secondary text-sm">Понедельник — Пятница</span>
-                    <span class="font-semibold text-text-primary text-sm">9:00 — 18:00</span>
-                  </div>
-                  <div class="flex justify-between py-2 border-b border-surface-100">
-                    <span class="text-text-secondary text-sm">Суббота</span>
-                    <span class="font-semibold text-text-primary text-sm">10:00 — 16:00</span>
-                  </div>
-                  <div class="flex justify-between py-2">
-                    <span class="text-text-secondary text-sm">Воскресенье</span>
-                    <span class="font-semibold text-text-primary text-sm">Выходной</span>
-                  </div>
-                </div>
-              </AppCardContent>
-            </AppCard>
           </div>
 
           <!-- Form -->
