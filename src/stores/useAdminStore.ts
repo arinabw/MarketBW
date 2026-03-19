@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import * as db from '@/lib/db'
-import type { Category, Product } from '@/lib/db'
+import type { AdminProductDraft, Category, Product } from '@/lib/catalog-types'
+import * as api from '@/api/admin'
 
 export const useAdminStore = defineStore('admin', () => {
   const categories = ref<Category[]>([])
@@ -10,12 +10,11 @@ export const useAdminStore = defineStore('admin', () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-  // Загрузка категорий
   const loadCategories = async () => {
     isLoading.value = true
     error.value = null
     try {
-      categories.value = db.getCategories()
+      categories.value = await api.getCategories()
     } catch (e) {
       error.value = 'Ошибка загрузки категорий'
       console.error(e)
@@ -24,12 +23,11 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  // Загрузка товаров
   const loadProducts = async () => {
     isLoading.value = true
     error.value = null
     try {
-      products.value = db.getProducts()
+      products.value = await api.getProducts()
     } catch (e) {
       error.value = 'Ошибка загрузки товаров'
       console.error(e)
@@ -38,12 +36,15 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  // Создание категории
   const createCategory = async (category: Category) => {
     isLoading.value = true
     error.value = null
     try {
-      db.createCategory(category)
+      await api.createCategory({
+        name: category.name,
+        description: category.description,
+        image: category.image,
+      })
       await loadCategories()
       return true
     } catch (e) {
@@ -55,12 +56,16 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  // Обновление категории
   const updateCategory = async (id: string, category: Partial<Category>) => {
     isLoading.value = true
     error.value = null
     try {
-      db.updateCategory(id, category)
+      const prev = categories.value.find((c) => c.id === id)
+      await api.updateCategory(id, {
+        name: category.name ?? prev?.name ?? '',
+        description: category.description ?? prev?.description ?? '',
+        image: category.image ?? prev?.image ?? '',
+      })
       await loadCategories()
       return true
     } catch (e) {
@@ -72,12 +77,11 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  // Удаление категории
   const deleteCategory = async (id: string) => {
     isLoading.value = true
     error.value = null
     try {
-      db.deleteCategory(id)
+      await api.deleteCategory(id)
       await loadCategories()
       return true
     } catch (e) {
@@ -89,12 +93,22 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  // Создание товара
-  const createProduct = async (product: Product) => {
+  const createProduct = async (product: AdminProductDraft) => {
     isLoading.value = true
     error.value = null
     try {
-      db.createProduct(product)
+      await api.createProduct({
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        category: product.category,
+        images: product.images,
+        materials: product.materials,
+        size: product.size,
+        technique: product.technique,
+        inStock: product.inStock,
+        featured: product.featured,
+      })
       await loadProducts()
       return true
     } catch (e) {
@@ -106,12 +120,27 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  // Обновление товара
-  const updateProduct = async (id: string, product: Partial<Product>) => {
+  const updateProduct = async (id: string, product: Partial<AdminProductDraft>) => {
     isLoading.value = true
     error.value = null
     try {
-      db.updateProduct(id, product)
+      const prev = products.value.find((p) => p.id === id)
+      if (!prev) {
+        error.value = 'Товар не найден'
+        return false
+      }
+      await api.updateProduct(id, {
+        name: product.name ?? prev.name,
+        description: product.description ?? prev.description,
+        price: product.price ?? prev.price,
+        category: product.category ?? prev.category,
+        images: product.images ?? prev.images,
+        materials: product.materials ?? prev.materials,
+        size: product.size ?? prev.size,
+        technique: product.technique ?? prev.technique,
+        inStock: product.inStock ?? prev.in_stock,
+        featured: product.featured ?? prev.featured,
+      })
       await loadProducts()
       return true
     } catch (e) {
@@ -123,12 +152,11 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  // Удаление товара
   const deleteProduct = async (id: string) => {
     isLoading.value = true
     error.value = null
     try {
-      db.deleteProduct(id)
+      await api.deleteProduct(id)
       await loadProducts()
       return true
     } catch (e) {
@@ -140,21 +168,19 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  // Аутентификация
   const login = async (username: string, password: string) => {
     isLoading.value = true
     error.value = null
     try {
-      const success = db.authenticateUser(username, password)
-      if (success) {
+      const data = await api.login(username, password)
+      if (data?.success) {
         isAuthenticated.value = true
         return true
-      } else {
-        error.value = 'Неверный логин или пароль'
-        return false
       }
+      error.value = 'Неверный логин или пароль'
+      return false
     } catch (e) {
-      error.value = 'Ошибка аутентификации'
+      error.value = 'Неверный логин или пароль'
       console.error(e)
       return false
     } finally {
@@ -162,10 +188,10 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  // Выход
   const logout = () => {
     isAuthenticated.value = false
     error.value = null
+    void api.logout()
   }
 
   return {

@@ -9,6 +9,7 @@ server-build/
 # env
 .env
 .env*.local
+docker/.env
 
 # database
 data/

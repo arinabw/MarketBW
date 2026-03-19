@@ -1,6 +1,7 @@
 import Database from 'better-sqlite3'
 import path from 'path'
 import fs from 'fs'
+import type { Category, Product, User } from './catalog-types.js'
 
 const DB_DIR = path.join(process.cwd(), 'data')
 const DB_PATH = path.join(DB_DIR, 'marketbw.db')
@@ -52,35 +53,7 @@ if (!adminUser) {
     .run('1', 'admin', 'admin123')
 }
 
-export interface Category {
-  id: string
-  name: string
-  description: string
-  image: string
-  created_at: string
-}
-
-export interface Product {
-  id: string
-  name: string
-  description: string
-  price: number
-  category: string
-  images: string[]
-  materials: string[]
-  size?: string
-  technique: string
-  in_stock: boolean
-  featured: boolean
-  created_at: string
-}
-
-export interface User {
-  id: string
-  username: string
-  password_hash: string
-  created_at: string
-}
+export type { Category, Product, User } from './catalog-types.js'
 
 // Категории
 export const getCategories = (): Category[] => {

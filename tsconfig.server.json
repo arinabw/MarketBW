@@ -10,5 +10,5 @@
     "esModuleInterop": true,
     "declaration": false
   },
-  "include": ["src/lib/db.ts"]
+  "include": ["src/lib/db.ts", "src/lib/catalog-types.ts"]
 }
