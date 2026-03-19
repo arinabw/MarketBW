@@ -1,8 +1,12 @@
+const path = require('path')
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  // Пути от каталога конфига: при `cd frontend && vite build` cwd ≠ корень репо,
+  // относительные ./src не находятся в Docker — контент пустой и @apply падает.
   content: [
-    './index.html',
-    './src/**/*.{vue,js}',
+    path.join(__dirname, 'index.html'),
+    path.join(__dirname, 'src', '**', '*.{vue,js}'),
   ],
   theme: {
     extend: {
