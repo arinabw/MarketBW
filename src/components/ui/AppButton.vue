@@ -19,16 +19,16 @@ const sizes: Record<string, string> = {
 }
 
 const variants: Record<string, string> = {
-  default: 'bg-gradient-to-r from-primary-500 to-primary-400 text-white shadow-glow hover:shadow-glow-lg hover:-translate-y-0.5',
-  premium: 'bg-gradient-to-r from-primary-500 to-primary-400 text-white shadow-glow hover:shadow-glow-lg hover:-translate-y-0.5',
-  modern: 'bg-gradient-to-r from-primary-500 to-accent-500 text-white shadow-glow hover:shadow-glow-lg hover:-translate-y-0.5',
-  outline: 'border-2 border-primary-400 text-primary-600 hover:bg-primary-50 hover:shadow-glow',
-  secondary: 'bg-white text-primary-700 hover:bg-surface-50 shadow-soft hover:shadow-soft-lg',
-  ghost: 'hover:bg-surface-100 text-text-secondary',
+  default: 'bg-primary-500/80 backdrop-blur-xl text-white border border-white/20 shadow-glow hover:shadow-glow-lg hover:-translate-y-0.5 hover:bg-primary-500/90',
+  premium: 'bg-gradient-to-r from-primary-500/90 to-accent-500/90 backdrop-blur-xl text-white border border-white/20 shadow-glow hover:shadow-glow-lg hover:-translate-y-0.5',
+  modern: 'bg-gradient-to-r from-primary-500/80 to-accent-500/80 backdrop-blur-xl text-white border border-white/20 shadow-glow hover:shadow-glow-lg hover:-translate-y-0.5',
+  outline: 'bg-white/60 backdrop-blur-xl border-2 border-primary-400/60 text-primary-600 hover:bg-primary-50/80 hover:shadow-glow hover:border-primary-500',
+  secondary: 'bg-white/70 backdrop-blur-xl text-primary-700 border border-white/30 hover:bg-surface-50/80 shadow-soft hover:shadow-soft-lg',
+  ghost: 'bg-transparent hover:bg-surface-100/60 backdrop-blur-sm text-text-secondary',
 }
 
 const buttonClass = computed(() => {
-  const base = 'inline-flex items-center justify-center font-medium transition-all duration-300 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200'
+  const base = 'inline-flex items-center justify-center font-medium transition-all duration-300 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-200/50 backdrop-blur-xl'
   return `${base} ${sizes[props.size]} ${variants[props.variant]}`
 })
 </script>

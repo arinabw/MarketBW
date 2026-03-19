@@ -9,7 +9,7 @@
     @apply border-surface-200;
   }
   body {
-    @apply bg-[#FDFBF8] text-text-primary antialiased;
+    @apply bg-[#FFD9D9] text-text-primary antialiased;
     font-family: 'Lato', system-ui, sans-serif;
     min-height: 100vh;
   }
@@ -34,7 +34,7 @@
 
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, #C0822A 0%, #D99A36 50%, #C1854E 100%);
+    background-image: linear-gradient(135deg, #BD7880 0%, #102B1F 50%, #4D0011 100%);
   }
 
   .card-modern {
