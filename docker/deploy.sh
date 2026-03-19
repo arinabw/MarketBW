@@ -1,180 +1,224 @@
 #!/bin/bash
+#
+# Установка и обновление MarketBW на сервере с Traefik (idpro1313/webserver).
+# Запускать на Linux: из каталога docker/ или из любого места: /opt/MarketBW/docker/deploy.sh install
+#
+# Использование:
+#   ./deploy.sh install              # первый запуск (проверка сети web)
+#   ./deploy.sh update               # git pull + build + up
+#   ./deploy.sh update --no-cache    # то же, сборка без кэша
+#   ./deploy.sh rebuild              # build --no-cache + up (без git)
+#   ./deploy.sh restart|stop|logs|status|clean
 
-# Скрипт установки и обновления сайта MarketBW
-# Использование: ./deploy.sh [install|update|restart|stop|logs]
+set -euo pipefail
 
-set -e
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$SCRIPT_DIR"
 
-# Цвета для вывода
+# Не используем source .env — в TRAEFIK_RULE бывают обратные кавычки Host(`domain`),
+# bash интерпретирует их как command substitution. Docker Compose читает .env сам.
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Функция для вывода сообщений
-log_info() {
-    echo -e "${GREEN}[INFO]${NC} $1"
-}
+log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
+log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
-
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Определение команды Docker Compose (v2: "docker compose", v1: "docker-compose")
 set_compose_cmd() {
-    if docker compose version &> /dev/null; then
-        COMPOSE_CMD="docker compose"
-    elif command -v docker-compose &> /dev/null; then
-        COMPOSE_CMD="docker-compose"
-    else
-        log_error "Docker Compose не найден. Установите Docker Compose (или плагин 'docker compose') перед запуском скрипта."
-        exit 1
-    fi
+  if docker compose version &> /dev/null; then
+    COMPOSE_CMD=(docker compose)
+  elif command -v docker-compose &> /dev/null; then
+    COMPOSE_CMD=(docker-compose)
+  else
+    log_error "Docker Compose не найден. Установите плагин «docker compose»."
+    exit 1
+  fi
 }
 
-# Проверка наличия Docker
+# Безопасное чтение KEY=value (без source .env — в других строках могут быть Host(`...`))
+compose_env_get() {
+  local key="$1"
+  local def="${2:-}"
+  [ ! -f .env ] && echo "$def" && return
+  local line=""
+  if grep -q -E "^[[:space:]]*${key}=" .env 2>/dev/null; then
+    line="$(grep -E "^[[:space:]]*${key}=" .env | tail -n1)"
+  fi
+  [ -z "$line" ] && echo "$def" && return
+  local val="${line#*=}"
+  val="${val%%#*}"
+  val="$(printf '%s' "$val" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+  val="${val#\"}"
+  val="${val%\"}"
+  val="${val#\'}"
+  val="${val%\'}"
+  [ -z "$val" ] && echo "$def" || printf '%s' "$val"
+}
+
+compose() {
+  local proj
+  proj="$(compose_env_get COMPOSE_PROJECT_NAME marketbw-stack)"
+  "${COMPOSE_CMD[@]}" -p "$proj" -f "$SCRIPT_DIR/docker-compose.yml" "$@"
+}
+
 check_docker() {
-    if ! command -v docker &> /dev/null; then
-        log_error "Docker не установлен. Установите Docker перед запуском скрипта."
-        exit 1
-    fi
-
-    set_compose_cmd
-    log_info "Docker и Docker Compose установлены ($COMPOSE_CMD)"
+  if ! command -v docker &> /dev/null; then
+    log_error "Docker не установлен."
+    exit 1
+  fi
+  set_compose_cmd
+  log_info "Compose: ${COMPOSE_CMD[*]}"
 }
 
-# Установка сайта
+# Сеть, к которой подключён Traefik (как в https://github.com/idpro1313/webserver )
+check_traefik_network() {
+  local net
+  net="$(compose_env_get TRAEFIK_NETWORK web)"
+  if ! docker network inspect "$net" &>/dev/null; then
+    log_error "Docker-сеть «$net» не найдена. Traefik из webserver обычно использует сеть web."
+    log_error "Создайте: docker network create web"
+    log_error "Или задайте TRAEFIK_NETWORK в docker/.env под вашу сеть."
+    exit 1
+  fi
+  log_info "Сеть «$net» найдена."
+}
+
+require_env_file() {
+  if [ ! -f ".env" ]; then
+    log_error "Нет файла docker/.env"
+    log_info "Скопируйте: cp $SCRIPT_DIR/env.example $SCRIPT_DIR/.env и задайте TRAEFIK_RULE, SITE_CONTAINER_NAME, TRAEFIK_ROUTER."
+    exit 1
+  fi
+}
+
+require_package_json() {
+  if [ ! -f "$REPO_ROOT/package.json" ]; then
+    log_error "Не найден $REPO_ROOT/package.json — запускайте скрипт из репозитория MarketBW (каталог docker/ внутри проекта)."
+    exit 1
+  fi
+}
+
 install() {
-    log_info "Начинаю установку сайта MarketBW..."
+  log_info "Установка MarketBW (Traefik / webserver)..."
+  require_package_json
+  require_env_file
+  check_traefik_network
 
-    # Проверка наличия необходимых файлов
-    if [ ! -f "../package.json" ]; then
-        log_error "Файл package.json не найден. Убедитесь, что вы находитесь в папке docker и проект настроен правильно."
-        exit 1
-    fi
+  log_info "Сборка образа..."
+  compose build
 
-    # Сборка Docker образа (включая установку зависимостей и сборку)
-    log_info "Сборка Docker образа..."
-    $COMPOSE_CMD -p marketbw-stack build
+  log_info "Запуск контейнера..."
+  compose up -d
 
-    # Запуск контейнера
-    log_info "Запуск контейнера..."
-    $COMPOSE_CMD -p marketbw-stack up -d
-
-    log_info "✅ Сайт успешно установлен и запущен!"
-    log_info "Сайт доступен по адресу: http://localhost:3000"
+  log_info "Готово. DNS (A) на IP сервера; HTTPS через Traefik (resolver le, entrypoint websecure по умолчанию)."
 }
 
-# Обновление сайта
 update() {
-    log_info "Начинаю обновление сайта MarketBW..."
+  local no_cache=""
+  if [ "${2:-}" = "--no-cache" ] || [ "${1:-}" = "--no-cache" ]; then
+    no_cache="--no-cache"
+  fi
 
-    # Остановка контейнера
-    log_info "Остановка контейнера..."
-    $COMPOSE_CMD -p marketbw-stack down
+  log_info "Обновление MarketBW..."
+  require_env_file
 
-    # Получение последних изменений (если используется git)
-    if [ -d "../.git" ]; then
-        log_info "Получение последних изменений из git..."
-        cd ..
-        git pull origin main || git pull origin master
-        cd docker
-    fi
+  log_info "Остановка контейнера..."
+  compose down
 
-    # Пересборка Docker образа (включая установку зависимостей и сборку)
-    log_info "Пересборка Docker образа..."
-    $COMPOSE_CMD -p marketbw-stack build
+  if [ -d "$REPO_ROOT/.git" ]; then
+    log_info "git pull..."
+    git -C "$REPO_ROOT" pull origin main || git -C "$REPO_ROOT" pull origin master || true
+  else
+    log_warn "Нет .git в $REPO_ROOT — пропускаю git pull."
+  fi
 
-    # Запуск контейнера
-    log_info "Запуск контейнера..."
-    $COMPOSE_CMD -p marketbw-stack up -d
+  log_info "Сборка образа${no_cache:+ (без кэша)}..."
+  if [ -n "$no_cache" ]; then
+    compose build --no-cache
+  else
+    compose build
+  fi
 
-    log_info "✅ Сайт успешно обновлен и запущен!"
+  log_info "Запуск..."
+  compose up -d
+
+  log_info "Обновление завершено."
 }
 
-# Перезапуск сайта
+rebuild() {
+  log_info "Пересборка без git pull..."
+  require_env_file
+  compose build --no-cache
+  compose up -d
+  log_info "Готово."
+}
+
 restart() {
-    log_info "Перезапуск сайта..."
-    $COMPOSE_CMD -p marketbw-stack restart
-    log_info "✅ Сайт успешно перезапущен!"
+  require_env_file
+  log_info "Перезапуск..."
+  compose restart
+  log_info "Готово."
 }
 
-# Остановка сайта
 stop() {
-    log_info "Остановка сайта..."
-    $COMPOSE_CMD -p marketbw-stack down
-    log_info "✅ Сайт успешно остановлен!"
+  require_env_file
+  compose down
+  log_info "Остановлено."
 }
 
-# Просмотр логов
 logs() {
-    log_info "Просмотр логов (Ctrl+C для выхода)..."
-    $COMPOSE_CMD -p marketbw-stack logs -f
+  require_env_file
+  compose logs -f
 }
 
-# Проверка статуса
 status() {
-    log_info "Статус контейнеров:"
-    $COMPOSE_CMD -p marketbw-stack ps
+  require_env_file
+  compose ps
 }
 
-# Очистка (удаление контейнеров и образов; внешняя сеть docker_static-net не удаляется)
 clean() {
-    log_warn "Это действие удалит контейнеры и образы MarketBW. Внешняя сеть docker_static-net не затрагивается. Продолжить? (y/n)"
-    read -r response
-    if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-        log_info "Остановка и удаление контейнеров и образов..."
-        $COMPOSE_CMD -p marketbw-stack down -v --rmi all
-        log_info "✅ Очистка завершена!"
-    else
-        log_info "Очистка отменена."
-    fi
+  require_env_file
+  local proj
+  proj="$(compose_env_get COMPOSE_PROJECT_NAME marketbw-stack)"
+  log_warn "Удалить контейнеры и образы проекта $proj? Сеть Traefik не трогаем. (y/n)"
+  read -r response
+  if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+    compose down -v --rmi all
+    log_info "Очистка выполнена."
+  else
+    log_info "Отменено."
+  fi
 }
 
-# Главное меню
-main() {
-    check_docker
+usage() {
+  echo "Использование: $0 {install|update|update --no-cache|rebuild|restart|stop|logs|status|clean}"
+  echo ""
+  echo "  install          — первая установка (проверка сети Traefik)"
+  echo "  update           — git pull + build + up"
+  echo "  update --no-cache — как update, с docker compose build --no-cache"
+  echo "  rebuild          — build --no-cache + up без git"
+  echo "  restart|stop|logs|status|clean"
+  echo ""
+  echo "Корень репозитория: $REPO_ROOT"
+  echo "Документация хостинга: https://github.com/idpro1313/webserver"
+}
 
-    case "${1:-}" in
-        install)
-            install
-            ;;
-        update)
-            update
-            ;;
-        restart)
-            restart
-            ;;
-        stop)
-            stop
-            ;;
-        logs)
-            logs
-            ;;
-        status)
-            status
-            ;;
-        clean)
-            clean
-            ;;
-        *)
-            echo "Использование: $0 {install|update|restart|stop|logs|status|clean}"
-            echo ""
-            echo "Команды:"
-            echo "  install  - Первичная установка сайта"
-            echo "  update   - Обновление сайта"
-            echo "  restart  - Перезапуск сайта"
-            echo "  stop     - Остановка сайта"
-            echo "  logs     - Просмотр логов"
-            echo "  status   - Проверка статуса"
-            echo "  clean    - Полная очистка (удаление контейнеров и образов)"
-            exit 1
-            ;;
-    esac
+main() {
+  check_docker
+  case "${1:-}" in
+    install) install ;;
+    update) update "$@" ;;
+    rebuild) rebuild ;;
+    restart) restart ;;
+    stop) stop ;;
+    logs) logs ;;
+    status) status ;;
+    clean) clean ;;
+    *) usage; exit 1 ;;
+  esac
 }
 
 main "$@"

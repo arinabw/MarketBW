@@ -1,20 +1,30 @@
+# Деплой за Traefik (как templates/node-site в https://github.com/idpro1313/webserver ).
+# Сеть web должна существовать (docker network create web — делает start-hosting.sh).
+# Перед запуском: cp env.example .env
+
 services:
   marketbw:
-    container_name: marketbw-app
+    container_name: ${SITE_CONTAINER_NAME:-marketbw-app}
     build:
       context: ..
       dockerfile: docker/Dockerfile
+    image: ${MARKETBW_IMAGE_NAME:-marketbw-local}
     restart: unless-stopped
     networks:
-      - marketbw-stack-net
-      - docker_static-net
+      - web
     volumes:
       - ../data:/app/data
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=${TRAEFIK_NETWORK:-web}
+      # Правило в кавычках — как в шаблоне webserver (корректно для Host(`...`) в .env)
+      - "traefik.http.routers.${TRAEFIK_ROUTER:-marketbw}.rule=${TRAEFIK_RULE}"
+      - traefik.http.routers.${TRAEFIK_ROUTER:-marketbw}.service=${TRAEFIK_ROUTER:-marketbw}
+      - traefik.http.routers.${TRAEFIK_ROUTER:-marketbw}.entrypoints=${TRAEFIK_HTTPS_ENTRYPOINT:-websecure}
+      - traefik.http.routers.${TRAEFIK_ROUTER:-marketbw}.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-le}
+      - traefik.http.services.${TRAEFIK_ROUTER:-marketbw}.loadbalancer.server.port=80
 
 networks:
-  marketbw-stack-net:
-    driver: bridge
-    name: marketbw-stack-net
-  # Внешняя сеть Caddy — не создаётся и не удаляется этим проектом
-  docker_static-net:
+  web:
     external: true
+    name: ${TRAEFIK_NETWORK:-web}

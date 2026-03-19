@@ -2,11 +2,11 @@
 FROM node:20-alpine AS base
 RUN apk update && apk upgrade --no-cache
 
+# Зависимости (better-sqlite3 — нативный модуль, нужны build tools)
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat python3 make g++
 WORKDIR /app
 COPY package.json ./
-# Без package-lock.json используем npm install (для npm ci добавьте lock-файл в репозиторий)
 RUN npm install
 
 FROM base AS builder
@@ -14,28 +14,29 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NODE_ENV=production
-RUN npm run build
+RUN npm run build && npm run build:server
 
-# Production: Node.js сервер + nginx
+# Production node_modules (без devDependencies)
+FROM base AS prod-deps
+RUN apk add --no-cache python3 make g++
+WORKDIR /app
+COPY package.json ./
+RUN npm install --omit=dev && apk del python3 make g++
+
+# Production: Node.js API + nginx
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Устанавливаем зависимости для админ-сервера
-RUN apk add --no-cache curl
+RUN apk add --no-cache nginx curl
 
-# Копируем админ-сервер
+COPY --from=prod-deps /app/node_modules ./node_modules
 COPY server.js ./
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/server-build ./server-build
 
-# Создаем директорию для БД
 RUN mkdir -p /app/data
 
-# Копируем статический сайт
-COPY --from=builder /app/dist /app/dist
-
-# Копируем конфигурацию nginx
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
-
-# Копируем скрипт запуска
 COPY docker/start.sh /start.sh
 RUN chmod +x /start.sh
 
