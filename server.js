@@ -163,6 +163,13 @@ app.post('/api/logout', (req, res) => {
   res.json({ success: true })
 })
 
+// Админка — тот же Vue SPA (маршрут /admin в router); nginx проксирует сюда
+// Не использовать префикс /admin.* — иначе совпадёт /administrator
+const adminIndex = path.join(__dirname, 'dist', 'index.html')
+app.get(/^\/admin(?:\/.*)?$/, (req, res) => {
+  res.sendFile(adminIndex)
+})
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Admin server running on port ${PORT}`)
