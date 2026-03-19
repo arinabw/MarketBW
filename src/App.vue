@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
+import YandexMetrika from '@/components/YandexMetrika.vue'
 </script>
 
 <template>
   <div id="app">
+    <YandexMetrika />
     <AppHeader />
     <main>
       <RouterView />

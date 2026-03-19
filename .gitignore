@@ -10,6 +10,9 @@ server-build/
 .env
 .env*.local
 
+# database
+data/
+
 # IDE
 .vscode/
 .idea/
