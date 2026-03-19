@@ -33,6 +33,8 @@ npm install
 npm run dev
 ```
 
+Контакты и название сайта — в **`src/lib/env.ts`**. Запросы админки к API идут на **`/api`** (см. `src/api/admin.ts`); отдельный `.env` в корне не нужен. Для сервера Traefik по-прежнему **`docker/.env`** из `docker/env.example`.
+
 ## Деплой на сервер (Traefik уже установлен)
 
 Инфраструктура — репозиторий **[webserver](https://github.com/idpro1313/webserver)**: сеть Docker **`web`**, resolver **`le`**, HTTPS entrypoint обычно **`websecure`** (как в шаблоне `templates/node-site`).
