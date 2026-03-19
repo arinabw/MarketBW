@@ -16,9 +16,28 @@ COPY . .
 ENV NODE_ENV=production
 RUN npm run build
 
-# Production: только nginx и статика, без Node
-FROM nginx:alpine AS runner
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Production: Node.js сервер + nginx
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+# Устанавливаем зависимости для админ-сервера
+RUN apk add --no-cache curl
+
+# Копируем админ-сервер
+COPY server.js ./
+
+# Создаем директорию для БД
+RUN mkdir -p /app/data
+
+# Копируем статический сайт
+COPY --from=builder /app/dist /app/dist
+
+# Копируем конфигурацию nginx
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 3000
-CMD ["nginx", "-g", "daemon off;"]
+
+# Копируем скрипт запуска
+COPY docker/start.sh /start.sh
+RUN chmod +x /start.sh
+
+EXPOSE 80
+CMD ["/start.sh"]

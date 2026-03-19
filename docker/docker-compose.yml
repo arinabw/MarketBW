@@ -8,6 +8,8 @@ services:
     networks:
       - marketbw-stack-net
       - docker_static-net
+    volumes:
+      - ../data:/app/data
 
 networks:
   marketbw-stack-net:
