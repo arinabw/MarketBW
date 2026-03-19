@@ -163,15 +163,6 @@ app.post('/api/logout', (req, res) => {
   res.json({ success: true })
 })
 
-// Serve admin panel
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'))
-})
-
-app.get('/admin/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'))
-})
-
 // Start server
 app.listen(PORT, () => {
   console.log(`Admin server running on port ${PORT}`)

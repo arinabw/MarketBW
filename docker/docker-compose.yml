@@ -7,7 +7,6 @@ services:
     restart: unless-stopped
     networks:
       - marketbw-stack-net
-      - docker_static-net
     volumes:
       - ../data:/app/data
 
@@ -15,6 +14,3 @@ networks:
   marketbw-stack-net:
     driver: bridge
     name: marketbw-stack-net
-  # Внешняя сеть Caddy — не создаётся и не удаляется этим проектом
-  docker_static-net:
-    external: true

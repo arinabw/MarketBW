@@ -9,6 +9,9 @@ dist/
 .env
 .env*.local
 
+# database
+data/
+
 # IDE
 .vscode/
 .idea/
