@@ -18,6 +18,10 @@ COPY public ./public
 COPY tailwind.config.js postcss.config.cjs tsconfig.json env.d.ts ./
 COPY frontend/vite.config.ts frontend/tsconfig.node.json ./frontend/
 
+# Vite root = /build (родитель frontend/), а npm install — в frontend/node_modules.
+# Без ссылки Rollup не находит vue и т.д. при разрешении импортов из /build/src.
+RUN ln -sfn /build/frontend/node_modules /build/node_modules
+
 ENV NODE_ENV=production
 RUN echo "[build-time] frontend: vite build START $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
     && cd frontend && npm run build \
