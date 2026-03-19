@@ -4,7 +4,7 @@
 
 ## Стек
 
-- **Vue 3** + TypeScript + Vite
+- **Vue 3** + JavaScript + Vite
 - **Tailwind CSS** с кастомной палитрой (primary/accent/surface)
 - **Lucide** иконки
 - **Pinia** для состояния
@@ -13,15 +13,15 @@
 ## Структура
 
 ```
-src/                # Vue (корень репозитория — root для Vite в frontend/vite.config.ts)
+src/                # Vue + JS (корень репозитория — root для Vite в frontend/vite.config.js)
 ├── views/          # Страницы (Home, Catalog, Product, Contact, FAQ)
 ├── components/
 ├── router/
 ├── stores/
 ├── api/            # клиенты /api
-├── lib/            # env.ts, utils.ts, catalog-types.ts (контент — API / SQLite)
+├── lib/            # env.js, utils.js
 └── styles/
-frontend/           # package.json, vite.config.ts, lockfile — npm install здесь
+frontend/           # package.json, vite.config.js, lockfile — npm install здесь
 backend/app/        # FastAPI: main.py, database.py
 docker/             # Dockerfile, compose, deploy.sh
 data/               # SQLite на сервере (том ../data из compose)
@@ -44,7 +44,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-Контакты и название сайта — в **`src/lib/env.ts`**. Запросы к API — **`/api`** (см. `src/api/`). Для сервера Traefik — **`docker/.env`** из `docker/env.example`; в compose для сервиса указан порт **8000**.
+Контакты и название сайта — в **`src/lib/env.js`**. Запросы к API — **`/api`** (см. `src/api/`). Для сервера Traefik — **`docker/.env`** из `docker/env.example`; в compose для сервиса указан порт **8000**.
 
 ## Деплой на сервер (Traefik уже установлен)
 
@@ -163,4 +163,4 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
 
 ## Конфигурация сайта
 
-Контакты и параметры — `src/lib/env.ts`.
+Контакты и параметры — `src/lib/env.js`.

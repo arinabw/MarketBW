@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { ArrowRight, Heart } from 'lucide-vue-next'
@@ -8,8 +8,8 @@ import { formatPrice } from '@/lib/utils'
 
 const route = useRoute()
 
-const products = ref<any[]>([])
-const categories = ref<any[]>([])
+const products = ref([])
+const categories = ref([])
 const isLoading = ref(true)
 
 const loadData = async () => {
@@ -33,7 +33,7 @@ onMounted(() => {
   loadData()
 })
 
-const selectedCategory = computed(() => route.query.category as string | undefined)
+const selectedCategory = computed(() => route.query.category)
 
 const filteredProducts = computed(() => {
   if (!selectedCategory.value) return products.value

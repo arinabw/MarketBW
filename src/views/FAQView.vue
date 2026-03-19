@@ -1,13 +1,12 @@
-<script setup lang="ts">
+<script setup>
 import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { ChevronDown, ArrowRight } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
 import { getFaqs } from '@/api/public'
-import type { FAQ } from '@/lib/catalog-types'
 
-const selectedCategory = ref<string>('all')
-const faqs = ref<FAQ[]>([])
+const selectedCategory = ref('all')
+const faqs = ref([])
 
 const categoryOptions = [
   { id: 'all', name: 'Все вопросы' },
@@ -31,9 +30,9 @@ onMounted(async () => {
   }
 })
 
-const openFAQs = ref<Set<string>>(new Set())
+const openFAQs = ref(new Set())
 
-const toggleFAQ = (id: string) => {
+const toggleFAQ = (id) => {
   const next = new Set(openFAQs.value)
   if (next.has(id)) next.delete(id)
   else next.add(id)

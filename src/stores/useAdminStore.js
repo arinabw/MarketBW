@@ -1,14 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { AdminProductDraft, Category, Product } from '@/lib/catalog-types'
 import * as api from '@/api/admin'
 
 export const useAdminStore = defineStore('admin', () => {
-  const categories = ref<Category[]>([])
-  const products = ref<Product[]>([])
+  const categories = ref([])
+  const products = ref([])
   const isAuthenticated = ref(false)
   const isLoading = ref(false)
-  const error = ref<string | null>(null)
+  const error = ref(null)
 
   const loadCategories = async () => {
     isLoading.value = true
@@ -36,7 +35,7 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  const createCategory = async (category: Category) => {
+  const createCategory = async (category) => {
     isLoading.value = true
     error.value = null
     try {
@@ -56,7 +55,7 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  const updateCategory = async (id: string, category: Partial<Category>) => {
+  const updateCategory = async (id, category) => {
     isLoading.value = true
     error.value = null
     try {
@@ -77,7 +76,7 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  const deleteCategory = async (id: string) => {
+  const deleteCategory = async (id) => {
     isLoading.value = true
     error.value = null
     try {
@@ -93,7 +92,7 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  const createProduct = async (product: AdminProductDraft) => {
+  const createProduct = async (product) => {
     isLoading.value = true
     error.value = null
     try {
@@ -120,7 +119,7 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  const updateProduct = async (id: string, product: Partial<AdminProductDraft>) => {
+  const updateProduct = async (id, product) => {
     isLoading.value = true
     error.value = null
     try {
@@ -152,7 +151,7 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  const deleteProduct = async (id: string) => {
+  const deleteProduct = async (id) => {
     isLoading.value = true
     error.value = null
     try {
@@ -168,7 +167,7 @@ export const useAdminStore = defineStore('admin', () => {
     }
   }
 
-  const login = async (username: string, password: string) => {
+  const login = async (username, password) => {
     isLoading.value = true
     error.value = null
     try {

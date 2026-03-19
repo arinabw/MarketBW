@@ -5,7 +5,7 @@
 
 ## Технологии
 - **База данных**: SQLite
-- **Фронтенд**: Vue 3 + TypeScript + Vite
+- **Фронтенд**: Vue 3 + JavaScript + Vite
 - **Состояние**: Pinia
 - **API**: FastAPI (Python) + uvicorn
 - **Контейнеризация**: Docker — **один** контейнер (сборка фронта в Node, рантайм Python + раздача `dist`)
@@ -15,7 +15,7 @@
 ```
 src/
 ├── api/
-│   └── admin.ts          # API клиент для админ-панели
+│   └── admin.js          # API клиент для админ-панели
 ├── components/
 │   └── admin/
 │       ├── AdminLogin.vue     # Форма входа
@@ -25,9 +25,9 @@ src/
 ├── views/
 │   └── AdminView.vue          # Главный компонент админ-панели
 ├── stores/
-│   └── useAdminStore.ts       # Pinia store для админ-данных
+│   └── useAdminStore.js       # Pinia store для админ-данных
 └── lib/
-    └── catalog-types.ts      # Типы каталога (фронт)
+    └── env.js, utils.js
 
 backend/
 └── app/

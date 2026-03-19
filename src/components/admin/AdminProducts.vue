@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useAdminStore } from '@/stores/useAdminStore'
 import { Plus, Trash2, Edit2, X, Image as ImageIcon } from 'lucide-vue-next'
@@ -6,14 +6,14 @@ import AppButton from '@/components/ui/AppButton.vue'
 
 const adminStore = useAdminStore()
 const isModalOpen = ref(false)
-const editingProduct = ref<any>(null)
+const editingProduct = ref(null)
 const formData = ref({
   name: '',
   description: '',
   price: 0,
   category: '',
-  images: [] as string[],
-  materials: [] as string[],
+  images: [],
+  materials: [],
   size: '',
   technique: '',
   inStock: true,
@@ -24,7 +24,7 @@ onMounted(async () => {
   await adminStore.loadProducts()
 })
 
-const openModal = (product?: any) => {
+const openModal = (product) => {
   if (product) {
     editingProduct.value = product
     formData.value = {
@@ -94,7 +94,7 @@ const handleSubmit = async () => {
   closeModal()
 }
 
-const handleDelete = async (id: string) => {
+const handleDelete = async (id) => {
   if (confirm('Удалить этот товар?')) {
     await adminStore.deleteProduct(id)
   }
@@ -107,7 +107,7 @@ const addImage = () => {
   }
 }
 
-const removeImage = (index: number) => {
+const removeImage = (index) => {
   formData.value.images.splice(index, 1)
 }
 
@@ -118,7 +118,7 @@ const addMaterial = () => {
   }
 }
 
-const removeMaterial = (index: number) => {
+const removeMaterial = (index) => {
   formData.value.materials.splice(index, 1)
 }
 </script>

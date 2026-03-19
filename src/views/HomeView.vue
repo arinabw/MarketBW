@@ -1,15 +1,14 @@
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { ArrowRight, Star, Heart, Sparkles } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
 import { getFeaturedProducts, getCategories, getReviews } from '@/api/public'
-import type { Review } from '@/lib/catalog-types'
 import { formatPrice } from '@/lib/utils'
 
-const featuredProducts = ref<any[]>([])
-const categories = ref<any[]>([])
-const featuredReviews = ref<Review[]>([])
+const featuredProducts = ref([])
+const categories = ref([])
+const featuredReviews = ref([])
 const isLoading = ref(true)
 
 onMounted(async () => {

@@ -39,27 +39,26 @@ const router = createRouter({
       path: '/admin/dashboard',
       name: 'admin-dashboard',
       component: () => import('@/views/AdminView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin/categories',
       name: 'admin-categories',
       component: () => import('@/views/AdminView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin/products',
       name: 'admin-products',
       component: () => import('@/views/AdminView.vue'),
-      meta: { requiresAuth: true }
+      meta: { requiresAuth: true },
     },
   ],
 })
 
-// Защита роутов админки
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const adminStore = useAdminStore()
-  
+
   if (to.meta.requiresAuth && !adminStore.isAuthenticated) {
     next('/admin')
   } else {

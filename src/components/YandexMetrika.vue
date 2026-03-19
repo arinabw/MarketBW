@@ -1,11 +1,11 @@
-<script setup lang="ts">
+<script setup>
 import { onMounted } from 'vue'
 
 const METRIKA_ID = 108152465
 
 onMounted(() => {
   // Инициализация Яндекс.Метрики
-  (function (m: any, e: any, t: any, r: any, i: any, k: any, a: any) {
+  (function (m, e, t, r, i, k, a) {
     m[i] = m[i] || function () {
       (m[i].a = m[i].a || []).push(arguments)
     }
@@ -22,8 +22,8 @@ onMounted(() => {
       a.parentNode.insertBefore(k, a)
   })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=' + METRIKA_ID, 'ym')
 
-  // Инициализация счетчика
-  ym(METRIKA_ID, 'init', {
+  // Инициализация счетчика (глобальная ym из tag.js)
+  window.ym(METRIKA_ID, 'init', {
     ssr: true,
     webvisor: true,
     clickmap: true,

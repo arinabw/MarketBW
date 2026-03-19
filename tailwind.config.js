@@ -2,7 +2,7 @@
 module.exports = {
   content: [
     './index.html',
-    './src/**/*.{vue,js,ts,jsx,tsx}',
+    './src/**/*.{vue,js}',
   ],
   theme: {
     extend: {
@@ -113,5 +113,4 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
 }

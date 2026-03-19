@@ -7,7 +7,7 @@
 
 ## Технологии
 - **База данных**: SQLite
-- **Фронтенд**: Vue 3 + TypeScript + Vite
+- **Фронтенд**: Vue 3 + JavaScript + Vite
 - **Состояние**: Pinia
 - **API**: FastAPI (Python)
 - **Docker**: один контейнер (см. `docker/Dockerfile`)
@@ -17,7 +17,7 @@
 ```
 src/
 ├── api/
-│   └── admin.ts          # API клиент для админ-панели
+│   └── admin.js          # API клиент для админ-панели
 ├── components/
 │   └── admin/
 │       ├── AdminLogin.vue     # Форма входа
@@ -27,9 +27,9 @@ src/
 ├── views/
 │   └── AdminView.vue          # Главный компонент админ-панели
 ├── stores/
-│   └── useAdminStore.ts       # Pinia store для админ-данных
+│   └── useAdminStore.js       # Pinia store для админ-данных
 └── lib/
-    └── catalog-types.ts
+    └── env.js, utils.js
 
 backend/app/
 ├── main.py
@@ -129,13 +129,13 @@ docker compose up -d --build
 
 ### Добавление новых компонентов
 1. Создайте компонент в `src/components/admin/`
-2. Добавьте логику в `src/stores/useAdminStore.ts`
+2. Добавьте логику в `src/stores/useAdminStore.js`
 3. Добавьте роут в `src/views/AdminView.vue`
 
 ### Добавление новых API эндпоинтов
 1. Логика БД — в `backend/app/database.py`
 2. Маршруты — в `backend/app/main.py`
-3. Клиент админки — в `src/api/admin.ts`
+3. Клиент админки — в `src/api/admin.js`
 
 ## Тестирование
 

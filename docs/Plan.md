@@ -49,7 +49,7 @@
 ```
 src/
 ├── api/
-│   └── admin.ts          # API клиент для админ-панели
+│   └── admin.js          # API клиент для админ-панели
 ├── components/
 │   └── admin/
 │       ├── AdminLogin.vue
@@ -60,9 +60,9 @@ src/
 ├── views/
 │   └── AdminView.vue     # Главный компонент админ-панели
 ├── stores/
-│   └── useAdminStore.ts  # Pinia store для админ-данных
+│   └── useAdminStore.js  # Pinia store для админ-данных
 └── lib/
-    └── catalog-types.ts  # Типы каталога (API — backend/app/database.py)
+    └── env.js, utils.js
 
 docker/
 └── admin/

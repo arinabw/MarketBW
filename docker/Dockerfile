@@ -15,8 +15,8 @@ RUN --mount=type=cache,target=/root/.npm \
 COPY index.html ./
 COPY src ./src
 COPY public ./public
-COPY tailwind.config.js postcss.config.cjs tsconfig.json env.d.ts ./
-COPY frontend/vite.config.ts frontend/tsconfig.node.json ./frontend/
+COPY tailwind.config.js postcss.config.cjs ./
+COPY frontend/vite.config.js ./frontend/
 
 # Vite root = /build (родитель frontend/), а npm install — в frontend/node_modules.
 # Без ссылки Rollup не находит vue и т.д. при разрешении импортов из /build/src.

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
 import YandexMetrika from '@/components/YandexMetrika.vue'

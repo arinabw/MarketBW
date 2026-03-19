@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { Menu, X, Phone, Mail } from 'lucide-vue-next'
@@ -17,7 +17,7 @@ const navigation = [
   { name: 'FAQ', href: '/faq' },
 ]
 
-const isActive = (href: string) => {
+const isActive = (href) => {
   if (href === '/') return route.path === '/'
   return route.path.startsWith(href)
 }

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { computed, ref, onMounted, watch } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { ArrowLeft, Heart, Star } from 'lucide-vue-next'
@@ -8,15 +8,14 @@ import AppCardHeader from '@/components/ui/AppCardHeader.vue'
 import AppCardContent from '@/components/ui/AppCardContent.vue'
 import AppCardTitle from '@/components/ui/AppCardTitle.vue'
 import { getProductById as getProductByIdApi, getCategories, getReviews } from '@/api/public'
-import type { Review } from '@/lib/catalog-types'
 import { formatPrice } from '@/lib/utils'
 
 const route = useRoute()
-const productId = computed(() => route.params.id as string)
+const productId = computed(() => String(route.params.id || ''))
 
-const product = ref<any>(null)
-const categories = ref<{ id: string; name: string }[]>([])
-const productReviews = ref<Review[]>([])
+const product = ref(null)
+const categories = ref([])
+const productReviews = ref([])
 const isLoading = ref(true)
 
 const loadProduct = async () => {

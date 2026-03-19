@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref } from 'vue'
 import { Phone, Mail, MapPin, Send } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'

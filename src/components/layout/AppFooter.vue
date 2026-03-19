@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { RouterLink } from 'vue-router'
 import { Phone, Mail, Instagram, Send, MessageCircle } from 'lucide-vue-next'
 import { env } from '@/lib/env'

@@ -1,24 +1,19 @@
-<script setup lang="ts">
+<script setup>
 import { computed } from 'vue'
 
-interface Props {
-  variant?: 'default' | 'premium' | 'modern' | 'outline' | 'secondary' | 'ghost'
-  size?: 'sm' | 'md' | 'lg' | 'icon'
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  variant: 'default',
-  size: 'md',
+const props = defineProps({
+  variant: { type: String, default: 'default' },
+  size: { type: String, default: 'md' },
 })
 
-const sizes: Record<string, string> = {
+const sizes = {
   sm: 'px-4 py-2 text-sm',
   md: 'px-6 py-3 text-sm',
   lg: 'px-8 py-4 text-base',
   icon: 'w-10 h-10',
 }
 
-const variants: Record<string, string> = {
+const variants = {
   default: 'bg-primary-500/80 backdrop-blur-xl text-white border border-white/20 shadow-glow hover:shadow-glow-lg hover:-translate-y-0.5 hover:bg-primary-500/90',
   premium: 'bg-gradient-to-r from-primary-500/90 to-accent-500/90 backdrop-blur-xl text-white border border-white/20 shadow-glow hover:shadow-glow-lg hover:-translate-y-0.5',
   modern: 'bg-gradient-to-r from-primary-500/80 to-accent-500/80 backdrop-blur-xl text-white border border-white/20 shadow-glow hover:shadow-glow-lg hover:-translate-y-0.5',

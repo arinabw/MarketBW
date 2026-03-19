@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted } from 'vue'
 import { useAdminStore } from '@/stores/useAdminStore'
 import { Plus, Trash2, Edit2, X } from 'lucide-vue-next'
@@ -6,7 +6,7 @@ import AppButton from '@/components/ui/AppButton.vue'
 
 const adminStore = useAdminStore()
 const isModalOpen = ref(false)
-const editingCategory = ref<any>(null)
+const editingCategory = ref(null)
 const formData = ref({
   name: '',
   description: '',
@@ -65,7 +65,7 @@ const handleSubmit = async () => {
   closeModal()
 }
 
-const handleDelete = async (id: string) => {
+const handleDelete = async (id) => {
   if (confirm('Удалить эту категорию?')) {
     await adminStore.deleteCategory(id)
   }
