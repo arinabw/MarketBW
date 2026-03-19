@@ -116,9 +116,14 @@ git status
 
 ### Автообновление по cron
 
+`auto-update.sh` сравнивает `HEAD` с `origin/$BRANCH` (по умолчанию **main**); при отличии вызывает **`deploy.sh update`** (тот же `git pull` по той же ветке). Есть **`flock`**, чтобы не запускать второй build, пока идёт первый.
+
 ```bash
-# пример: каждую минуту проверка ветки main
-* * * * * BRANCH=main /opt/MarketBW/docker/auto-update.sh >> /var/log/marketbw-auto-update.log 2>&1
+# каждую минуту; ветка main (можно не указывать)
+* * * * * /opt/MarketBW/docker/auto-update.sh >> /var/log/marketbw-auto-update.log 2>&1
+
+# ветка master
+* * * * * BRANCH=master /opt/MarketBW/docker/auto-update.sh >> /var/log/marketbw-auto-update.log 2>&1
 ```
 
 ### Ускорение сборки Docker на сервере
