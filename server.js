@@ -144,17 +144,25 @@ app.post('/api/login', (req, res) => {
   try {
     const { username, password } = req.body
 
+    console.log('Login attempt:', { username, passwordLength: password?.length })
+
     if (!username || !password) {
+      console.log('Login failed: missing credentials')
       return res.status(400).json({ error: 'Не все обязательные поля заполнены' })
     }
 
     const success = db.authenticateUser(username, password)
+    console.log('Authentication result:', success)
+    
     if (success) {
+      console.log('Login successful for user:', username)
       res.json({ success: true })
     } else {
+      console.log('Login failed: invalid credentials for user:', username)
       res.status(401).json({ error: 'Неверный логин или пароль' })
     }
   } catch (error) {
+    console.error('Login error:', error)
     res.status(500).json({ error: 'Ошибка при аутентификации' })
   }
 })

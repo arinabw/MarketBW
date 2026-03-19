@@ -9,9 +9,11 @@ const DB_PATH = path.join(DB_DIR, 'marketbw.db')
 // Создаем директорию для БД, если она не существует
 if (!fs.existsSync(DB_DIR)) {
   fs.mkdirSync(DB_DIR, { recursive: true })
+  console.log(`Created database directory: ${DB_DIR}`)
 }
 
 const db = new Database(DB_PATH)
+console.log(`Database initialized at: ${DB_PATH}`)
 
 // Инициализация таблиц
 db.exec(`
@@ -51,6 +53,9 @@ const adminUser = db.prepare('SELECT * FROM users WHERE username = ?').get('admi
 if (!adminUser) {
   db.prepare('INSERT INTO users (id, username, password_hash) VALUES (?, ?, ?)')
     .run('1', 'admin', 'admin123')
+  console.log('Admin user created: admin / admin123')
+} else {
+  console.log('Admin user already exists')
 }
 
 export type { Category, Product, User } from './catalog-types.js'
@@ -157,9 +162,19 @@ export const deleteProduct = (id: string) => {
 
 // Аутентификация
 export const authenticateUser = (username: string, password: string): boolean => {
+  console.log('Authenticating user:', username)
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username) as User | undefined
-  if (!user) return false
-  return user.password_hash === password
+  
+  if (!user) {
+    console.log('User not found:', username)
+    return false
+  }
+  
+  console.log('User found, checking password. Stored hash length:', user.password_hash.length)
+  const isValid = user.password_hash === password
+  console.log('Password match:', isValid)
+  
+  return isValid
 }
 
 export default db
