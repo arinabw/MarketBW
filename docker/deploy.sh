@@ -16,6 +16,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$SCRIPT_DIR"
 
+# Ускорение сборки: кэш npm между билдами (RUN --mount в Dockerfile)
+export DOCKER_BUILDKIT=1
+export COMPOSE_DOCKER_CLI_BUILD=1
+
 # Не используем source .env — в TRAEFIK_RULE бывают обратные кавычки Host(`domain`),
 # bash интерпретирует их как command substitution. Docker Compose читает .env сам.
 RED='\033[0;31m'

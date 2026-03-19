@@ -121,6 +121,16 @@ git status
 * * * * * BRANCH=main /opt/MarketBW/docker/auto-update.sh >> /var/log/marketbw-auto-update.log 2>&1
 ```
 
+### Ускорение сборки Docker на сервере
+
+- **`deploy.sh` включает BuildKit** — кэшируется каталог npm между сборками (образ собирается заметно быстрее после первого раза).
+- В образе **нет второго `npm install`** для production: после `vite build` выполняется **`npm prune --omit=dev`** (не пересобирается `better-sqlite3`).
+- Если в репозитории есть **`package-lock.json`**, в Docker используется **`npm ci`** (быстрее и фиксированные версии). Без lock-файла — как раньше, **`npm install`**.
+
+**Добавить lock локально:** `npm install` в корне проекта и закоммитить `package-lock.json`.
+
+**Только Docker на машине:** `chmod +x scripts/generate-package-lock.sh && ./scripts/generate-package-lock.sh`
+
 ### Важно
 
 - Порты **80/443** не пробрасываются в compose сайта — их слушает Traefik.
