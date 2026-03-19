@@ -209,13 +209,13 @@ const featuredReviews = computed(() => reviews.slice(0, 3))
     </section>
 
     <!-- CTA -->
-    <section class="section-padding bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 text-white relative overflow-hidden">
+    <section class="section-padding bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 relative overflow-hidden">
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.08),transparent_60%)]"></div>
       <div class="container-custom text-center relative z-10">
-        <h2 class="text-3xl md:text-4xl font-display font-bold mb-4 text-white">
+        <h2 class="text-3xl md:text-4xl font-display font-bold mb-4 text-surface-900">
           Создадим ваше собственное чудо?
         </h2>
-        <p class="text-lg mb-8 max-w-xl mx-auto text-white/85">
+        <p class="text-lg mb-8 max-w-xl mx-auto text-surface-800">
           Я создаю украшения на заказ по вашим индивидуальным пожеланиям.
           Каждое изделие Bead Wonder — это уникальная история.
         </p>
