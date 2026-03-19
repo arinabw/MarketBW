@@ -9,6 +9,10 @@ const repoRoot = path.resolve(__dirname, '..')
 
 export default defineConfig(({ mode }) => ({
   root: repoRoot,
+  // Явный postcss из корня репо (рядом с tailwind.config.js), иначе Vite может не найти конфиг.
+  css: {
+    postcss: path.join(repoRoot, 'postcss.config.cjs'),
+  },
   plugins: [vue()],
   resolve: {
     alias: {

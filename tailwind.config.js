@@ -1,12 +1,10 @@
-const path = require('path')
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  // Пути от каталога конфига: при `cd frontend && vite build` cwd ≠ корень репо,
-  // относительные ./src не находятся в Docker — контент пустой и @apply падает.
+  // Пути относительно ЭТОГО файла (tailwind.config.js в корне репо) — не от process.cwd().
+  // CSS с @apply обязательно включать: иначе утилиты из theme не подхватываются для @apply.
   content: [
-    path.join(__dirname, 'index.html'),
-    path.join(__dirname, 'src', '**', '*.{vue,js}'),
+    './index.html',
+    './src/**/*.{vue,js,css}',
   ],
   theme: {
     extend: {

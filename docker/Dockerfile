@@ -23,8 +23,9 @@ COPY frontend/vite.config.js ./frontend/
 RUN ln -sfn /build/frontend/node_modules /build/node_modules
 
 ENV NODE_ENV=production
+# Сборка из /build: postcss/tailwind видят корень репо; `cd frontend` ломал разрешение конфигов.
 RUN echo "[build-time] frontend: vite build START $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-    && cd frontend && npm run build \
+    && ./frontend/node_modules/.bin/vite build --config frontend/vite.config.js \
     && echo "[build-time] frontend: vite build END   $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 FROM python:3.13-slim AS runtime
