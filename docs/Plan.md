@@ -40,7 +40,7 @@
 - Использование официального образа `sqlite:3`
 
 ### 5. Интеграция с существующим проектом
-- Замена статических данных в `src/lib/data.ts` на данные из БД
+- Статический контент перенесён в SQLite + API (`reviews`, `faqs`, демо-каталог при пустой БД — `backend/app/seed_content.py`).
 - Создание API middleware для обработки запросов
 - Использование существующих компонентов UI
 
@@ -62,7 +62,7 @@ src/
 ├── stores/
 │   └── useAdminStore.ts  # Pinia store для админ-данных
 └── lib/
-    └── db.ts             # Работа с БД
+    └── catalog-types.ts  # Типы каталога (API — backend/app/database.py)
 
 docker/
 └── admin/

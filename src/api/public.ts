@@ -1,4 +1,5 @@
 import axios from 'axios'
+import type { FAQ, Review } from '@/lib/catalog-types'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api'
 
@@ -58,6 +59,19 @@ export const getFeaturedProducts = async (): Promise<Product[]> => {
 export const getProductsByCategory = async (category: string): Promise<Product[]> => {
   const products = await getProducts()
   return products.filter(p => p.category === category)
+}
+
+/** Все отзывы или по товару (`product_id` на бэкенде) */
+export const getReviews = async (productId?: string): Promise<Review[]> => {
+  const response = await api.get<Review[]>('/reviews', {
+    params: productId ? { product_id: productId } : {},
+  })
+  return response.data
+}
+
+export const getFaqs = async (): Promise<FAQ[]> => {
+  const response = await api.get<FAQ[]>('/faqs')
+  return response.data
 }
 
 export default api

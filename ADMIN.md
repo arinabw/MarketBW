@@ -5,10 +5,10 @@
 
 ## Технологии
 - **База данных**: SQLite
-- **Фреймворк**: Vue 3 + TypeScript
+- **Фронтенд**: Vue 3 + TypeScript + Vite
 - **Состояние**: Pinia
-- **Сервер**: Express.js
-- **Контейнеризация**: Docker (общий контейнер с сайтом)
+- **API**: FastAPI (Python) + uvicorn
+- **Контейнеризация**: Docker — **один** контейнер (сборка фронта в Node, рантайм Python + раздача `dist`)
 
 ## Структура проекта
 
@@ -27,20 +27,24 @@ src/
 ├── stores/
 │   └── useAdminStore.ts       # Pinia store для админ-данных
 └── lib/
-    └── db.ts                  # Работа с БД
+    └── catalog-types.ts      # Типы каталога (фронт)
+
+backend/
+└── app/
+    ├── main.py               # FastAPI, маршруты /api, раздача SPA
+    └── database.py           # SQLite (та же схема, что раньше в Node)
 
 docker/
-├── Dockerfile                # Общий контейнер (сайт + админ-сервер)
-├── nginx.conf                # Nginx конфигурация
-├── start.sh                  # Скрипт запуска
-└── docker-compose.yml        # Настройка контейнеров
+├── Dockerfile                # Multi-stage: Node → dist, затем Python-рантайм
+└── docker-compose.yml        # Traefik, порт контейнера **8000**
 ```
 
 ## Установка и запуск
 
-### 1. Установка зависимостей
+### 1. Установка зависимостей (локально)
 ```bash
-npm install better-sqlite3
+cd frontend && npm install
+cd ../backend && pip install -r requirements.txt
 ```
 
 ### 2. Запуск контейнера
@@ -109,6 +113,10 @@ docker-compose up -d --build
 - `POST /api/login` - Войти в систему
 - `POST /api/logout` - Выйти из системы
 
+### Контент сайта (публично)
+- `GET /api/reviews` — все отзывы; `GET /api/reviews?product_id=<id>` — отзывы по товару
+- `GET /api/faqs` — вопросы и ответы для страницы FAQ
+
 ## Деплой
 
 ### Docker
@@ -139,14 +147,14 @@ docker-compose up -d --build
 1. Проверьте логи контейнера: `docker-compose logs marketbw`
 2. Проверьте, что папка `data` существует и имеет правильные права доступа
 3. Проверьте, что контейнер запущен: `docker-compose ps`
-4. Проверьте, что Nginx проксирует запросы корректно
+4. Проверьте, что Traefik указывает на порт **8000** контейнера (`loadbalancer.server.port`)
 
 ## Архитектура
 
-### Общий контейнер
-- Node.js сервер (Express) обрабатывает API и админ-панель
-- Nginx проксирует запросы к API и админ-панели
-- Статический сайт (Vue SPA) обслуживается Nginx
+### Один контейнер
+- **uvicorn** поднимает FastAPI на порту **8000**
+- Маршруты **`/api/*`** — REST API и SQLite
+- Статика Vue (**`dist`**) и SPA fallback (**`/admin`**) отдаются тем же процессом
 
 ### Маршрутизация
 - `/` - основной сайт

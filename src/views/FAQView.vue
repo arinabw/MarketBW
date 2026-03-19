@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { ChevronDown, ArrowRight } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
-import { faqs } from '@/lib/data'
+import { getFaqs } from '@/api/public'
+import type { FAQ } from '@/lib/catalog-types'
 
 const selectedCategory = ref<string>('all')
+const faqs = ref<FAQ[]>([])
 
 const categoryOptions = [
   { id: 'all', name: 'Все вопросы' },
@@ -16,8 +18,17 @@ const categoryOptions = [
 ]
 
 const filteredFAQs = computed(() => {
-  if (selectedCategory.value === 'all') return faqs
-  return faqs.filter(faq => faq.category === selectedCategory.value)
+  if (selectedCategory.value === 'all') return faqs.value
+  return faqs.value.filter(faq => faq.category === selectedCategory.value)
+})
+
+onMounted(async () => {
+  try {
+    faqs.value = await getFaqs()
+  } catch (e) {
+    console.error(e)
+    faqs.value = []
+  }
 })
 
 const openFAQs = ref<Set<string>>(new Set())

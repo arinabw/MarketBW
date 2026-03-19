@@ -22,7 +22,7 @@ services:
       - traefik.http.routers.${TRAEFIK_ROUTER:-marketbw}.service=${TRAEFIK_ROUTER:-marketbw}
       - traefik.http.routers.${TRAEFIK_ROUTER:-marketbw}.entrypoints=${TRAEFIK_HTTPS_ENTRYPOINT:-websecure}
       - traefik.http.routers.${TRAEFIK_ROUTER:-marketbw}.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-le}
-      - traefik.http.services.${TRAEFIK_ROUTER:-marketbw}.loadbalancer.server.port=80
+      - traefik.http.services.${TRAEFIK_ROUTER:-marketbw}.loadbalancer.server.port=8000
 
 networks:
   web:

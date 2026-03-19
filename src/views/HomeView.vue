@@ -1,35 +1,36 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { ArrowRight, Star, Heart, Sparkles } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
-import { getFeaturedProducts, getCategories } from '@/api/public'
-import { categories as staticCategories, reviews } from '@/lib/data'
+import { getFeaturedProducts, getCategories, getReviews } from '@/api/public'
+import type { Review } from '@/lib/catalog-types'
 import { formatPrice } from '@/lib/utils'
 
 const featuredProducts = ref<any[]>([])
 const categories = ref<any[]>([])
+const featuredReviews = ref<Review[]>([])
 const isLoading = ref(true)
 
 onMounted(async () => {
   try {
-    const [products, cats] = await Promise.all([
+    const [products, cats, allReviews] = await Promise.all([
       getFeaturedProducts(),
-      getCategories()
+      getCategories(),
+      getReviews(),
     ])
     featuredProducts.value = products
     categories.value = cats
+    featuredReviews.value = allReviews.slice(0, 3)
   } catch (error) {
     console.error('Error loading data:', error)
-    // Fallback to static data if API fails
-    featuredProducts.value = getFeaturedProducts()
-    categories.value = staticCategories
+    featuredProducts.value = []
+    categories.value = []
+    featuredReviews.value = []
   } finally {
     isLoading.value = false
   }
 })
-
-const featuredReviews = computed(() => reviews.slice(0, 3))
 </script>
 
 <template>
@@ -182,7 +183,7 @@ const featuredReviews = computed(() => reviews.slice(0, 3))
             Что говорят о наших бисерных чудесах
           </p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div v-if="featuredReviews.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div v-for="review in featuredReviews" :key="review.id" class="card-modern p-6">
             <div class="flex items-center gap-3 mb-4">
               <div class="w-11 h-11 bg-gradient-to-br from-primary-400 to-accent-400 rounded-full flex items-center justify-center text-white font-bold text-sm">
@@ -205,6 +206,9 @@ const featuredReviews = computed(() => reviews.slice(0, 3))
             </p>
           </div>
         </div>
+        <p v-else class="text-center text-text-secondary text-sm">
+          Отзывы появятся здесь после загрузки с сервера.
+        </p>
       </div>
     </section>
 

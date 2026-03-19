@@ -8,32 +8,43 @@
 - **Tailwind CSS** с кастомной палитрой (primary/accent/surface)
 - **Lucide** иконки
 - **Pinia** для состояния
-- **Docker** (nginx + Node API + SQLite) за **Traefik** — как в [idpro1313/webserver](https://github.com/idpro1313/webserver)
+- **Docker**: один контейнер — **FastAPI (uvicorn)** на порту **8000**, SQLite, сборка фронта в **Node** (multi-stage Dockerfile) за **Traefik** — как в [idpro1313/webserver](https://github.com/idpro1313/webserver)
 
 ## Структура
 
 ```
-src/
+src/                # Vue (корень репозитория — root для Vite в frontend/vite.config.ts)
 ├── views/          # Страницы (Home, Catalog, Product, Contact, FAQ)
 ├── components/
-│   ├── ui/         # AppButton, AppCard, ...
-│   └── layout/     # AppHeader, AppFooter
-├── router/         # Vue Router
-├── stores/         # Pinia
-├── lib/            # data.ts, env.ts, utils.ts, db.ts
-└── styles/         # main.css (Tailwind)
-docker/             # Dockerfile, compose, deploy.sh — деплой на сервер
-data/               # на сервере: БД SQLite (том ../data из compose)
+├── router/
+├── stores/
+├── api/            # клиенты /api
+├── lib/            # env.ts, utils.ts, catalog-types.ts (контент — API / SQLite)
+└── styles/
+frontend/           # package.json, vite.config.ts, lockfile — npm install здесь
+backend/app/        # FastAPI: main.py, database.py
+docker/             # Dockerfile, compose, deploy.sh
+data/               # SQLite на сервере (том ../data из compose)
 ```
 
 ## Разработка
 
+**Фронт** (Vite проксирует `/api` → `http://127.0.0.1:8000`):
+
 ```bash
-npm install
-npm run dev
+cd frontend && npm install
+cd .. && npm run dev
 ```
 
-Контакты и название сайта — в **`src/lib/env.ts`**. Запросы админки к API идут на **`/api`** (см. `src/api/admin.ts`); отдельный `.env` в корне не нужен. Для сервера Traefik по-прежнему **`docker/.env`** из `docker/env.example`.
+**API** (второй терминал):
+
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+Контакты и название сайта — в **`src/lib/env.ts`**. Запросы к API — **`/api`** (см. `src/api/`). Для сервера Traefik — **`docker/.env`** из `docker/env.example`; в compose для сервиса указан порт **8000**.
 
 ## Деплой на сервер (Traefik уже установлен)
 
@@ -132,13 +143,15 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
 
 Редирект `>> …log 2>&1` в crontab необязателен. Если лога нет — смотрите **`/tmp/marketbw-auto-update.log`** и что cron идёт от пользователя с правом **`docker`**.
 
+**Перемешивание лога с выводом Docker:** раньше использовался `exec deploy.sh`, из‑за этого снималась блокировка и cron каждую минуту дописывал строки в тот же файл во время сборки. Сейчас вызывается **`bash deploy.sh`** и один **`flock`** на весь запуск (`/tmp/marketbw-auto-update.run.lock`).
+
 ### Ускорение сборки Docker на сервере
 
-- **`deploy.sh` включает BuildKit** — кэшируется каталог npm между сборками (образ собирается заметно быстрее после первого раза).
-- В образе **нет второго `npm install`** для production: после `vite build` выполняется **`npm prune --omit=dev`** (не пересобирается `better-sqlite3`).
-- Если в репозитории есть **`package-lock.json`**, в Docker используется **`npm ci`** (быстрее и фиксированные версии). Без lock-файла — как раньше, **`npm install`**.
+- **`deploy.sh` включает BuildKit** — кэшируется npm между сборками фронта (`RUN --mount=type=cache,target=/root/.npm`).
+- Слой **Python** кэшируется, пока не меняется `backend/requirements.txt`.
+- Если есть **`frontend/package-lock.json`**, в Docker используется **`npm ci`**; иначе — **`npm install`**.
 
-**Добавить lock локально:** `npm install` в корне проекта и закоммитить `package-lock.json`.
+**Добавить lock локально:** `cd frontend && npm install` и закоммитить **`frontend/package-lock.json`**.
 
 **Только Docker на машине:** `chmod +x scripts/generate-package-lock.sh && ./scripts/generate-package-lock.sh`
 

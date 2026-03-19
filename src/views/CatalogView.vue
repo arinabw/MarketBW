@@ -4,7 +4,6 @@ import { useRoute, RouterLink } from 'vue-router'
 import { ArrowRight, Heart } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
 import { getProducts, getCategories } from '@/api/public'
-import { products as staticProducts, categories as staticCategories } from '@/lib/data'
 import { formatPrice } from '@/lib/utils'
 
 const route = useRoute()
@@ -23,9 +22,8 @@ const loadData = async () => {
     categories.value = cats
   } catch (error) {
     console.error('Error loading data:', error)
-    // Fallback to static data if API fails
-    products.value = staticProducts
-    categories.value = staticCategories
+    products.value = []
+    categories.value = []
   } finally {
     isLoading.value = false
   }
@@ -111,7 +109,7 @@ const selectedCategoryName = computed(() => {
                 <div v-if="product.featured" class="absolute top-3 right-3 bg-primary-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-glow">
                   Хит
                 </div>
-                <div v-if="!product.inStock" class="absolute top-3 left-3 bg-surface-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                <div v-if="!product.in_stock" class="absolute top-3 left-3 bg-surface-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
                   Нет в наличии
                 </div>
               </div>

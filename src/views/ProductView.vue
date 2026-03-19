@@ -7,30 +7,35 @@ import AppCard from '@/components/ui/AppCard.vue'
 import AppCardHeader from '@/components/ui/AppCardHeader.vue'
 import AppCardContent from '@/components/ui/AppCardContent.vue'
 import AppCardTitle from '@/components/ui/AppCardTitle.vue'
-import { getProductById as getProductByIdApi } from '@/api/public'
-import { getProductById as getProductByIdStatic, getReviewsByProductId, categories as staticCategories } from '@/lib/data'
+import { getProductById as getProductByIdApi, getCategories, getReviews } from '@/api/public'
+import type { Review } from '@/lib/catalog-types'
 import { formatPrice } from '@/lib/utils'
 
 const route = useRoute()
 const productId = computed(() => route.params.id as string)
 
 const product = ref<any>(null)
-const productReviews = computed(() => getReviewsByProductId(productId.value))
+const categories = ref<{ id: string; name: string }[]>([])
+const productReviews = ref<Review[]>([])
 const isLoading = ref(true)
 
 const loadProduct = async () => {
+  isLoading.value = true
+  const id = productId.value
   try {
-    const prod = await getProductByIdApi(productId.value)
-    if (prod) {
-      product.value = prod
-    } else {
-      // Fallback to static data
-      product.value = getProductByIdStatic(productId.value)
-    }
+    const [cats, prod, revs] = await Promise.all([
+      getCategories(),
+      getProductByIdApi(id),
+      getReviews(id),
+    ])
+    categories.value = cats
+    product.value = prod ?? null
+    productReviews.value = revs
   } catch (error) {
     console.error('Error loading product:', error)
-    // Fallback to static data
-    product.value = getProductByIdStatic(productId.value)
+    categories.value = []
+    product.value = null
+    productReviews.value = []
   } finally {
     isLoading.value = false
   }
@@ -60,7 +65,10 @@ const prevImage = () => {
 </script>
 
 <template>
-  <div v-if="product">
+  <div v-if="isLoading" class="min-h-[50vh] flex items-center justify-center">
+    <p class="text-text-secondary">Загрузка…</p>
+  </div>
+  <div v-else-if="product">
     <!-- Back -->
     <section class="py-4 bg-white border-b border-surface-200">
       <div class="container-custom">
@@ -179,7 +187,7 @@ const prevImage = () => {
     </section>
 
     <!-- Reviews -->
-    <section v-if="productReviews.length > 0" class="section-padding bg-surface-50">
+    <section v-if="productReviews.length > 0 && product" class="section-padding bg-surface-50">
       <div class="container-custom">
         <h2 class="section-title">Отзывы</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">

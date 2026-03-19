@@ -28,7 +28,7 @@ Thumbs.db
 .git
 .gitignore
 
-# Не исключать весь docker/ — в Dockerfile нужны nginx.conf и start.sh из контекста.
+# Не исключать весь docker/ — контекст сборки включает docker/Dockerfile.
 # Локальный .env compose на машине разработчика в образ не кладём:
 docker/.env
 

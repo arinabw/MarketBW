@@ -3,12 +3,14 @@
 ## Описание
 Модуль администрирования каталога товаров с доступом по адресу `/admin` с паролем.
 
+> Актуальное описание: **[ADMIN.md](../ADMIN.md)** в корне репозитория.
+
 ## Технологии
 - **База данных**: SQLite
-- **Фреймворк**: Vue 3 + TypeScript
+- **Фронтенд**: Vue 3 + TypeScript + Vite
 - **Состояние**: Pinia
-- **Сервер**: Express.js
-- **Контейнеризация**: Docker
+- **API**: FastAPI (Python)
+- **Docker**: один контейнер (см. `docker/Dockerfile`)
 
 ## Структура проекта
 
@@ -27,28 +29,33 @@ src/
 ├── stores/
 │   └── useAdminStore.ts       # Pinia store для админ-данных
 └── lib/
-    └── db.ts                  # Работа с БД
+    └── catalog-types.ts
 
-docker/admin/
-├── Dockerfile                # Контейнер для админ-сервера
-└── docker-compose.yml        # Настройка контейнеров
+backend/app/
+├── main.py
+└── database.py
+
+docker/
+├── Dockerfile
+└── docker-compose.yml
 ```
 
 ## Установка и запуск
 
 ### 1. Установка зависимостей
 ```bash
-npm install better-sqlite3
+cd frontend && npm install
+cd ../backend && pip install -r requirements.txt
 ```
 
-### 2. Запуск админ-сервера
+### 2. Запуск
 ```bash
-# В директории docker/admin
-docker-compose up -d
+# из docker/ — см. README
+docker compose up -d --build
 ```
 
 ### 3. Доступ к админ-панели
-- URL: `http://localhost:3000/admin`
+- URL: `https://<ваш-домен>/admin` или локально через Vite + uvicorn (см. README)
 - Логин: `admin`
 - Пароль: `admin123`
 
@@ -126,15 +133,15 @@ docker-compose up -d
 3. Добавьте роут в `src/views/AdminView.vue`
 
 ### Добавление новых API эндпоинтов
-1. Добавьте методы в `src/lib/db.ts`
-2. Добавьте методы в `src/api/admin.ts`
-3. Добавьте обработчики в `server.js`
+1. Логика БД — в `backend/app/database.py`
+2. Маршруты — в `backend/app/main.py`
+3. Клиент админки — в `src/api/admin.ts`
 
 ## Тестирование
 
 ### Тестирование админ-панели
-1. Запустите админ-сервер: `docker-compose up -d`
-2. Откройте браузер: `http://localhost:3000/admin`
+1. Запустите стек (см. README / `docker/deploy.sh`)
+2. Откройте `/admin` на вашем домене или локально
 3. Войдите с учетными данными: admin / admin123
 4. Проверьте функционал категорий и товаров
 
