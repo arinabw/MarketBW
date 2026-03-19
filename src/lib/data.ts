@@ -3,7 +3,7 @@ export interface Product {
   name: string
   description: string
   price: number
-  category: 'bracelet' | 'necklace' | 'earrings' | 'brooch'
+  category: 'bracelet' | 'necklace' | 'earrings'
   images: string[]
   materials: string[]
   size?: string
@@ -57,12 +57,6 @@ export const categories: Category[] = [
     name: 'Серьги',
     description: 'Нежные серьги из бисера для любого образа',
     image: '/images/categories/earrings.svg'
-  },
-  {
-    id: 'brooch',
-    name: 'Броши',
-    description: 'Декоративные броши из бисера ручной работы',
-    image: '/images/categories/brooches.svg'
   }
 ]
 
@@ -118,23 +112,6 @@ export const products: Product[] = [
     inStock: true,
     featured: false,
     createdAt: new Date('2024-02-01')
-  },
-  {
-    id: '4',
-    name: 'Брошь "Ромашковое поле"',
-    description: 'Милая брошь в виде ромашки, созданная с использованием различных техник бисероплетения. Отличный подарок для близких.',
-    price: 2200,
-    category: 'brooch',
-    images: [
-      '/images/products/brooch-1-1.svg',
-      '/images/products/brooch-1-2.svg'
-    ],
-    materials: ['Бисер разных размеров', 'Фетровая основа', 'Застежка-булавка'],
-    size: 'Диаметр 5 см',
-    technique: 'Комбинированная техника',
-    inStock: true,
-    featured: false,
-    createdAt: new Date('2024-02-10')
   },
   {
     id: '5',
