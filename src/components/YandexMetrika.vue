@@ -22,7 +22,8 @@ onMounted(() => {
       a.parentNode.insertBefore(k, a)
   })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=' + METRIKA_ID, 'ym')
 
-  // Инициализация счетчика (глобальная ym из tag.js)
+  // Заглушка ym ставит вызовы в очередь до загрузки tag.js
+  if (typeof window.ym !== 'function') return
   window.ym(METRIKA_ID, 'init', {
     ssr: true,
     webvisor: true,

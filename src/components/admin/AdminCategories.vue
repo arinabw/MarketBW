@@ -17,7 +17,7 @@ onMounted(async () => {
   await adminStore.loadCategories()
 })
 
-const openModal = (category?: any) => {
+const openModal = (category) => {
   if (category) {
     editingCategory.value = category
     formData.value = {

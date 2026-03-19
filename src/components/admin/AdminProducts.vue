@@ -75,7 +75,9 @@ const closeModal = () => {
 }
 
 const handleSubmit = async () => {
-  if (!formData.value.name || !formData.value.price || !formData.value.category) {
+  const { name, price, category } = formData.value
+  const priceOk = price !== '' && price !== null && price !== undefined && Number.isFinite(Number(price))
+  if (!name?.trim() || !category || !priceOk) {
     alert('Заполните обязательные поля')
     return
   }

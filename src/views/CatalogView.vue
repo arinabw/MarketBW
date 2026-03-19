@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { ArrowRight, Heart } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
@@ -33,7 +33,12 @@ onMounted(() => {
   loadData()
 })
 
-const selectedCategory = computed(() => route.query.category)
+/** Vue Router может отдать category как string | string[] */
+const selectedCategory = computed(() => {
+  const c = route.query.category
+  if (Array.isArray(c)) return c[0] ?? undefined
+  return c ?? undefined
+})
 
 const filteredProducts = computed(() => {
   if (!selectedCategory.value) return products.value
