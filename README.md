@@ -116,15 +116,21 @@ git status
 
 ### Автообновление по cron
 
-`auto-update.sh` сравнивает `HEAD` с `origin/$BRANCH` (по умолчанию **main**); при отличии вызывает **`deploy.sh update`** (тот же `git pull` по той же ветке). Есть **`flock`**, чтобы не запускать второй build, пока идёт первый.
+`auto-update.sh` сравнивает `HEAD` с `origin/$BRANCH` (по умолчанию **main**); при отличии вызывает **`deploy.sh update`**. Скрипт сам **создаёт каталог лога**, **пишет в файл** (`exec >> …`) и задаёт **`PATH`** — даже без редиректа в crontab строки появляются в **`/opt/webserver/log/marketbw-auto-update.log`** (если каталог недоступен — **`/tmp/marketbw-auto-update.log`**). Свой путь: переменная **`MARKETBW_AUTO_UPDATE_LOG`**.
+
+**`chmod +x docker/auto-update.sh docker/deploy.sh`**
 
 ```bash
-# каждую минуту; ветка main (можно не указывать)
-* * * * * /opt/MarketBW/docker/auto-update.sh >> /var/log/marketbw-auto-update.log 2>&1
+# PATH в crontab по-прежнему нужен (первая строка без *):
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
+
+* * * * * /opt/webserver/sites/MarketBW/docker/auto-update.sh
 
 # ветка master
-* * * * * BRANCH=master /opt/MarketBW/docker/auto-update.sh >> /var/log/marketbw-auto-update.log 2>&1
+* * * * * BRANCH=master /opt/webserver/sites/MarketBW/docker/auto-update.sh
 ```
+
+Редирект `>> …log 2>&1` в crontab необязателен. Если лога нет — смотрите **`/tmp/marketbw-auto-update.log`** и что cron идёт от пользователя с правом **`docker`**.
 
 ### Ускорение сборки Docker на сервере
 

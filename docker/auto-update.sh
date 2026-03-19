@@ -1,18 +1,33 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Автообновление MarketBW по cron при появлении новых коммитов на origin.
 #
-# Требования:
-#   - клон с GitHub (есть .git), настроен remote origin;
-#   - один раз выполнен install: есть docker/.env;
-#   - Docker доступен пользователю cron (часто root — ок).
+# Лог пишется ВНУТРИ скрипта (mkdir каталога + exec >> файл). Так cron не молчит,
+# если каталога для редиректа не было или редирект в crontab не сработал.
+# Путь: MARKETBW_AUTO_UPDATE_LOG или по умолчанию /opt/webserver/log/marketbw-auto-update.log
+# При невозможности создать каталог — /tmp/marketbw-auto-update.log
 #
-# crontab -e (каждую минуту проверка; сборка только если есть новые коммиты):
-#   * * * * * /opt/webserver/sites/MarketBW/docker/auto-update.sh >> /var/log/marketbw-auto-update.log 2>&1
+# crontab (PATH обязателен у cron):
+#   PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
+#   * * * * * /opt/webserver/sites/MarketBW/docker/auto-update.sh
 #
-# Другая ветка (по умолчанию main):
-#   * * * * * BRANCH=master /opt/.../docker/auto-update.sh >> /var/log/marketbw-auto-update.log 2>&1
+# Редирект в crontab не обязателен; можно оставить для дубля: >> /opt/webserver/log/... 2>&1
 #
-# Параллельный запуск (пока идёт долгий build) блокируется flock.
+# chmod +x docker/auto-update.sh docker/deploy.sh
+# Ветка: BRANCH=master перед путём в crontab.
+
+# --- лог до set -e: иначе при ранней ошибке нечего писать ---
+LOG_FILE="${MARKETBW_AUTO_UPDATE_LOG:-/opt/webserver/log/marketbw-auto-update.log}"
+LOG_DIR="$(dirname "$LOG_FILE")"
+if ! mkdir -p "$LOG_DIR" 2>/dev/null; then
+  LOG_FILE="/tmp/marketbw-auto-update.log"
+fi
+exec >>"$LOG_FILE" 2>&1
+
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin${PATH:+:$PATH}"
+[ -d /snap/bin ] && PATH="/snap/bin:$PATH"
+export PATH
+
+echo "[$(date -Iseconds)] === auto-update старт (лог-файл: $LOG_FILE, user=$(id -un 2>/dev/null || echo unknown)) ==="
 
 set -euo pipefail
 
@@ -26,7 +41,6 @@ log_msg() {
 }
 
 export BRANCH
-# deploy.sh update использует GIT_BRANCH или BRANCH для git pull
 
 if command -v flock >/dev/null 2>&1; then
   exec 9>"$LOCK_FILE"

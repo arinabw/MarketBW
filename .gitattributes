@@ -1,0 +1,5 @@
+# Скрипты для Linux/cron — только LF (иначе shebang ломается)
+*.sh text eol=lf
+docker/deploy.sh text eol=lf
+docker/auto-update.sh text eol=lf
+scripts/*.sh text eol=lf
