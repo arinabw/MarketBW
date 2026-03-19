@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  admin-server:
+    build:
+      context: ..
+      dockerfile: docker/admin/Dockerfile
+    container_name: marketbw-admin
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped

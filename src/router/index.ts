@@ -29,6 +29,11 @@ const router = createRouter({
       name: 'faq',
       component: () => import('@/views/FAQView.vue'),
     },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('@/views/AdminView.vue'),
+    },
   ],
 })
 
