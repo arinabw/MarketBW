@@ -1,12 +1,34 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { ArrowRight, Star, Heart, Sparkles } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
-import { getFeaturedProducts, categories, reviews } from '@/lib/data'
+import { getFeaturedProducts, getCategories } from '@/api/public'
+import { categories as staticCategories, reviews } from '@/lib/data'
 import { formatPrice } from '@/lib/utils'
 
-const featuredProducts = computed(() => getFeaturedProducts())
+const featuredProducts = ref<any[]>([])
+const categories = ref<any[]>([])
+const isLoading = ref(true)
+
+onMounted(async () => {
+  try {
+    const [products, cats] = await Promise.all([
+      getFeaturedProducts(),
+      getCategories()
+    ])
+    featuredProducts.value = products
+    categories.value = cats
+  } catch (error) {
+    console.error('Error loading data:', error)
+    // Fallback to static data if API fails
+    featuredProducts.value = getFeaturedProducts()
+    categories.value = staticCategories
+  } finally {
+    isLoading.value = false
+  }
+})
+
 const featuredReviews = computed(() => reviews.slice(0, 3))
 </script>
 

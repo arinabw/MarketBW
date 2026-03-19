@@ -1,23 +1,50 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { ArrowRight, Heart } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
-import { products, categories } from '@/lib/data'
+import { getProducts, getCategories } from '@/api/public'
+import { products as staticProducts, categories as staticCategories } from '@/lib/data'
 import { formatPrice } from '@/lib/utils'
 
 const route = useRoute()
 
+const products = ref<any[]>([])
+const categories = ref<any[]>([])
+const isLoading = ref(true)
+
+const loadData = async () => {
+  try {
+    const [prods, cats] = await Promise.all([
+      getProducts(),
+      getCategories()
+    ])
+    products.value = prods
+    categories.value = cats
+  } catch (error) {
+    console.error('Error loading data:', error)
+    // Fallback to static data if API fails
+    products.value = staticProducts
+    categories.value = staticCategories
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  loadData()
+})
+
 const selectedCategory = computed(() => route.query.category as string | undefined)
 
 const filteredProducts = computed(() => {
-  if (!selectedCategory.value) return products
-  return products.filter(product => product.category === selectedCategory.value)
+  if (!selectedCategory.value) return products.value
+  return products.value.filter(product => product.category === selectedCategory.value)
 })
 
 const selectedCategoryName = computed(() => {
   if (!selectedCategory.value) return 'Все изделия'
-  const category = categories.find(cat => cat.id === selectedCategory.value)
+  const category = categories.value.find(cat => cat.id === selectedCategory.value)
   return category ? category.name : 'Все изделия'
 })
 </script>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { ArrowLeft, Heart, Star } from 'lucide-vue-next'
 import AppButton from '@/components/ui/AppButton.vue'
@@ -7,14 +7,42 @@ import AppCard from '@/components/ui/AppCard.vue'
 import AppCardHeader from '@/components/ui/AppCardHeader.vue'
 import AppCardContent from '@/components/ui/AppCardContent.vue'
 import AppCardTitle from '@/components/ui/AppCardTitle.vue'
-import { getProductById, getReviewsByProductId, categories } from '@/lib/data'
+import { getProductById as getProductByIdApi } from '@/api/public'
+import { getProductById as getProductByIdStatic, getReviewsByProductId, categories as staticCategories } from '@/lib/data'
 import { formatPrice } from '@/lib/utils'
 
 const route = useRoute()
 const productId = computed(() => route.params.id as string)
 
-const product = computed(() => getProductById(productId.value))
+const product = ref<any>(null)
 const productReviews = computed(() => getReviewsByProductId(productId.value))
+const isLoading = ref(true)
+
+const loadProduct = async () => {
+  try {
+    const prod = await getProductByIdApi(productId.value)
+    if (prod) {
+      product.value = prod
+    } else {
+      // Fallback to static data
+      product.value = getProductByIdStatic(productId.value)
+    }
+  } catch (error) {
+    console.error('Error loading product:', error)
+    // Fallback to static data
+    product.value = getProductByIdStatic(productId.value)
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  loadProduct()
+})
+
+watch(() => route.params.id, () => {
+  loadProduct()
+})
 
 const currentImageIndex = ref(0)
 
