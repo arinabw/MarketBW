@@ -1,6 +1,6 @@
 {
   "name": "marketbw/site",
-  "version": "3.1.1",
+  "version": "3.1.2",
   "description": "Bead Wonder — визитка рукоделия (Slim 4, Twig 3, SQLite)",
   "type": "project",
   "require": {
