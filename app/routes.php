@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Database;
+use App\ProductImages;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -213,8 +214,17 @@ return function (App $app, ContainerInterface $container): void {
             if (!is_dir($imagesDir . '/products')) {
                 mkdir($imagesDir . '/products', 0755, true);
             }
-            $paths = parse_image_paths($_POST['image_paths'] ?? '');
-            $paths = array_merge($paths, handle_image_uploads($_FILES['images'] ?? null, $imagesDir));
+            $norm = ProductImages::normalizeFromForm((string) ($_POST['image_paths'] ?? ''), $imagesDir);
+            if ($norm['error'] !== null) {
+                return $view()->render($response, 'admin/product_form.twig', [
+                    'error' => $norm['error'],
+                    'product' => null,
+                    'categories' => $db()->categories(),
+                    'form' => $_POST,
+                    'admin_section' => 'products',
+                ]);
+            }
+            $paths = array_merge($norm['paths'], handle_image_uploads($_FILES['images'] ?? null, $imagesDir));
             $materials = parse_lines($_POST['materials'] ?? '');
             $name = trim((string) ($_POST['name'] ?? ''));
             $desc = trim((string) ($_POST['description'] ?? ''));
@@ -237,11 +247,14 @@ return function (App $app, ContainerInterface $container): void {
             return $response->withHeader('Location', '/admin/products')->withStatus(302);
         });
 
-        $group->get('/products/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view): Response {
+        $group->get('/products/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view, $settings): Response {
             $p = $db()->productById((string) $args['id']);
             if (!$p) {
                 return $response->withStatus(404);
             }
+            $imagesDir = rtrim($settings()['images_dir'], '/');
+            [$p, ] = ProductImages::migrateStoredDataUrls($p, $db(), $imagesDir);
+
             return $view()->render($response, 'admin/product_form.twig', [
                 'product' => $p,
                 'categories' => $db()->categories(),
@@ -259,8 +272,22 @@ return function (App $app, ContainerInterface $container): void {
             if (!is_dir($imagesDir . '/products')) {
                 mkdir($imagesDir . '/products', 0755, true);
             }
-            $paths = parse_image_paths($_POST['image_paths'] ?? '');
-            $paths = array_merge($paths, handle_image_uploads($_FILES['images'] ?? null, $imagesDir));
+            $norm = ProductImages::normalizeFromForm((string) ($_POST['image_paths'] ?? ''), $imagesDir);
+            if ($norm['error'] !== null) {
+                $p = $db()->productById($id);
+                if (!$p) {
+                    return $response->withStatus(404);
+                }
+
+                return $view()->render($response, 'admin/product_form.twig', [
+                    'error' => $norm['error'],
+                    'product' => $p,
+                    'categories' => $db()->categories(),
+                    'form' => $_POST,
+                    'admin_section' => 'products',
+                ]);
+            }
+            $paths = array_merge($norm['paths'], handle_image_uploads($_FILES['images'] ?? null, $imagesDir));
             $materials = parse_lines($_POST['materials'] ?? '');
             $name = trim((string) ($_POST['name'] ?? ''));
             $desc = trim((string) ($_POST['description'] ?? ''));
@@ -377,19 +404,6 @@ return function (App $app, ContainerInterface $container): void {
 /**
  * @return list<string>
  */
-function parse_image_paths(string $raw): array
-{
-    $lines = preg_split('/\r\n|\r|\n/', $raw) ?: [];
-    $out = [];
-    foreach ($lines as $line) {
-        $line = trim($line);
-        if ($line !== '') {
-            $out[] = $line;
-        }
-    }
-    return $out;
-}
-
 /**
  * @return list<string>
  */

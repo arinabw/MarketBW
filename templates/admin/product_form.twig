@@ -3,6 +3,7 @@
 {% block title %}{{ product ? 'Редактирование' : 'Новый товар' }}{% endblock %}
 
 {% block content %}
+{% set f = form|default({}) %}
 <h1 style="font-family:var(--display);margin-top:0">{{ product ? 'Редактировать товар' : 'Новый товар' }}</h1>
 {% if error is defined %}
 <div class="alert">{{ error }}</div>
@@ -11,7 +12,7 @@
   <input type="hidden" name="csrf" value="{{ csrf_token() }}">
   <div class="form-row">
     <label for="name">Название *</label>
-    <input id="name" name="name" required value="{{ product ? product.name : (form.name ?? '') }}">
+    <input id="name" name="name" required value="{{ f.name|default(product ? product.name : '') }}">
   </div>
   <div class="form-row">
     <label for="description">Описание</label>
@@ -19,20 +20,20 @@
   </div>
   <div class="form-row">
     <label for="price">Цена *</label>
-    <input id="price" name="price" type="text" required value="{{ product ? product.price : (form.price ?? '') }}">
+    <input id="price" name="price" type="text" required value="{{ f.price|default(product ? product.price : '') }}">
   </div>
   <div class="form-row">
     <label for="category">Категория (id) *</label>
     <select id="category" name="category" required>
       <option value="">— выберите —</option>
       {% for c in categories %}
-      <option value="{{ c.id }}" {% if product and product.category == c.id %}selected{% elseif form.category|default('') == c.id %}selected{% endif %}>{{ c.name }} ({{ c.id }})</option>
+      <option value="{{ c.id }}" {% if f.category|default(product ? product.category : '') == c.id %}selected{% endif %}>{{ c.name }} ({{ c.id }})</option>
       {% endfor %}
     </select>
   </div>
   <div class="form-row">
-    <label for="image_paths">Пути к изображениям (по одному в строке, URL с /images/...)</label>
-    <textarea id="image_paths" name="image_paths" rows="4" placeholder="/images/products/1.svg">{% if product %}{{ product.images|join("\n") }}{% else %}{{ form.image_paths ?? '' }}{% endif %}</textarea>
+    <label for="image_paths">Пути к изображениям (по одному в строке, только <code>/images/…</code>). Не вставляйте base64 — загрузите файлы полем ниже или укажите готовый путь.</label>
+    <textarea id="image_paths" name="image_paths" rows="5" placeholder="/images/products/photo.jpg" spellcheck="false">{{ f.image_paths|default(product ? product.images|join("\n") : '') }}</textarea>
   </div>
   <div class="form-row">
     <label for="images">Загрузить файлы (несколько)</label>
@@ -40,15 +41,15 @@
   </div>
   <div class="form-row">
     <label for="materials">Материалы (по строке)</label>
-    <textarea id="materials" name="materials" rows="4">{% if product %}{{ product.materials|join("\n") }}{% else %}{{ form.materials ?? '' }}{% endif %}</textarea>
+    <textarea id="materials" name="materials" rows="4">{{ f.materials|default(product ? product.materials|join("\n") : '') }}</textarea>
   </div>
   <div class="form-row">
     <label for="size">Размер</label>
-    <input id="size" name="size" value="{{ product ? product.size : (form.size ?? '') }}">
+    <input id="size" name="size" value="{{ f.size|default(product ? product.size : '') }}">
   </div>
   <div class="form-row">
     <label for="technique">Техника</label>
-    <input id="technique" name="technique" value="{{ product ? product.technique : (form.technique ?? '') }}">
+    <input id="technique" name="technique" value="{{ f.technique|default(product ? product.technique : '') }}">
   </div>
   <div class="form-row" style="display:flex;gap:1rem;flex-wrap:wrap">
     <label><input type="checkbox" name="in_stock" {% if product is null or product.in_stock %}checked{% endif %}> В наличии</label>
