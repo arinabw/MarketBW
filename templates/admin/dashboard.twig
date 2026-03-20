@@ -4,7 +4,12 @@
 
 {% block content %}
 <h1 style="font-family:var(--display);margin-top:0">Обзор</h1>
-<p class="muted">Краткая статистика каталога.</p>
+<p class="muted">Краткая статистика и быстрые ссылки.</p>
+<p style="margin-bottom:1rem">
+  <a class="btn btn--primary" href="/admin/content">Контент сайта</a>
+  <a class="btn btn--ghost" href="/admin/faqs">FAQ</a>
+  <a class="btn btn--ghost" href="/admin/reviews">Отзывы</a>
+</p>
 <div class="grid-cards" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
   <div class="box">
     <div class="muted" style="font-size:0.85rem">Товары</div>

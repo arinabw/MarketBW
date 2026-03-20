@@ -4,17 +4,17 @@
 <section class="hero">
   <div class="container hero__grid">
     <div>
-      <div class="badge">✨ {{ site_name }} — бисерные чудеса</div>
-      <h1>Маленькие чудеса <span class="hero__accent">из бисера</span></h1>
-      <p class="lead">Уникальные украшения ручной работы — с любовью и вниманием к каждой детали.</p>
+      <div class="badge">{{ t('home.badge_prefix') }}{{ site_name }}{{ t('home.badge_suffix') }}</div>
+      <h1>{{ t('home.hero_title') }}<span class="hero__accent">{{ t('home.hero_title_accent') }}</span></h1>
+      <p class="lead">{{ t('home.hero_lead') }}</p>
       <div class="btn-row">
-        <a class="btn btn--primary" href="/catalog">Открыть каталог</a>
-        <a class="btn btn--ghost" href="/contact">Связаться с мастером</a>
+        <a class="btn btn--primary" href="/catalog">{{ t('home.btn_catalog') }}</a>
+        <a class="btn btn--ghost" href="/contact">{{ t('home.btn_contact') }}</a>
       </div>
     </div>
     <div class="hero-art">
       <div class="hero-art__frame">
-        <img src="/images/hero-beadwork.svg" alt="Украшения из бисера" width="600" height="400" loading="eager">
+        <img src="{{ t('home.hero_image') }}" alt="{{ t('home.hero_image_alt') }}" width="600" height="400" loading="eager">
       </div>
     </div>
   </div>
@@ -22,8 +22,8 @@
 
 <section class="section section--white">
   <div class="container">
-    <h2 class="section-title">Категории</h2>
-    <p class="section-sub">Выберите направление и откройте для себя каталог изделий.</p>
+    <h2 class="section-title">{{ t('home.section_categories_title') }}</h2>
+    <p class="section-sub">{{ t('home.section_categories_sub') }}</p>
     <div class="grid-cards">
       {% for c in categories %}
       <a class="card card--link" href="{{ catalog_url(c.id, null, null) }}">
@@ -33,7 +33,7 @@
         <div class="card__body">
           <h3 class="card__title">{{ c.name }}</h3>
           <p class="card__text">{{ c.description }}</p>
-          <span class="card__link">Смотреть →</span>
+          <span class="card__link">{{ t('home.card_link') }}</span>
         </div>
       </a>
       {% endfor %}
@@ -43,8 +43,8 @@
 
 <section class="section">
   <div class="container">
-    <h2 class="section-title">Избранное</h2>
-    <p class="section-sub">Подборка актуальных работ в наличии.</p>
+    <h2 class="section-title">{{ t('home.section_featured_title') }}</h2>
+    <p class="section-sub">{{ t('home.section_featured_sub') }}</p>
     <div class="grid-cards">
       {% for p in featured %}
       <article class="card">
@@ -56,11 +56,11 @@
           <h3 class="card__title"><a href="/product/{{ p.id }}">{{ p.name }}</a></h3>
           <div class="card__meta">{{ p.price|price_rub }}</div>
           <p class="card__text">{{ p.description|slice(0, 120) }}{% if p.description|length > 120 %}…{% endif %}</p>
-          <a class="card__link" href="/product/{{ p.id }}">Подробнее</a>
+          <a class="card__link" href="/product/{{ p.id }}">{{ t('home.card_more') }}</a>
         </div>
       </article>
       {% else %}
-      <p class="muted empty-hint">Пока нет избранных товаров — загляните в <a href="/catalog">каталог</a>.</p>
+      <p class="muted empty-hint">{{ t('home.featured_empty')|raw }}</p>
       {% endfor %}
     </div>
   </div>
@@ -68,8 +68,8 @@
 
 <section class="section section--white">
   <div class="container">
-    <h2 class="section-title">Отзывы</h2>
-    <p class="section-sub">Несколько слов от покупательниц.</p>
+    <h2 class="section-title">{{ t('home.section_reviews_title') }}</h2>
+    <p class="section-sub">{{ t('home.section_reviews_sub') }}</p>
     <div class="grid-cards reviews-grid">
       {% for r in reviews %}
       <div class="review">

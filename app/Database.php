@@ -76,6 +76,11 @@ CREATE TABLE IF NOT EXISTS faqs (
     answer TEXT NOT NULL,
     category TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS site_content (
+    content_key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+);
 SQL;
         $this->pdo->exec($schema);
 
@@ -362,5 +367,132 @@ SQL;
         $row['featured'] = (bool) $row['featured'];
         $row['price'] = (float) $row['price'];
         return $row;
+    }
+
+    /**
+     * Слияние: значения по умолчанию + .env + переопределения из БД.
+     *
+     * @param array<string, mixed> $settings
+     *
+     * @return array<string, string>
+     */
+    public function getMergedSiteContent(array $settings): array
+    {
+        $defaults = SiteContentDefaults::defaults($settings);
+        $st = $this->pdo->query('SELECT content_key, value FROM site_content');
+        $over = [];
+        if ($st) {
+            foreach ($st->fetchAll() as $row) {
+                $over[(string) $row['content_key']] = (string) $row['value'];
+            }
+        }
+
+        return SiteContentDefaults::applyMetaPlaceholders(array_merge($defaults, $over), (string) ($settings['site_name'] ?? ''));
+    }
+
+    /**
+     * @param array<string, string> $pairs только известные ключи; пустая строка — сброс к значению по умолчанию (удаление из БД)
+     */
+    public function saveSiteContent(array $pairs): void
+    {
+        $allowed = array_flip(SiteContentDefaults::allKeys());
+        $del = $this->pdo->prepare('DELETE FROM site_content WHERE content_key = ?');
+        $up = $this->pdo->prepare(
+            'INSERT INTO site_content (content_key, value) VALUES (?, ?)
+             ON CONFLICT(content_key) DO UPDATE SET value = excluded.value'
+        );
+        foreach ($pairs as $k => $v) {
+            if (!isset($allowed[$k])) {
+                continue;
+            }
+            if ($v === '') {
+                $del->execute([$k]);
+            } else {
+                $up->execute([$k, $v]);
+            }
+        }
+    }
+
+    public function faqById(string $id): ?array
+    {
+        $st = $this->pdo->prepare('SELECT * FROM faqs WHERE id = ?');
+        $st->execute([$id]);
+        $row = $st->fetch();
+        return $row ?: null;
+    }
+
+    public function createFaq(string $question, string $answer, string $category): string
+    {
+        $id = (string) (int) (microtime(true) * 1000);
+        $this->pdo->prepare(
+            'INSERT INTO faqs (id, question, answer, category) VALUES (?, ?, ?, ?)'
+        )->execute([$id, $question, $answer, $category]);
+
+        return $id;
+    }
+
+    public function updateFaq(string $id, ?string $question, ?string $answer, ?string $category): void
+    {
+        $fields = [];
+        $vals = [];
+        if ($question !== null) {
+            $fields[] = 'question = ?';
+            $vals[] = $question;
+        }
+        if ($answer !== null) {
+            $fields[] = 'answer = ?';
+            $vals[] = $answer;
+        }
+        if ($category !== null) {
+            $fields[] = 'category = ?';
+            $vals[] = $category;
+        }
+        if ($fields === []) {
+            return;
+        }
+        $vals[] = $id;
+        $this->pdo->prepare('UPDATE faqs SET ' . implode(', ', $fields) . ' WHERE id = ?')->execute($vals);
+    }
+
+    public function deleteFaq(string $id): void
+    {
+        $this->pdo->prepare('DELETE FROM faqs WHERE id = ?')->execute([$id]);
+    }
+
+    public function reviewById(string $id): ?array
+    {
+        $st = $this->pdo->prepare('SELECT * FROM reviews WHERE id = ?');
+        $st->execute([$id]);
+        $row = $st->fetch();
+        return $row ?: null;
+    }
+
+    public function createReview(string $author, int $rating, string $text, string $date, ?string $productId): string
+    {
+        $id = (string) (int) (microtime(true) * 1000);
+        $this->pdo->prepare(
+            'INSERT INTO reviews (id, author, rating, text, date, product_id) VALUES (?, ?, ?, ?, ?, ?)'
+        )->execute([$id, $author, max(1, min(5, $rating)), $text, $date, $productId]);
+
+        return $id;
+    }
+
+    public function updateReview(string $id, string $author, int $rating, string $text, string $date, ?string $productId): void
+    {
+        $this->pdo->prepare(
+            'UPDATE reviews SET author = ?, rating = ?, text = ?, date = ?, product_id = ? WHERE id = ?'
+        )->execute([
+            $author,
+            max(1, min(5, $rating)),
+            $text,
+            $date,
+            $productId,
+            $id,
+        ]);
+    }
+
+    public function deleteReview(string $id): void
+    {
+        $this->pdo->prepare('DELETE FROM reviews WHERE id = ?')->execute([$id]);
     }
 }

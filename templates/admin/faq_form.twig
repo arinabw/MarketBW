@@ -1,0 +1,28 @@
+{% extends "admin/layout.twig" %}
+
+{% block title %}FAQ{% endblock %}
+
+{% block content %}
+{% set f = form|default({}) %}
+<h1 style="font-family:var(--display);margin-top:0">{{ faq ? 'Редактировать вопрос' : 'Новый вопрос' }}</h1>
+{% if error is defined %}
+<div class="alert">{{ error }}</div>
+{% endif %}
+<form method="post" class="box" style="margin-top:1rem">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <div class="form-row">
+    <label for="question">Вопрос *</label>
+    <input id="question" name="question" required value="{{ f.question|default(faq ? faq.question : '') }}">
+  </div>
+  <div class="form-row">
+    <label for="answer">Ответ *</label>
+    <textarea id="answer" name="answer" rows="5" required>{{ f.answer|default(faq ? faq.answer : '') }}</textarea>
+  </div>
+  <div class="form-row">
+    <label for="category">Категория (метка)</label>
+    <input id="category" name="category" value="{{ f.category|default(faq ? faq.category : 'general') }}" placeholder="order, shipping, care…">
+  </div>
+  <button class="btn btn--primary" type="submit">Сохранить</button>
+  <a class="btn btn--ghost" href="/admin/faqs">Отмена</a>
+</form>
+{% endblock %}

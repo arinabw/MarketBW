@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="{{ master_tagline }} — {{ site_name }}, украшения из бисера ручной работы.">
+  <meta name="description" content="{{ t('meta.description') }}">
   <title>{% block title %}{{ site_name }}{% endblock %}</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/favicon.svg">
@@ -16,13 +16,13 @@
   <header class="site-header">
     <div class="container">
       <div class="site-header__inner">
-        <a class="logo" href="/">{{ site_name }} <span>·</span> бисер</a>
+        <a class="logo" href="/">{{ site_name }} <span>·</span> {{ t('header.logo_suffix') }}</a>
         <nav class="nav" aria-label="Основное меню">
-          <a href="/" class="{{ nav_is_active('/') ? 'is-active' : '' }}">Главная</a>
-          <a href="/catalog" class="{{ nav_is_active('/catalog') ? 'is-active' : '' }}">Каталог</a>
-          <a href="/about" class="{{ nav_is_active('/about') ? 'is-active' : '' }}">О мастере</a>
-          <a href="/contact" class="{{ nav_is_active('/contact') ? 'is-active' : '' }}">Контакты</a>
-          <a href="/faq" class="{{ nav_is_active('/faq') ? 'is-active' : '' }}">FAQ</a>
+          <a href="/" class="{{ nav_is_active('/') ? 'is-active' : '' }}">{{ t('nav.home') }}</a>
+          <a href="/catalog" class="{{ nav_is_active('/catalog') ? 'is-active' : '' }}">{{ t('nav.catalog') }}</a>
+          <a href="/about" class="{{ nav_is_active('/about') ? 'is-active' : '' }}">{{ t('nav.about') }}</a>
+          <a href="/contact" class="{{ nav_is_active('/contact') ? 'is-active' : '' }}">{{ t('nav.contact') }}</a>
+          <a href="/faq" class="{{ nav_is_active('/faq') ? 'is-active' : '' }}">{{ t('nav.faq') }}</a>
         </nav>
         {% include 'partials/social-icons.twig' %}
       </div>
@@ -42,12 +42,12 @@
         </div>
       </div>
       <nav class="footer-nav" aria-label="Дополнительно">
-        <a href="/about">О мастере</a>
-        <a href="/faq">Вопросы и ответы</a>
-        <a href="/contact">Контакты</a>
-        <a href="/catalog">Каталог</a>
+        <a href="/about">{{ t('nav.about') }}</a>
+        <a href="/faq">{{ t('nav.faq') }}</a>
+        <a href="/contact">{{ t('nav.contact') }}</a>
+        <a href="/catalog">{{ t('nav.catalog') }}</a>
       </nav>
-      <p class="footer-note">Изделия ручной работы: сроки и возврат обсуждаются индивидуально.</p>
+      <p class="footer-note">{{ t('footer.note') }}</p>
     </div>
   </footer>
   {% include 'partials/metrika.twig' %}

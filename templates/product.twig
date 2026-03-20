@@ -6,9 +6,9 @@
 <section class="section section--tight section--white">
   <div class="container">
     <nav class="breadcrumbs" aria-label="Навигация">
-      <a href="/">Главная</a>
+      <a href="/">{{ t('product.breadcrumb_home') }}</a>
       <span class="breadcrumbs__sep">/</span>
-      <a href="/catalog">Каталог</a>
+      <a href="/catalog">{{ t('product.breadcrumb_catalog') }}</a>
       {% if category_name %}
       <span class="breadcrumbs__sep">/</span>
       <a href="{{ catalog_url(product.category, null, null) }}">{{ category_name }}</a>
@@ -41,12 +41,12 @@
       <p class="product-info__price">{{ product.price|price_rub }}</p>
       <p class="muted product-info__desc">{{ product.description }}</p>
       <dl class="product-meta">
-        <div><dt>Техника</dt><dd>{{ product.technique }}</dd></div>
-        {% if product.size %}<div><dt>Размер</dt><dd>{{ product.size }}</dd></div>{% endif %}
-        <div><dt>В наличии</dt><dd>{{ product.in_stock ? 'да' : 'под заказ' }}</dd></div>
+        <div><dt>{{ t('product.meta_technique') }}</dt><dd>{{ product.technique }}</dd></div>
+        {% if product.size %}<div><dt>{{ t('product.meta_size') }}</dt><dd>{{ product.size }}</dd></div>{% endif %}
+        <div><dt>{{ t('product.meta_stock') }}</dt><dd>{{ product.in_stock ? t('product.meta_stock_yes') : t('product.meta_stock_no') }}</dd></div>
       </dl>
       {% if product.materials|length %}
-      <p class="product-info__label"><strong>Материалы</strong></p>
+      <p class="product-info__label"><strong>{{ t('product.materials_label') }}</strong></p>
       <ul class="meta-list">
         {% for m in product.materials %}
         <li>{{ m }}</li>
@@ -55,16 +55,16 @@
       {% endif %}
 
       <div class="order-steps">
-        <h2 class="order-steps__title">Как заказать</h2>
+        <h2 class="order-steps__title">{{ t('product.order_title') }}</h2>
         <ol class="order-steps__list">
-          <li>Напишите в <a href="/contact">контакты</a> или в мессенджер — укажите изделие или идею.</li>
-          <li>Согласуем детали, срок и стоимость.</li>
-          <li>После подтверждения — изготовление и отправка.</li>
+          <li>{{ t('product.order_step_1')|raw }}</li>
+          <li>{{ t('product.order_step_2')|raw }}</li>
+          <li>{{ t('product.order_step_3')|raw }}</li>
         </ol>
       </div>
 
       <div class="btn-row product-actions">
-        <a class="btn btn--primary" href="/contact">Заказать или задать вопрос</a>
+        <a class="btn btn--primary" href="/contact">{{ t('product.btn_order') }}</a>
         {% if social_telegram != '#' %}
         <a class="btn btn--tg" href="{{ social_telegram }}" target="_blank" rel="noopener">Telegram</a>
         {% endif %}
@@ -79,7 +79,7 @@
 {% if reviews|length %}
 <section class="section">
   <div class="container">
-    <h2 class="section-title">Отзывы об этом изделии</h2>
+    <h2 class="section-title">{{ t('product.reviews_title') }}</h2>
     {% for r in reviews %}
     <div class="review">
       <div class="review__head">

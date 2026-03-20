@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Database;
 use App\ProductImages;
+use App\SiteContentDefaults;
+use App\SiteUpload;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -398,12 +400,229 @@ return function (App $app, ContainerInterface $container): void {
             $db()->deleteCategory((string) $args['id']);
             return $response->withHeader('Location', '/admin/categories')->withStatus(302);
         });
+
+        $group->get('/content', function (Request $request, Response $response) use ($db, $view, $settings): Response {
+            $qp = $request->getQueryParams();
+            $saved = isset($qp['saved']) && $qp['saved'] === '1';
+
+            return $view()->render($response, 'admin/content.twig', [
+                'content' => $db()->getMergedSiteContent($settings()),
+                'content_groups' => SiteContentDefaults::adminGroups(),
+                'image_keys' => SiteContentDefaults::imageKeys(),
+                'saved' => $saved,
+                'admin_section' => 'content',
+            ]);
+        });
+
+        $group->post('/content', function (Request $request, Response $response) use ($db, $settings): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $input = $_POST['content'] ?? [];
+            if (!is_array($input)) {
+                $input = [];
+            }
+            $pairs = [];
+            foreach (SiteContentDefaults::allKeys() as $k) {
+                if (!array_key_exists($k, $input)) {
+                    continue;
+                }
+                $pairs[$k] = (string) $input[$k];
+            }
+            $imgDir = rtrim($settings()['images_dir'], '/');
+            foreach (SiteContentDefaults::imageKeys() as $k) {
+                $fname = 'img_' . str_replace('.', '_', $k);
+                $path = SiteUpload::saveImage($_FILES[$fname] ?? null, $imgDir);
+                if ($path !== null) {
+                    $pairs[$k] = $path;
+                }
+            }
+            $db()->saveSiteContent($pairs);
+
+            return $response->withHeader('Location', '/admin/content?saved=1')->withStatus(302);
+        });
+
+        $group->get('/faqs', function (Request $request, Response $response) use ($db, $view): Response {
+            return $view()->render($response, 'admin/faqs.twig', [
+                'faqs' => $db()->faqs(),
+                'admin_section' => 'faqs',
+            ]);
+        });
+
+        $group->get('/faqs/new', function (Request $request, Response $response) use ($view): Response {
+            return $view()->render($response, 'admin/faq_form.twig', [
+                'faq' => null,
+                'admin_section' => 'faqs',
+            ]);
+        });
+
+        $group->post('/faqs/new', function (Request $request, Response $response) use ($db, $view): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $q = trim((string) ($_POST['question'] ?? ''));
+            $a = trim((string) ($_POST['answer'] ?? ''));
+            $cat = trim((string) ($_POST['category'] ?? 'general'));
+            if ($q === '' || $a === '') {
+                return $view()->render($response, 'admin/faq_form.twig', [
+                    'error' => 'Заполните вопрос и ответ',
+                    'faq' => null,
+                    'form' => $_POST,
+                    'admin_section' => 'faqs',
+                ]);
+            }
+            $db()->createFaq($q, $a, $cat !== '' ? $cat : 'general');
+
+            return $response->withHeader('Location', '/admin/faqs')->withStatus(302);
+        });
+
+        $group->get('/faqs/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view): Response {
+            $f = $db()->faqById((string) $args['id']);
+            if (!$f) {
+                return $response->withStatus(404);
+            }
+
+            return $view()->render($response, 'admin/faq_form.twig', [
+                'faq' => $f,
+                'admin_section' => 'faqs',
+            ]);
+        });
+
+        $group->post('/faqs/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $id = (string) $args['id'];
+            $q = trim((string) ($_POST['question'] ?? ''));
+            $a = trim((string) ($_POST['answer'] ?? ''));
+            $cat = trim((string) ($_POST['category'] ?? 'general'));
+            if ($q === '' || $a === '') {
+                $f = $db()->faqById($id);
+                if (!$f) {
+                    return $response->withStatus(404);
+                }
+
+                return $view()->render($response, 'admin/faq_form.twig', [
+                    'error' => 'Заполните вопрос и ответ',
+                    'faq' => $f,
+                    'form' => $_POST,
+                    'admin_section' => 'faqs',
+                ]);
+            }
+            $db()->updateFaq($id, $q, $a, $cat !== '' ? $cat : 'general');
+
+            return $response->withHeader('Location', '/admin/faqs')->withStatus(302);
+        });
+
+        $group->post('/faqs/{id}/delete', function (Request $request, Response $response, array $args) use ($db): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $db()->deleteFaq((string) $args['id']);
+
+            return $response->withHeader('Location', '/admin/faqs')->withStatus(302);
+        });
+
+        $group->get('/reviews', function (Request $request, Response $response) use ($db, $view): Response {
+            return $view()->render($response, 'admin/reviews.twig', [
+                'reviews' => $db()->reviews(),
+                'admin_section' => 'reviews',
+            ]);
+        });
+
+        $group->get('/reviews/new', function (Request $request, Response $response) use ($db, $view): Response {
+            return $view()->render($response, 'admin/review_form.twig', [
+                'review' => null,
+                'products' => $db()->products(),
+                'admin_section' => 'reviews',
+            ]);
+        });
+
+        $group->post('/reviews/new', function (Request $request, Response $response) use ($db, $view): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $author = trim((string) ($_POST['author'] ?? ''));
+            $text = trim((string) ($_POST['text'] ?? ''));
+            $rating = (int) ($_POST['rating'] ?? 5);
+            $date = trim((string) ($_POST['date'] ?? '')) ?: date('Y-m-d H:i:s');
+            $pid = trim((string) ($_POST['product_id'] ?? ''));
+            $productId = $pid !== '' ? $pid : null;
+            if ($author === '' || $text === '') {
+                return $view()->render($response, 'admin/review_form.twig', [
+                    'error' => 'Заполните автора и текст',
+                    'review' => null,
+                    'products' => $db()->products(),
+                    'form' => $_POST,
+                    'admin_section' => 'reviews',
+                ]);
+            }
+            $db()->createReview($author, $rating, $text, $date, $productId);
+
+            return $response->withHeader('Location', '/admin/reviews')->withStatus(302);
+        });
+
+        $group->get('/reviews/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view): Response {
+            $r = $db()->reviewById((string) $args['id']);
+            if (!$r) {
+                return $response->withStatus(404);
+            }
+
+            return $view()->render($response, 'admin/review_form.twig', [
+                'review' => $r,
+                'products' => $db()->products(),
+                'admin_section' => 'reviews',
+            ]);
+        });
+
+        $group->post('/reviews/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $id = (string) $args['id'];
+            $author = trim((string) ($_POST['author'] ?? ''));
+            $text = trim((string) ($_POST['text'] ?? ''));
+            $rating = (int) ($_POST['rating'] ?? 5);
+            $date = trim((string) ($_POST['date'] ?? '')) ?: date('Y-m-d H:i:s');
+            $pid = trim((string) ($_POST['product_id'] ?? ''));
+            $productId = $pid !== '' ? $pid : null;
+            if ($author === '' || $text === '') {
+                $r = $db()->reviewById($id);
+                if (!$r) {
+                    return $response->withStatus(404);
+                }
+
+                return $view()->render($response, 'admin/review_form.twig', [
+                    'error' => 'Заполните автора и текст',
+                    'review' => $r,
+                    'products' => $db()->products(),
+                    'form' => $_POST,
+                    'admin_section' => 'reviews',
+                ]);
+            }
+            $db()->updateReview($id, $author, $rating, $text, $date, $productId);
+
+            return $response->withHeader('Location', '/admin/reviews')->withStatus(302);
+        });
+
+        $group->post('/reviews/{id}/delete', function (Request $request, Response $response, array $args) use ($db): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $db()->deleteReview((string) $args['id']);
+
+            return $response->withHeader('Location', '/admin/reviews')->withStatus(302);
+        });
     })->add($adminGuard);
 };
 
-/**
- * @return list<string>
- */
 /**
  * @return list<string>
  */

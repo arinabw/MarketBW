@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Database;
+use App\SiteContentDefaults;
 use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
@@ -53,8 +54,18 @@ $containerBuilder->addDefinitions([
         $env->addFunction(new \Twig\TwigFunction('phone_digits', function (string $phone): string {
             return preg_replace('/\D+/', '', $phone) ?: '';
         }));
-        $env->addFunction(new \Twig\TwigFunction('whatsapp_url', function () use ($settings): string {
-            $d = preg_replace('/\D+/', '', $settings['contact_whatsapp'] ?? '');
+        $env->addFunction(new \Twig\TwigFunction('t', function (string $key) use ($env): string {
+            $content = $env->getGlobals()['content'] ?? [];
+
+            return (string) ($content[$key] ?? '');
+        }));
+        $env->addFunction(new \Twig\TwigFunction('content_label', function (string $key): string {
+            return SiteContentDefaults::fieldLabel($key);
+        }));
+        $env->addFunction(new \Twig\TwigFunction('whatsapp_url', function () use ($env): string {
+            $g = $env->getGlobals();
+            $d = preg_replace('/\D+/', '', (string) ($g['contact_whatsapp'] ?? ''));
+
             return $d !== '' ? 'https://wa.me/' . $d : '#';
         }));
         $env->addFilter(new \Twig\TwigFilter('stars', function ($rating): string {
@@ -113,5 +124,22 @@ $app->addErrorMiddleware(
 $container->get(Database::class)->init();
 
 (require __DIR__ . '/routes.php')($app, $container);
+
+$app->add(function ($request, $handler) use ($container) {
+    $settings = $container->get('settings');
+    $merged = $container->get(Database::class)->getMergedSiteContent($settings);
+    $env = $container->get('twig')->getEnvironment();
+    $env->addGlobal('content', $merged);
+    $env->addGlobal('master_name', $merged['brand.master_name'] ?? $settings['master_name']);
+    $env->addGlobal('master_tagline', $merged['brand.tagline'] ?? $settings['master_tagline']);
+    $env->addGlobal('contact_email', $merged['contact.email'] ?? $settings['contact_email']);
+    $env->addGlobal('contact_phone', $merged['contact.phone'] ?? $settings['contact_phone']);
+    $env->addGlobal('contact_whatsapp', $merged['contact.whatsapp'] ?? $settings['contact_whatsapp']);
+    $env->addGlobal('social_instagram', $merged['social.instagram'] ?? $settings['social_instagram']);
+    $env->addGlobal('social_telegram', $merged['social.telegram'] ?? $settings['social_telegram']);
+    $env->addGlobal('social_vk', $merged['social.vk'] ?? $settings['social_vk']);
+
+    return $handler->handle($request);
+});
 
 return $app;

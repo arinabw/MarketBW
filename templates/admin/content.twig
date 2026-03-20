@@ -1,0 +1,38 @@
+{% extends "admin/layout.twig" %}
+
+{% block title %}Контент сайта{% endblock %}
+
+{% block content %}
+<h1 style="font-family:var(--display);margin-top:0">Тексты и изображения</h1>
+<p class="muted">Здесь можно менять формулировки на всех страницах и путь к картинке на главной (или загрузить файл). Контакты и соцсети дублируют .env при первом запуске — после сохранения значения берутся отсюда.</p>
+{% if saved %}
+<div class="alert alert--success">Сохранено.</div>
+{% endif %}
+<form method="post" action="/admin/content" enctype="multipart/form-data" class="box admin-content-form" style="margin-top:1rem">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  {% for title, keys in content_groups %}
+  <fieldset class="admin-fieldset">
+    <legend class="admin-fieldset__legend">{{ title }}</legend>
+    {% for key in keys %}
+    <div class="form-row">
+      <label for="c-{{ key|replace({'.':'-'}) }}">{{ content_label(key) }}</label>
+      {% if key in image_keys %}
+      <input type="text" name="content[{{ key }}]" id="c-{{ key|replace({'.':'-'}) }}" value="{{ content[key]|default('') }}" placeholder="/images/...">
+      <div class="admin-upload-preview" style="margin-top:0.5rem">
+        {% if content[key]|default('') %}
+        <figure class="admin-upload-preview__item">
+          <img src="{{ content[key] }}" alt="" loading="lazy" width="200" height="120">
+        </figure>
+        {% endif %}
+      </div>
+      <input type="file" name="img_{{ key|replace({'.':'_'}) }}" accept=".jpg,.jpeg,.png,.gif,.webp,.svg">
+      {% else %}
+      <textarea name="content[{{ key }}]" id="c-{{ key|replace({'.':'-'}) }}" rows="{% if key in ['about.intro_p1','about.intro_p2','contact.form_success','meta.description','product.order_step_1','product.order_step_2','product.order_step_3'] %}4{% else %}2{% endif %}">{{ content[key]|default('') }}</textarea>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </fieldset>
+  {% endfor %}
+  <button class="btn btn--primary" type="submit">Сохранить всё</button>
+</form>
+{% endblock %}
