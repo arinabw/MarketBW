@@ -16,7 +16,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$SCRIPT_DIR"
 
-# Ускорение сборки: кэш npm между билдами (RUN --mount в Dockerfile)
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
@@ -98,16 +97,16 @@ require_env_file() {
   fi
 }
 
-require_package_json() {
-  if [ ! -f "$REPO_ROOT/package.json" ]; then
-    log_error "Не найден $REPO_ROOT/package.json — запускайте скрипт из репозитория MarketBW (каталог docker/ внутри проекта)."
+require_repo_root() {
+  if [ ! -f "$REPO_ROOT/composer.json" ]; then
+    log_error "Не найден $REPO_ROOT/composer.json — запускайте скрипт из репозитория MarketBW (каталог docker/ внутри проекта)."
     exit 1
   fi
 }
 
 install() {
   log_info "Установка MarketBW (Traefik / webserver)..."
-  require_package_json
+  require_repo_root
   require_env_file
   check_traefik_network
 

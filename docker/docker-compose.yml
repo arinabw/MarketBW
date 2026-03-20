@@ -1,6 +1,9 @@
-# Деплой за Traefik (как templates/node-site в https://github.com/idpro1313/webserver ).
-# Сеть web должна существовать (docker network create web — делает start-hosting.sh).
+# Деплой за Traefik (сеть web должна существовать: docker network create web).
 # Перед запуском: cp env.example .env
+#
+# Тома:
+#   ../data        — SQLite marketbw.db (персистентная БД на сервере)
+#   ../public/images — картинки каталога и загрузки (можно заменить путём на сервере)
 
 services:
   marketbw:
@@ -12,17 +15,27 @@ services:
     restart: unless-stopped
     networks:
       - web
+    environment:
+      DATA_DIR: /var/www/data
+      IMAGES_DIR: /var/www/images
+      APP_DEBUG: ${APP_DEBUG:-false}
+      SITE_NAME: ${SITE_NAME:-Bead Wonder}
+      CONTACT_EMAIL: ${CONTACT_EMAIL:-your-email@example.com}
+      CONTACT_PHONE: ${CONTACT_PHONE:-+7 (999) 123-45-67}
+      SOCIAL_INSTAGRAM: ${SOCIAL_INSTAGRAM:-#}
+      SOCIAL_TELEGRAM: ${SOCIAL_TELEGRAM:-#}
+      SOCIAL_VK: ${SOCIAL_VK:-#}
     volumes:
-      - ../data:/app/data
+      - ../data:/var/www/data
+      - ../public/images:/var/www/images
     labels:
       - traefik.enable=true
       - traefik.docker.network=${TRAEFIK_NETWORK:-web}
-      # Правило в кавычках — как в шаблоне webserver (корректно для Host(`...`) в .env)
       - "traefik.http.routers.${TRAEFIK_ROUTER:-marketbw}.rule=${TRAEFIK_RULE}"
       - traefik.http.routers.${TRAEFIK_ROUTER:-marketbw}.service=${TRAEFIK_ROUTER:-marketbw}
       - traefik.http.routers.${TRAEFIK_ROUTER:-marketbw}.entrypoints=${TRAEFIK_HTTPS_ENTRYPOINT:-websecure}
       - traefik.http.routers.${TRAEFIK_ROUTER:-marketbw}.tls.certresolver=${TRAEFIK_CERT_RESOLVER:-le}
-      - traefik.http.services.${TRAEFIK_ROUTER:-marketbw}.loadbalancer.server.port=8000
+      - traefik.http.services.${TRAEFIK_ROUTER:-marketbw}.loadbalancer.server.port=80
 
 networks:
   web:

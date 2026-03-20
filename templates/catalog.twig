@@ -1,0 +1,41 @@
+{% extends "base.twig" %}
+
+{% block title %}Каталог — {{ site_name }}{% endblock %}
+
+{% block body %}
+<section class="page-hero">
+  <div class="container">
+    <h1>Каталог</h1>
+    <p class="muted">Все изделия в одном месте — фильтр по категории.</p>
+  </div>
+</section>
+
+<section class="section section--white">
+  <div class="container">
+    <div class="filters">
+      <a class="chip {{ active_category is empty ? 'is-active' : '' }}" href="/catalog">Все</a>
+      {% for c in categories %}
+      <a class="chip {{ active_category == c.id ? 'is-active' : '' }}" href="/catalog?category={{ c.id|e('url') }}">{{ c.name }}</a>
+      {% endfor %}
+    </div>
+    <div class="grid-cards">
+      {% for p in products %}
+      <article class="card">
+        <a href="/product/{{ p.id }}" class="card__img">
+          {% set img = p.images[0] ?? '/images/placeholder.svg' %}
+          <img src="{{ img }}" alt="{{ p.name }}">
+        </a>
+        <div class="card__body">
+          <h2 class="card__title"><a href="/product/{{ p.id }}">{{ p.name }}</a></h2>
+          <div class="card__meta">{{ p.price|price_rub }}</div>
+          <p class="card__text">{{ p.description|slice(0, 110) }}{% if p.description|length > 110 %}…{% endif %}</p>
+          <a class="card__link" href="/product/{{ p.id }}">Открыть</a>
+        </div>
+      </article>
+      {% else %}
+      <p class="muted">В этой категории пока пусто. <a href="/catalog">Сбросить фильтр</a>.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

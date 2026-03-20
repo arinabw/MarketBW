@@ -1,0 +1,38 @@
+{% extends "admin/layout.twig" %}
+
+{% block title %}Категории{% endblock %}
+
+{% block content %}
+<h1 style="font-family:var(--display);margin-top:0">Категории</h1>
+<p><a class="btn btn--primary" href="/admin/categories/new">Добавить категорию</a></p>
+<div class="table-wrap" style="margin-top:1rem">
+  <table>
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Название</th>
+        <th>Картинка</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in categories %}
+      <tr>
+        <td><code>{{ c.id }}</code></td>
+        <td>{{ c.name }}</td>
+        <td><a href="{{ c.image }}" target="_blank" rel="noopener">{{ c.image }}</a></td>
+        <td style="white-space:nowrap">
+          <a href="/admin/categories/{{ c.id }}/edit">Изменить</a>
+          <form class="inline-form" method="post" action="/admin/categories/{{ c.id }}/delete" style="margin-left:0.5rem" onsubmit="return confirm('Удалить категорию?');">
+            <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn--ghost" style="padding:0.25rem 0.5rem;font-size:0.85rem">Удалить</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="muted">Нет категорий.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

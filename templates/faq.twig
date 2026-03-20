@@ -1,0 +1,23 @@
+{% extends "base.twig" %}
+
+{% block title %}FAQ — {{ site_name }}{% endblock %}
+
+{% block body %}
+<section class="page-hero">
+  <div class="container">
+    <h1>Вопросы и ответы</h1>
+    <p class="muted">Коротко о заказах, доставке и уходе за изделиями.</p>
+  </div>
+</section>
+
+<section class="section section--white">
+  <div class="container" style="max-width:720px;margin:0 auto">
+    {% for f in faqs %}
+    <div class="faq-item">
+      <p class="faq-q">{{ f.question }}</p>
+      <p class="faq-a">{{ f.answer }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

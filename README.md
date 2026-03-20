@@ -1,166 +1,77 @@
-# MarketBW
+# MarketBW (marketbw.ru)
 
-Сайт украшений из бисера ручной работы.
+Сайт-визитка рукоделия (украшения из бисера). **Текущий прод-стек** — лёгкий PHP + SQLite + Twig в Docker (Nginx + PHP-FPM за Traefik).
 
-## Стек
+## Стек (актуальный)
 
-- **Vue 3** + JavaScript + Vite
-- **Tailwind CSS** с кастомной палитрой (primary/accent/surface)
-- **Lucide** иконки
-- **Pinia** для состояния
-- **Docker**: один контейнер — **FastAPI (uvicorn)** на порту **8000**, SQLite, сборка фронта в **Node** (multi-stage Dockerfile) за **Traefik** — как в [idpro1313/webserver](https://github.com/idpro1313/webserver)
+| Слой | Технология |
+|------|------------|
+| HTTP | **Nginx** → **PHP 8.3-FPM** (Alpine) |
+| Приложение | **Slim 4** (маршруты), **Twig 3** |
+| Данные | **SQLite** (`marketbw.db`) |
+| Контейнер | Один образ, **порт 80** (Traefik → сервис) |
 
-## Структура
+Память: образ без Node/Python; на VDS достаточно **<200 MB RAM** при типичной нагрузке визитки.
+
+## Структура репозитория
 
 ```
-src/                # Vue + JS (корень репозитория — root для Vite в frontend/vite.config.js)
-├── views/          # Страницы (Home, Catalog, Product, Contact, FAQ)
-├── components/
-├── router/
-├── stores/
-├── api/            # клиенты /api
-├── lib/            # env.js, utils.js
-└── styles/
-frontend/           # package.json, vite.config.js, lockfile — npm install здесь
-backend/app/        # FastAPI: main.py, database.py
-docker/             # Dockerfile, compose, deploy.sh
-data/               # SQLite на сервере (том ../data из compose)
+app/              # PHP: bootstrap, routes, Database, Seed
+config/           # settings.php (env + дефолты)
+public/           # document root: index.php, css/, images/
+templates/        # Twig (сайт + /admin)
+docker/           # Dockerfile, nginx.conf, supervisord.conf, compose, env.example
+data/             # SQLite (том на сервере: ../data → /var/www/data)
 ```
 
-## Разработка
+## Локальная разработка
 
-**Фронт** (Vite проксирует `/api` → `http://127.0.0.1:8000`):
+1. Установите зависимости PHP:
 
 ```bash
-cd frontend && npm install
-cd .. && npm run dev
+composer install
 ```
 
-**API** (второй терминал):
+2. Запуск встроенного сервера PHP (из корня репозитория):
 
 ```bash
-cd backend
-pip install -r requirements.txt
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+php -S localhost:8080 -t public
 ```
 
-Контакты и название сайта — в **`src/lib/env.js`**. Запросы к API — **`/api`** (см. `src/api/`). Для сервера Traefik — **`docker/.env`** из `docker/env.example`; в compose для сервиса указан порт **8000**.
+Откройте http://localhost:8080 — статика `/images` и `/css` отдаётся из `public/`.
 
-## Деплой на сервер (Traefik уже установлен)
+Переменные (опционально): скопируйте значения из `config/settings.php` или задайте `DATA_DIR`, `IMAGES_DIR`, `CONTACT_EMAIL` и т.д. в окружении.
 
-Инфраструктура — репозиторий **[webserver](https://github.com/idpro1313/webserver)**: сеть Docker **`web`**, resolver **`le`**, HTTPS entrypoint обычно **`websecure`** (как в шаблоне `templates/node-site`).
+## Админка
 
-### 1. Клонировать весь проект на сервер
+- URL: **`/admin`**
+- Логин по умолчанию после первой инициализации БД: **`admin`** / **`admin123`** — **смените пароль** после деплоя (хэш хранится в SQLite).
 
-Нужен **полный** репозиторий (не только папка `docker/`), например:
+## Деплой (Docker + Traefik)
+
+Инфраструктура — как в [idpro1313/webserver](https://github.com/idpro1313/webserver): сеть Docker **`web`**, HTTPS entrypoint обычно **`websecure`**, resolver **`le`**.
 
 ```bash
-sudo git clone <url> /opt/MarketBW
 cd /opt/MarketBW/docker
-```
-
-Контекст сборки в compose — родитель каталога `docker/`, том БД — **`/opt/MarketBW/data`**.
-
-### 2. Сеть Traefik
-
-Если ещё нет (на чистом Docker): `docker network create web`. Установка по webserver это делает автоматически.
-
-### 3. Настроить `.env`
-
-```bash
 cp env.example .env
-nano .env
+# Правьте TRAEFIK_RULE, домен, контакты (SITE_NAME, CONTACT_*)
+docker network create web   # если ещё нет
+docker compose up -d --build
 ```
 
-Обязательно задайте уникальные на сервере **`SITE_CONTAINER_NAME`**, **`TRAEFIK_ROUTER`**, и правило **`TRAEFIK_RULE`**, например:
+### Тома на сервере
 
-```env
-TRAEFIK_RULE=Host(`mysite.ru`) || Host(`www.mysite.ru`)
-```
+| Том в compose | Назначение |
+|---------------|------------|
+| `../data` → `/var/www/data` | Файл **`marketbw.db`** (SQLite) |
+| `../public/images` → `/var/www/images` | Картинки каталога и загрузки из админки (URL вида `/images/...`) |
 
-(обратные кавычки вокруг доменов — как в [README webserver](https://github.com/idpro1313/webserver).)
+При первом запуске пустой папки `data/` создаётся БД и демо-данные (если таблицы пустые). Картинки демо копируются в образ в `/var/www/images`; при монтировании тома поверх `../public/images` используйте файлы из репозитория или свои.
 
-При несовпадении имён entrypoint/resolver с вашим `reverse-proxy` поправьте **`TRAEFIK_HTTPS_ENTRYPOINT`** и **`TRAEFIK_CERT_RESOLVER`**.
+### Traefik
 
-### 4. Запуск и обновление
+В `docker-compose.yml` для сервиса указан порт **`80`** (`loadbalancer.server.port=80`).
 
-```bash
-chmod +x deploy.sh auto-update.sh
-# из корня репозитория можно так же:
-# chmod +x scripts/marketbw-deploy.sh && ./scripts/marketbw-deploy.sh install
+## Лицензия / контакты
 
-./deploy.sh install              # первый раз
-./deploy.sh update               # git pull + сборка + up
-./deploy.sh update --no-cache    # как в README node-site: полная пересборка
-./deploy.sh rebuild              # без git: только build --no-cache + up
-./deploy.sh logs|status|stop|restart
-```
-
-Скрипт **не делает `source .env`**, чтобы не ломаться на `Host(\`...\`)` в bash.
-
-### Обновление на сервере после изменений в GitHub
-
-**`docker/.env` в репозиторий не коммитится** (в `.gitignore`) — на `git pull` он не влияет.
-
-Достаточно из каталога с проектом:
-
-```bash
-cd /opt/webserver/sites/MarketBW/docker
-./deploy.sh update
-```
-
-Скрипт сам сделает `git pull` из **корня репозитория** (`MarketBW/`), затем пересоберёт образ и поднимет контейнер. Ручной `git pull` не обязателен.
-
-Если **`git pull` падает с ошибкой** — обычно на сервере меняли отслеживаемые файлы (не `.env`). Посмотреть:
-
-```bash
-cd /opt/webserver/sites/MarketBW
-git status
-```
-
-Варианты:
-
-- откатить случайные правки в tracked-файлах: `git checkout -- <файл>`;
-- или временно убрать свои правки: `git stash -u` → `./docker/deploy.sh update` → при необходимости `git stash pop` (осторожно с конфликтами).
-
-Если когда-то **`docker/.env` попал в коммит**, Git будет ругаться при pull — тогда: `git rm --cached docker/.env` (локально), закоммитить исправление в репо, на сервере после pull оставить свой `.env` на диске.
-
-### Автообновление по cron
-
-`auto-update.sh` сравнивает `HEAD` с `origin/$BRANCH` (по умолчанию **main**); при отличии вызывает **`deploy.sh update`**. Скрипт сам **создаёт каталог лога**, **пишет в файл** (`exec >> …`) и задаёт **`PATH`** — даже без редиректа в crontab строки появляются в **`/opt/webserver/log/marketbw-auto-update.log`** (если каталог недоступен — **`/tmp/marketbw-auto-update.log`**). Свой путь: переменная **`MARKETBW_AUTO_UPDATE_LOG`**.
-
-**`chmod +x docker/auto-update.sh docker/deploy.sh`**
-
-```bash
-# PATH в crontab по-прежнему нужен (первая строка без *):
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
-
-* * * * * /opt/webserver/sites/MarketBW/docker/auto-update.sh
-
-# ветка master
-* * * * * BRANCH=master /opt/webserver/sites/MarketBW/docker/auto-update.sh
-```
-
-Редирект `>> …log 2>&1` в crontab необязателен. Если лога нет — смотрите **`/tmp/marketbw-auto-update.log`** и что cron идёт от пользователя с правом **`docker`**.
-
-**Перемешивание лога с выводом Docker:** раньше использовался `exec deploy.sh`, из‑за этого снималась блокировка и cron каждую минуту дописывал строки в тот же файл во время сборки. Сейчас вызывается **`bash deploy.sh`** и один **`flock`** на весь запуск (`/tmp/marketbw-auto-update.run.lock`).
-
-### Ускорение сборки Docker на сервере
-
-- **`deploy.sh` включает BuildKit** — кэшируется npm между сборками фронта (`RUN --mount=type=cache,target=/root/.npm`).
-- Слой **Python** кэшируется, пока не меняется `backend/requirements.txt`.
-- Если есть **`frontend/package-lock.json`**, в Docker используется **`npm ci`**; иначе — **`npm install`**.
-
-**Добавить lock локально:** `cd frontend && npm install` и закоммитить **`frontend/package-lock.json`**.
-
-**Только Docker на машине:** `chmod +x scripts/generate-package-lock.sh && ./scripts/generate-package-lock.sh`
-
-### Важно
-
-- Порты **80/443** не пробрасываются в compose сайта — их слушает Traefik.
-- Имя контейнера Traefik в webserver — **`traefik_proxy`**; конфликта портов с другим прокси быть не должно.
-- У каждого сайта на одном хосте — **свои** `TRAEFIK_ROUTER` и `SITE_CONTAINER_NAME`.
-
-## Конфигурация сайта
-
-Контакты и параметры — `src/lib/env.js`.
+Проект частный; контакты и соцсети настраиваются через переменные окружения или `config/settings.php`.

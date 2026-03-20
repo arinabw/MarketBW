@@ -1,10 +1,5 @@
-# dependencies
-node_modules/
-
-# build output
-dist/
-server-build/
-/build
+# PHP
+vendor/
 
 # env
 .env
@@ -26,13 +21,8 @@ Thumbs.db
 
 # logs
 *.log
-npm-debug.log*
 
 # misc
 *.pem
-*.tgz
-*.tsbuildinfo
-.eslintcache
-coverage/
 tmp/
 temp/

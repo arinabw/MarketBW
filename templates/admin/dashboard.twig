@@ -1,0 +1,18 @@
+{% extends "admin/layout.twig" %}
+
+{% block title %}Обзор{% endblock %}
+
+{% block content %}
+<h1 style="font-family:var(--display);margin-top:0">Обзор</h1>
+<p class="muted">Краткая статистика каталога.</p>
+<div class="grid-cards" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+  <div class="box">
+    <div class="muted" style="font-size:0.85rem">Товары</div>
+    <div style="font-size:2rem;font-weight:800">{{ product_count }}</div>
+  </div>
+  <div class="box">
+    <div class="muted" style="font-size:0.85rem">Категории</div>
+    <div style="font-size:2rem;font-weight:800">{{ category_count }}</div>
+  </div>
+</div>
+{% endblock %}

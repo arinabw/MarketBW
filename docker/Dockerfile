@@ -1,50 +1,46 @@
 # syntax=docker/dockerfile:1
-# Один контейнер: FastAPI (uvicorn) + статика Vue из dist. Сборка фронта — Node, рантайм — Python.
-# BuildKit: DOCKER_BUILDKIT=1 — кэш npm между сборками (см. deploy.sh).
+# Nginx + PHP-FPM 8.3 (Alpine) — минимальный рантайм для VDS
+# Сборка: из корня репозитория: docker build -f docker/Dockerfile .
 
-FROM node:20-alpine AS frontend
-WORKDIR /build
-
-COPY frontend/package*.json ./frontend/
-RUN --mount=type=cache,target=/root/.npm \
-    sh -c '\
-    echo "[build-time] frontend: npm ci/install START $(date -u +%Y-%m-%dT%H:%M:%SZ)"; \
-    cd frontend && if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; else npm install --no-audit --no-fund; fi; \
-    echo "[build-time] frontend: npm ci/install END   $(date -u +%Y-%m-%dT%H:%M:%SZ)"'
-
-COPY index.html ./
-COPY src ./src
-COPY public ./public
-COPY tailwind.config.js postcss.config.cjs ./
-COPY frontend/vite.config.js ./frontend/
-
-# Vite root = /build (родитель frontend/), а npm install — в frontend/node_modules.
-# Без ссылки Rollup не находит vue и т.д. при разрешении импортов из /build/src.
-RUN ln -sfn /build/frontend/node_modules /build/node_modules
-
-ENV NODE_ENV=production
-# Сборка из /build: postcss/tailwind видят корень репо; `cd frontend` ломал разрешение конфигов.
-RUN echo "[build-time] frontend: vite build START $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-    && ./frontend/node_modules/.bin/vite build --config frontend/vite.config.js \
-    && echo "[build-time] frontend: vite build END   $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-
-FROM python:3.13-slim AS runtime
+FROM composer:2 AS vendor
 WORKDIR /app
+COPY composer.json ./
+COPY app ./app
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    DATA_DIR=/app/data
+FROM php:8.3-fpm-alpine
 
-COPY backend/requirements.txt /tmp/requirements.txt
-RUN echo "[build-time] runtime: pip install START $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
-    && pip install --no-cache-dir -r /tmp/requirements.txt \
-    && rm /tmp/requirements.txt \
-    && echo "[build-time] runtime: pip install END   $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+RUN apk add --no-cache nginx supervisor sqlite-libs \
+    && docker-php-ext-install pdo_sqlite opcache \
+    && rm -rf /var/cache/apk/* \
+    && sed -i 's/^clear_env = yes/clear_env = no/' /usr/local/etc/php-fpm.d/www.conf 2>/dev/null || true
 
-COPY backend/app ./app
-COPY --from=frontend /build/dist ./dist
+RUN printf 'upload_max_filesize=12M\npost_max_size=12M\nmemory_limit=128M\n' > /usr/local/etc/php/conf.d/marketbw.ini \
+    && printf 'opcache.enable=1\nopcache.memory_consumption=32\n' >> /usr/local/etc/php/conf.d/marketbw.ini
 
-RUN mkdir -p /app/data
+WORKDIR /var/www
 
-EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+COPY --from=vendor /app/vendor ./vendor
+COPY app ./app
+COPY public ./public
+COPY templates ./templates
+COPY config ./config
+COPY composer.json ./
+
+# Демо-картинки в образе; на сервере можно смонтировать том поверх /var/www/images
+COPY public/images /var/www/images
+
+COPY docker/nginx.conf /etc/nginx/http.d/default.conf
+COPY docker/supervisord.conf /etc/supervisord.conf
+
+RUN mkdir -p /var/www/data /run/nginx \
+    && chown -R www-data:www-data /var/www/data /var/www/images \
+    && chmod -R g+w /var/www/images
+
+ENV DATA_DIR=/var/www/data \
+    IMAGES_DIR=/var/www/images \
+    APP_DEBUG=false
+
+EXPOSE 80
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]

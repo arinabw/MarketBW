@@ -1,0 +1,86 @@
+{% extends "base.twig" %}
+
+{% block body %}
+<section class="hero">
+  <div class="container hero__grid">
+    <div>
+      <div class="badge">✨ {{ site_name }} — бисерные чудеса</div>
+      <h1>Маленькие чудеса <span style="color:var(--primary)">из бисера</span></h1>
+      <p class="lead">Уникальные украшения ручной работы — с любовью и вниманием к каждой детали.</p>
+      <div class="btn-row">
+        <a class="btn btn--primary" href="/catalog">Открыть каталог</a>
+        <a class="btn btn--ghost" href="/contact">Связаться с мастером</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <div style="border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border)">
+        <img src="/images/hero-beadwork.svg" alt="Украшения из бисера" width="600" height="400">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--white">
+  <div class="container">
+    <h2 class="section-title">Категории</h2>
+    <p class="section-sub">Выберите направление и откройте для себя каталог изделий.</p>
+    <div class="grid-cards">
+      {% for c in categories %}
+      <a class="card" href="/catalog?category={{ c.id|e('url') }}" style="text-decoration:none;color:inherit">
+        <div class="card__img">
+          <img src="{{ c.image }}" alt="{{ c.name }}">
+        </div>
+        <div class="card__body">
+          <h3 class="card__title">{{ c.name }}</h3>
+          <p class="card__text">{{ c.description }}</p>
+          <span class="card__link">Смотреть →</span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Избранное</h2>
+    <p class="section-sub">Подборка актуальных работ в наличии.</p>
+    <div class="grid-cards">
+      {% for p in featured %}
+      <article class="card">
+        <a href="/product/{{ p.id }}" class="card__img">
+          {% set img = p.images[0] ?? '/images/placeholder.svg' %}
+          <img src="{{ img }}" alt="{{ p.name }}">
+        </a>
+        <div class="card__body">
+          <h3 class="card__title"><a href="/product/{{ p.id }}">{{ p.name }}</a></h3>
+          <div class="card__meta">{{ p.price|price_rub }}</div>
+          <p class="card__text">{{ p.description|slice(0, 120) }}{% if p.description|length > 120 %}…{% endif %}</p>
+          <a class="card__link" href="/product/{{ p.id }}">Подробнее</a>
+        </div>
+      </article>
+      {% else %}
+      <p class="muted">Пока нет избранных товаров — загляните в <a href="/catalog">каталог</a>.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section section--white">
+  <div class="container">
+    <h2 class="section-title">Отзывы</h2>
+    <p class="section-sub">Несколько слов от покупательниц.</p>
+    <div class="grid-cards">
+      {% for r in reviews %}
+      <div class="review">
+        <div class="review__head">
+          <span>{{ r.author }}</span>
+          <span class="muted">{{ r.date|slice(0, 10) }}</span>
+        </div>
+        <p class="muted" style="margin:0">{{ r.text }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

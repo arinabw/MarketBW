@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ site_name }}{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="logo" href="/">{{ site_name }} <span>·</span> бисер</a>
+      <nav class="nav" aria-label="Основное меню">
+        <a href="/">Главная</a>
+        <a href="/catalog">Каталог</a>
+        <a href="/contact">Контакты</a>
+        <a href="/faq">FAQ</a>
+      </nav>
+    </div>
+  </header>
+  <main>
+    {% block body %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>© {{ "now"|date("Y") }} {{ site_name }}. Рукоделие и украшения из бисера.</div>
+      <div>
+        <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
+        ·
+        <a href="tel:{{ contact_phone|replace({' ': '', '(': '', ')': '', '-': ''}) }}">{{ contact_phone }}</a>
+      </div>
+    </div>
+  </footer>
+  {% include 'partials/metrika.twig' %}
+  {% block scripts %}{% endblock %}
+</body>
+</html>

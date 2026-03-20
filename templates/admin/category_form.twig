@@ -1,0 +1,31 @@
+{% extends "admin/layout.twig" %}
+
+{% block title %}{{ category ? 'Категория' : 'Новая категория' }}{% endblock %}
+
+{% block content %}
+<h1 style="font-family:var(--display);margin-top:0">{{ category ? 'Редактировать категорию' : 'Новая категория' }}</h1>
+{% if error is defined %}
+<div class="alert">{{ error }}</div>
+{% endif %}
+<form method="post" enctype="multipart/form-data" class="box" style="margin-top:1rem">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <div class="form-row">
+    <label for="name">Название *</label>
+    <input id="name" name="name" required value="{{ category ? category.name : (form.name ?? '') }}">
+  </div>
+  <div class="form-row">
+    <label for="description">Описание</label>
+    <textarea id="description" name="description">{{ category ? category.description : (form.description ?? '') }}</textarea>
+  </div>
+  <div class="form-row">
+    <label for="image">Путь к картинке (URL) *</label>
+    <input id="image" name="image" value="{{ category ? category.image : (form.image ?? '') }}" placeholder="/images/categories/example.svg">
+  </div>
+  <div class="form-row">
+    <label for="image_file">Или загрузить файл</label>
+    <input id="image_file" name="image_file" type="file" accept=".jpg,.jpeg,.png,.gif,.webp,.svg">
+  </div>
+  <button class="btn btn--primary" type="submit">Сохранить</button>
+  <a class="btn btn--ghost" href="/admin/categories">Отмена</a>
+</form>
+{% endblock %}

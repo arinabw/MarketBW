@@ -1,48 +1,10 @@
-# Node modules
 node_modules
-npm-debug.log
-yarn-error.log
-
-# Build output
-dist
-dist-ssr
-*.local
-
-# Environment files
+.git
+data
+vendor
 .env
-.env.local
-.env.*.local
-
-# IDE
+.env.*
+*.log
+dist
 .vscode
 .idea
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Git
-.git
-.gitignore
-
-# Не исключать весь docker/ — контекст сборки включает docker/Dockerfile.
-# Локальный .env compose на машине разработчика в образ не кладём:
-docker/.env
-
-# Documentation
-docs
-*.md
-!README.md
-
-# Scripts
-scripts
-
-# Data (will be mounted as volume)
-data
-
-# Logs
-logs
-*.log
