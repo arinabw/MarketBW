@@ -10,8 +10,9 @@
     <thead>
       <tr>
         <th>Id</th>
+        <th class="admin-col-thumb" aria-label="Превью"></th>
         <th>Название</th>
-        <th>Картинка</th>
+        <th>Путь</th>
         <th></th>
       </tr>
     </thead>
@@ -19,8 +20,11 @@
       {% for c in categories %}
       <tr>
         <td><code>{{ c.id }}</code></td>
+        <td class="admin-col-thumb">
+          <a href="{{ c.image }}" target="_blank" rel="noopener" title="Открыть файл"><img class="admin-table-thumb" src="{{ c.image }}" alt="" loading="lazy" width="56" height="56"></a>
+        </td>
         <td>{{ c.name }}</td>
-        <td><a href="{{ c.image }}" target="_blank" rel="noopener">{{ c.image }}</a></td>
+        <td style="font-size:0.85rem;word-break:break-all"><a href="{{ c.image }}" target="_blank" rel="noopener">{{ c.image }}</a></td>
         <td style="white-space:nowrap">
           <a href="/admin/categories/{{ c.id }}/edit">Изменить</a>
           <form class="inline-form" method="post" action="/admin/categories/{{ c.id }}/delete" style="margin-left:0.5rem" onsubmit="return confirm('Удалить категорию?');">
@@ -30,7 +34,7 @@
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="4" class="muted">Нет категорий.</td></tr>
+      <tr><td colspan="5" class="muted">Нет категорий.</td></tr>
       {% endfor %}
     </tbody>
   </table>

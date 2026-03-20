@@ -3,6 +3,7 @@
 {% block title %}{{ category ? 'Категория' : 'Новая категория' }}{% endblock %}
 
 {% block content %}
+{% set f = form|default({}) %}
 <h1 style="font-family:var(--display);margin-top:0">{{ category ? 'Редактировать категорию' : 'Новая категория' }}</h1>
 {% if error is defined %}
 <div class="alert">{{ error }}</div>
@@ -11,21 +12,68 @@
   <input type="hidden" name="csrf" value="{{ csrf_token() }}">
   <div class="form-row">
     <label for="name">Название *</label>
-    <input id="name" name="name" required value="{{ category ? category.name : (form.name ?? '') }}">
+    <input id="name" name="name" required value="{{ f.name|default(category ? category.name : '') }}">
   </div>
   <div class="form-row">
     <label for="description">Описание</label>
-    <textarea id="description" name="description">{{ category ? category.description : (form.description ?? '') }}</textarea>
+    <textarea id="description" name="description">{{ f.description|default(category ? category.description : '') }}</textarea>
   </div>
   <div class="form-row">
     <label for="image">Путь к картинке (URL) *</label>
-    <input id="image" name="image" value="{{ category ? category.image : (form.image ?? '') }}" placeholder="/images/categories/example.svg">
+    <input id="image" name="image" value="{{ f.image|default(category ? category.image : '') }}" placeholder="/images/categories/example.svg">
   </div>
+  {% if category and category.image %}
+  <div class="form-row">
+    <p class="admin-upload-label">Сейчас на сайте</p>
+    <div class="admin-upload-preview">
+      <figure class="admin-upload-preview__item">
+        <img src="{{ category.image }}" alt="" loading="lazy" width="200" height="140">
+        <figcaption class="admin-upload-preview__caption">{{ category.image }}</figcaption>
+      </figure>
+    </div>
+  </div>
+  {% endif %}
   <div class="form-row">
     <label for="image_file">Или загрузить файл</label>
     <input id="image_file" name="image_file" type="file" accept=".jpg,.jpeg,.png,.gif,.webp,.svg">
+    <div id="category-file-preview" class="admin-upload-preview--pending" hidden>
+      <p class="admin-upload-label">Выбрано для загрузки — заменит путь после «Сохранить»</p>
+      <div class="admin-upload-preview">
+        <figure class="admin-upload-preview__item">
+          <img id="category-file-preview-img" src="" alt="">
+          <figcaption id="category-file-preview-cap" class="admin-upload-preview__caption"></figcaption>
+        </figure>
+      </div>
+    </div>
   </div>
   <button class="btn btn--primary" type="submit">Сохранить</button>
   <a class="btn btn--ghost" href="/admin/categories">Отмена</a>
 </form>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  var input = document.getElementById('image_file');
+  var wrap = document.getElementById('category-file-preview');
+  var img = document.getElementById('category-file-preview-img');
+  var cap = document.getElementById('category-file-preview-cap');
+  if (!input || !wrap || !img || !cap) return;
+  var lastUrl = '';
+  input.addEventListener('change', function () {
+    if (lastUrl) {
+      try { URL.revokeObjectURL(lastUrl); } catch (e) {}
+      lastUrl = '';
+    }
+    var file = input.files && input.files[0];
+    if (!file) {
+      wrap.hidden = true;
+      return;
+    }
+    lastUrl = URL.createObjectURL(file);
+    img.src = lastUrl;
+    cap.textContent = file.name + ' (' + (file.size < 1024 ? file.size + ' B' : (file.size < 1048576 ? (file.size / 1024).toFixed(1) + ' KB' : (file.size / 1048576).toFixed(1) + ' MB')) + ')';
+    wrap.hidden = false;
+  });
+})();
+</script>
 {% endblock %}

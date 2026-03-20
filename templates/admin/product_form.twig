@@ -16,7 +16,7 @@
   </div>
   <div class="form-row">
     <label for="description">Описание</label>
-    <textarea id="description" name="description">{{ product ? product.description : (form.description ?? '') }}</textarea>
+    <textarea id="description" name="description">{{ f.description|default(product ? product.description : '') }}</textarea>
   </div>
   <div class="form-row">
     <label for="price">Цена *</label>
@@ -35,9 +35,26 @@
     <label for="image_paths">Пути к изображениям (по одному в строке, только <code>/images/…</code>). Не вставляйте base64 — загрузите файлы полем ниже или укажите готовый путь.</label>
     <textarea id="image_paths" name="image_paths" rows="5" placeholder="/images/products/photo.jpg" spellcheck="false">{{ f.image_paths|default(product ? product.images|join("\n") : '') }}</textarea>
   </div>
+  {% if product and product.images|length %}
+  <div class="form-row">
+    <p class="admin-upload-label">Сейчас в карточке товара</p>
+    <div class="admin-upload-preview" aria-hidden="true">
+      {% for src in product.images %}
+      <figure class="admin-upload-preview__item">
+        <img src="{{ src }}" alt="" loading="lazy" width="200" height="140">
+        <figcaption class="admin-upload-preview__caption">{{ src }}</figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
   <div class="form-row">
     <label for="images">Загрузить файлы (несколько)</label>
     <input id="images" name="images[]" type="file" accept=".jpg,.jpeg,.png,.gif,.webp,.svg" multiple>
+    <div id="product-files-preview" class="admin-upload-preview--pending" hidden>
+      <p class="admin-upload-label">Выбрано для загрузки — появится на сайте после «Сохранить»</p>
+      <div id="product-files-preview-inner" class="admin-upload-preview"></div>
+    </div>
   </div>
   <div class="form-row">
     <label for="materials">Материалы (по строке)</label>
@@ -58,4 +75,44 @@
   <button class="btn btn--primary" type="submit">Сохранить</button>
   <a class="btn btn--ghost" href="/admin/products">Отмена</a>
 </form>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  var input = document.getElementById('images');
+  var wrap = document.getElementById('product-files-preview');
+  var inner = document.getElementById('product-files-preview-inner');
+  if (!input || !wrap || !inner) return;
+  var urls = [];
+  function revokeAll() {
+    urls.forEach(function (u) { try { URL.revokeObjectURL(u); } catch (e) {} });
+    urls = [];
+  }
+  input.addEventListener('change', function () {
+    revokeAll();
+    inner.innerHTML = '';
+    var files = input.files ? Array.prototype.slice.call(input.files) : [];
+    if (!files.length) {
+      wrap.hidden = true;
+      return;
+    }
+    wrap.hidden = false;
+    files.forEach(function (file) {
+      var u = URL.createObjectURL(file);
+      urls.push(u);
+      var fig = document.createElement('figure');
+      fig.className = 'admin-upload-preview__item';
+      var img = document.createElement('img');
+      img.src = u;
+      img.alt = file.name;
+      fig.appendChild(img);
+      var cap = document.createElement('figcaption');
+      cap.className = 'admin-upload-preview__caption';
+      cap.textContent = file.name + ' (' + (file.size < 1024 ? file.size + ' B' : (file.size < 1048576 ? (file.size / 1024).toFixed(1) + ' KB' : (file.size / 1048576).toFixed(1) + ' MB')) + ')';
+      fig.appendChild(cap);
+      inner.appendChild(fig);
+    });
+  });
+})();
+</script>
 {% endblock %}
