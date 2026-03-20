@@ -2,3 +2,4 @@
 *.sh text eol=lf
 docker/deploy.sh text eol=lf
 docker/auto-update.sh text eol=lf
+docker/docker-entrypoint.sh text eol=lf

@@ -28,17 +28,19 @@ COPY config ./config
 COPY composer.json ./
 COPY VERSION /var/www/VERSION
 
-LABEL org.opencontainers.image.version="3.0.1"
+LABEL org.opencontainers.image.version="3.0.2"
 
 # Демо-картинки в образе; на сервере можно смонтировать том поверх /var/www/images
 COPY public/images /var/www/images
 
 COPY docker/nginx.conf /etc/nginx/http.d/default.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
+COPY docker/docker-entrypoint.sh /docker-entrypoint.sh
 
 RUN mkdir -p /var/www/data /run/nginx \
     && chown -R www-data:www-data /var/www/data /var/www/images \
-    && chmod -R g+w /var/www/images
+    && chmod -R g+w /var/www/images \
+    && chmod +x /docker-entrypoint.sh
 
 ENV DATA_DIR=/var/www/data \
     IMAGES_DIR=/var/www/images \
@@ -46,4 +48,4 @@ ENV DATA_DIR=/var/www/data \
 
 EXPOSE 80
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/docker-entrypoint.sh"]

@@ -86,7 +86,6 @@ SQL;
         }
 
         Seed::ifEmpty($this->pdo);
-        $this->pdo->exec('UPDATE products SET in_stock = 1');
     }
 
     /** @return list<array<string, mixed>> */
