@@ -10,12 +10,12 @@ use Slim\App;
 use Slim\Psr7\Response as SlimResponse;
 use Slim\Routing\RouteCollectorProxy;
 
-return static function (App $app, ContainerInterface $container): void {
-    $db = static fn (): Database => $container->get(Database::class);
-    $view = static fn () => $container->get('twig');
-    $settings = static fn (): array => $container->get('settings');
+return function (App $app, ContainerInterface $container): void {
+    $db = fn (): Database => $container->get(Database::class);
+    $view = fn () => $container->get('twig');
+    $settings = fn (): array => $container->get('settings');
 
-    $app->get('/', static function (Request $request, Response $response) use ($db, $view): Response {
+    $app->get('/', function (Request $request, Response $response) use ($db, $view): Response {
         $database = $db();
         $featured = $database->featuredProducts(8);
         $categories = $database->categories();
@@ -27,7 +27,7 @@ return static function (App $app, ContainerInterface $container): void {
         ]);
     });
 
-    $app->get('/catalog', static function (Request $request, Response $response) use ($db, $view): Response {
+    $app->get('/catalog', function (Request $request, Response $response) use ($db, $view): Response {
         $q = $request->getQueryParams();
         $cat = isset($q['category']) ? (string) $q['category'] : null;
         $database = $db();
@@ -38,7 +38,7 @@ return static function (App $app, ContainerInterface $container): void {
         ]);
     });
 
-    $app->get('/product/{id}', static function (Request $request, Response $response, array $args) use ($db, $view): Response {
+    $app->get('/product/{id}', function (Request $request, Response $response, array $args) use ($db, $view): Response {
         $database = $db();
         $product = $database->productById((string) $args['id']);
         if (!$product) {
@@ -51,11 +51,11 @@ return static function (App $app, ContainerInterface $container): void {
         ]);
     });
 
-    $app->get('/contact', static function (Request $request, Response $response) use ($view): Response {
+    $app->get('/contact', function (Request $request, Response $response) use ($view): Response {
         return $view()->render($response, 'contact.twig', []);
     });
 
-    $app->get('/faq', static function (Request $request, Response $response) use ($db, $view): Response {
+    $app->get('/faq', function (Request $request, Response $response) use ($db, $view): Response {
         return $view()->render($response, 'faq.twig', [
             'faqs' => $db()->faqs(),
         ]);
@@ -72,14 +72,14 @@ return static function (App $app, ContainerInterface $container): void {
         return $handler->handle($request);
     };
 
-    $app->get('/admin/login', static function (Request $request, Response $response) use ($view): Response {
+    $app->get('/admin/login', function (Request $request, Response $response) use ($view): Response {
         if (!empty($_SESSION['admin'])) {
             return $response->withHeader('Location', '/admin')->withStatus(302);
         }
         return $view()->render($response, 'admin/login.twig', []);
     });
 
-    $app->post('/admin/login', static function (Request $request, Response $response) use ($db, $view): Response {
+    $app->post('/admin/login', function (Request $request, Response $response) use ($db, $view): Response {
         $data = (array) $request->getParsedBody();
         $user = isset($data['username']) ? (string) $data['username'] : '';
         $pass = isset($data['password']) ? (string) $data['password'] : '';
@@ -90,14 +90,14 @@ return static function (App $app, ContainerInterface $container): void {
         return $view()->render($response, 'admin/login.twig', ['error' => 'Неверный логин или пароль']);
     });
 
-    $app->post('/admin/logout', static function (Request $request, Response $response): Response {
+    $app->post('/admin/logout', function (Request $request, Response $response): Response {
         $_SESSION['admin'] = false;
         unset($_SESSION['admin']);
         return $response->withHeader('Location', '/admin/login')->withStatus(302);
     })->add($adminGuard);
 
     $app->group('/admin', function (RouteCollectorProxy $group) use ($db, $view, $settings): void {
-        $group->get('', static function (Request $request, Response $response) use ($db, $view): Response {
+        $group->get('', function (Request $request, Response $response) use ($db, $view): Response {
             $database = $db();
             $pc = (int) $database->pdo()->query('SELECT COUNT(*) FROM products')->fetchColumn();
             $cc = (int) $database->pdo()->query('SELECT COUNT(*) FROM categories')->fetchColumn();
@@ -108,7 +108,7 @@ return static function (App $app, ContainerInterface $container): void {
             ]);
         });
 
-        $group->get('/products', static function (Request $request, Response $response) use ($db, $view): Response {
+        $group->get('/products', function (Request $request, Response $response) use ($db, $view): Response {
             return $view()->render($response, 'admin/products.twig', [
                 'products' => $db()->products(),
                 'categories' => $db()->categories(),
@@ -116,7 +116,7 @@ return static function (App $app, ContainerInterface $container): void {
             ]);
         });
 
-        $group->get('/products/new', static function (Request $request, Response $response) use ($db, $view): Response {
+        $group->get('/products/new', function (Request $request, Response $response) use ($db, $view): Response {
             return $view()->render($response, 'admin/product_form.twig', [
                 'product' => null,
                 'categories' => $db()->categories(),
@@ -124,7 +124,7 @@ return static function (App $app, ContainerInterface $container): void {
             ]);
         });
 
-        $group->post('/products/new', static function (Request $request, Response $response) use ($db, $view, $settings): Response {
+        $group->post('/products/new', function (Request $request, Response $response) use ($db, $view, $settings): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -157,7 +157,7 @@ return static function (App $app, ContainerInterface $container): void {
             return $response->withHeader('Location', '/admin/products')->withStatus(302);
         });
 
-        $group->get('/products/{id}/edit', static function (Request $request, Response $response, array $args) use ($db, $view): Response {
+        $group->get('/products/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view): Response {
             $p = $db()->productById((string) $args['id']);
             if (!$p) {
                 return $response->withStatus(404);
@@ -169,7 +169,7 @@ return static function (App $app, ContainerInterface $container): void {
             ]);
         });
 
-        $group->post('/products/{id}/edit', static function (Request $request, Response $response, array $args) use ($db, $view, $settings): Response {
+        $group->post('/products/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view, $settings): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -206,7 +206,7 @@ return static function (App $app, ContainerInterface $container): void {
             return $response->withHeader('Location', '/admin/products')->withStatus(302);
         });
 
-        $group->post('/products/{id}/delete', static function (Request $request, Response $response, array $args) use ($db): Response {
+        $group->post('/products/{id}/delete', function (Request $request, Response $response, array $args) use ($db): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -215,21 +215,21 @@ return static function (App $app, ContainerInterface $container): void {
             return $response->withHeader('Location', '/admin/products')->withStatus(302);
         });
 
-        $group->get('/categories', static function (Request $request, Response $response) use ($db, $view): Response {
+        $group->get('/categories', function (Request $request, Response $response) use ($db, $view): Response {
             return $view()->render($response, 'admin/categories.twig', [
                 'categories' => $db()->categories(),
                 'admin_section' => 'cats',
             ]);
         });
 
-        $group->get('/categories/new', static function (Request $request, Response $response) use ($view): Response {
+        $group->get('/categories/new', function (Request $request, Response $response) use ($view): Response {
             return $view()->render($response, 'admin/category_form.twig', [
                 'category' => null,
                 'admin_section' => 'cats',
             ]);
         });
 
-        $group->post('/categories/new', static function (Request $request, Response $response) use ($db, $view, $settings): Response {
+        $group->post('/categories/new', function (Request $request, Response $response) use ($db, $view, $settings): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -253,7 +253,7 @@ return static function (App $app, ContainerInterface $container): void {
             return $response->withHeader('Location', '/admin/categories')->withStatus(302);
         });
 
-        $group->get('/categories/{id}/edit', static function (Request $request, Response $response, array $args) use ($db, $view): Response {
+        $group->get('/categories/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view): Response {
             $id = (string) $args['id'];
             foreach ($db()->categories() as $c) {
                 if ($c['id'] === $id) {
@@ -266,7 +266,7 @@ return static function (App $app, ContainerInterface $container): void {
             return $response->withStatus(404);
         });
 
-        $group->post('/categories/{id}/edit', static function (Request $request, Response $response, array $args) use ($db, $view, $settings): Response {
+        $group->post('/categories/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view, $settings): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -283,7 +283,7 @@ return static function (App $app, ContainerInterface $container): void {
             return $response->withHeader('Location', '/admin/categories')->withStatus(302);
         });
 
-        $group->post('/categories/{id}/delete', static function (Request $request, Response $response, array $args) use ($db): Response {
+        $group->post('/categories/{id}/delete', function (Request $request, Response $response, array $args) use ($db): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);

@@ -20,8 +20,8 @@ if ($twigCache !== false && !is_dir($twigCache)) {
 $containerBuilder = new ContainerBuilder();
 $containerBuilder->addDefinitions([
     'settings' => $settings,
-    Database::class => static fn () => new Database($settings['data_dir']),
-    'twig' => static function () use ($settings, $twigCache) {
+    Database::class => fn () => new Database($settings['data_dir']),
+    'twig' => function () use ($settings, $twigCache) {
         $twig = Twig::create(dirname(__DIR__) . '/templates', [
             'cache' => $twigCache,
             'auto_reload' => (bool) ($settings['displayErrorDetails'] ?? false),
@@ -33,10 +33,10 @@ $containerBuilder->addDefinitions([
         $env->addGlobal('social_instagram', $settings['social_instagram']);
         $env->addGlobal('social_telegram', $settings['social_telegram']);
         $env->addGlobal('social_vk', $settings['social_vk']);
-        $env->addFunction(new \Twig\TwigFunction('csrf_token', static function (): string {
+        $env->addFunction(new \Twig\TwigFunction('csrf_token', function (): string {
             return $_SESSION['csrf'] ?? '';
         }));
-        $env->addFilter(new \Twig\TwigFilter('price_rub', static function ($v): string {
+        $env->addFilter(new \Twig\TwigFilter('price_rub', function ($v): string {
             return number_format((float) $v, 0, ',', ' ') . ' ₽';
         }));
         return $twig;
