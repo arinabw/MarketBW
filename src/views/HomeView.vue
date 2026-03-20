@@ -30,6 +30,10 @@ onMounted(async () => {
     isLoading.value = false
   }
 })
+
+const handleImageError = (event) => {
+  event.target.src = '/images/placeholder.svg'
+}
 </script>
 
 <template>
@@ -146,7 +150,9 @@ onMounted(async () => {
                 <img
                   :src="product.images[0]"
                   :alt="product.name"
+                  loading="lazy"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                  @error="handleImageError"
                 />
                 <div v-if="product.featured" class="absolute top-3 right-3 bg-primary-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-glow">
                   Хит

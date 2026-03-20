@@ -17,7 +17,6 @@ const formData = ref({
   materials: [],
   size: '',
   technique: '',
-  inStock: true,
   featured: false
 })
 
@@ -37,7 +36,6 @@ const openModal = (product) => {
       materials: product.materials,
       size: product.size || '',
       technique: product.technique,
-      inStock: product.in_stock,
       featured: product.featured
     }
   } else {
@@ -51,7 +49,6 @@ const openModal = (product) => {
       materials: [],
       size: '',
       technique: '',
-      inStock: true,
       featured: false
     }
   }
@@ -70,7 +67,6 @@ const closeModal = () => {
     materials: [],
     size: '',
     technique: '',
-    inStock: true,
     featured: false
   }
 }
@@ -296,28 +292,15 @@ const removeMaterial = (index) => {
             />
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div class="flex items-center gap-2">
-              <input
-                v-model="formData.inStock"
-                type="checkbox"
-                id="inStock"
-                class="w-5 h-5 rounded"
-                style="accent-color: #BD7880"
-              />
-              <label for="inStock" class="text-sm" style="color: #A24C61">В наличии</label>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <input
-                v-model="formData.featured"
-                type="checkbox"
-                id="featured"
-                class="w-5 h-5 rounded"
-                style="accent-color: #BD7880"
-              />
-              <label for="featured" class="text-sm" style="color: #A24C61">Хит</label>
-            </div>
+          <div class="flex items-center gap-2">
+            <input
+              v-model="formData.featured"
+              type="checkbox"
+              id="featured"
+              class="w-5 h-5 rounded"
+              style="accent-color: #BD7880"
+            />
+            <label for="featured" class="text-sm" style="color: #A24C61">Хит</label>
           </div>
 
           <div>

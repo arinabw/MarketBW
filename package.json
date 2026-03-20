@@ -1,6 +1,6 @@
 {
   "name": "marketbw",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "private": true,
   "description": "Корневой package.json: скрипты делегируют в frontend/. API — backend/ (FastAPI).",
   "scripts": {

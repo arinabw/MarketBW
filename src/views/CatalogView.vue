@@ -50,6 +50,10 @@ const selectedCategoryName = computed(() => {
   const category = categories.value.find(cat => cat.id === selectedCategory.value)
   return category ? category.name : 'Все изделия'
 })
+
+const handleImageError = (event) => {
+  event.target.src = '/images/placeholder.svg'
+}
 </script>
 
 <template>
@@ -105,19 +109,18 @@ const selectedCategoryName = computed(() => {
             class="group block"
           >
             <div class="product-card">
-              <div class="aspect-square relative overflow-hidden">
-                <img
-                  :src="product.images[0]"
-                  :alt="product.name"
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                <div v-if="product.featured" class="absolute top-3 right-3 bg-primary-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-glow">
-                  Хит
-                </div>
-                <div v-if="!product.in_stock" class="absolute top-3 left-3 bg-surface-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                  Нет в наличии
-                </div>
-              </div>
+               <div class="aspect-square relative overflow-hidden">
+                 <img
+                   :src="product.images[0]"
+                   :alt="product.name"
+                   loading="lazy"
+                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                   @error="handleImageError"
+                 />
+                 <div v-if="product.featured" class="absolute top-3 right-3 bg-primary-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-glow">
+                   Хит
+                 </div>
+               </div>
               <div class="p-5">
                 <h3 class="font-display text-base font-bold text-text-primary mb-1.5 group-hover:text-primary-600 transition-colors line-clamp-1">
                   {{ product.name }}
