@@ -96,16 +96,42 @@ SQL;
         return $st ? $st->fetchAll() : [];
     }
 
-    /** @return list<array<string, mixed>> */
-    public function products(?string $categoryId = null): array
+    /**
+     * @param 'date_desc'|'price_asc'|'price_desc' $sort
+     * @return list<array<string, mixed>>
+     */
+    public function products(?string $categoryId = null, ?string $search = null, string $sort = 'date_desc'): array
     {
+        $where = [];
+        $params = [];
         if ($categoryId !== null && $categoryId !== '') {
-            $st = $this->pdo->prepare('SELECT * FROM products WHERE category = ? ORDER BY created_at DESC');
-            $st->execute([$categoryId]);
+            $where[] = 'category = ?';
+            $params[] = $categoryId;
+        }
+        if ($search !== null && $search !== '') {
+            $where[] = 'instr(LOWER(name), LOWER(?)) > 0';
+            $params[] = $search;
+        }
+        $whereSql = $where !== [] ? 'WHERE ' . implode(' AND ', $where) : '';
+        $order = match ($sort) {
+            'price_asc' => 'price ASC',
+            'price_desc' => 'price DESC',
+            default => 'created_at DESC',
+        };
+        $sql = 'SELECT * FROM products ' . $whereSql . ' ORDER BY ' . $order;
+        if ($params !== []) {
+            $st = $this->pdo->prepare($sql);
+            $st->execute($params);
         } else {
-            $st = $this->pdo->query('SELECT * FROM products ORDER BY created_at DESC');
+            $st = $this->pdo->query($sql);
         }
         return $st ? array_map([$this, 'mapProduct'], $st->fetchAll()) : [];
+    }
+
+    public function updatePassword(string $username, string $newPlainPassword): void
+    {
+        $hash = password_hash($newPlainPassword, PASSWORD_DEFAULT);
+        $this->pdo->prepare('UPDATE users SET password_hash = ? WHERE username = ?')->execute([$hash, $username]);
     }
 
     /** @return list<array<string, mixed>> */

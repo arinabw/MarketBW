@@ -20,6 +20,7 @@
       <a href="/admin" class="{{ (admin_section|default('')) == 'dash' ? 'is-active' : '' }}">Обзор</a>
       <a href="/admin/products" class="{{ (admin_section|default('')) == 'products' ? 'is-active' : '' }}">Товары</a>
       <a href="/admin/categories" class="{{ (admin_section|default('')) == 'cats' ? 'is-active' : '' }}">Категории</a>
+      <a href="/admin/password" class="{{ (admin_section|default('')) == 'password' ? 'is-active' : '' }}">Пароль</a>
       <a href="/" target="_blank" rel="noopener">Сайт →</a>
     </nav>
     {% block content %}{% endblock %}

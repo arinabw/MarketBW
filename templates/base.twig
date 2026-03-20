@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{ master_tagline }} — {{ site_name }}, украшения из бисера ручной работы.">
   <title>{% block title %}{{ site_name }}{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,27 +12,40 @@
 </head>
 <body>
   <header class="site-header">
-    <div class="container site-header__inner">
-      <a class="logo" href="/">{{ site_name }} <span>·</span> бисер</a>
-      <nav class="nav" aria-label="Основное меню">
-        <a href="/">Главная</a>
-        <a href="/catalog">Каталог</a>
-        <a href="/contact">Контакты</a>
-        <a href="/faq">FAQ</a>
-      </nav>
+    <div class="container">
+      <div class="site-header__inner">
+        <a class="logo" href="/">{{ site_name }} <span>·</span> бисер</a>
+        <nav class="nav" aria-label="Основное меню">
+          <a href="/" class="{{ nav_is_active('/') ? 'is-active' : '' }}">Главная</a>
+          <a href="/catalog" class="{{ nav_is_active('/catalog') ? 'is-active' : '' }}">Каталог</a>
+          <a href="/about" class="{{ nav_is_active('/about') ? 'is-active' : '' }}">О мастере</a>
+          <a href="/contact" class="{{ nav_is_active('/contact') ? 'is-active' : '' }}">Контакты</a>
+          <a href="/faq" class="{{ nav_is_active('/faq') ? 'is-active' : '' }}">FAQ</a>
+        </nav>
+        {% include 'partials/social-icons.twig' %}
+      </div>
     </div>
   </header>
   <main>
     {% block body %}{% endblock %}
   </main>
   <footer class="site-footer">
-    <div class="container footer-grid">
-      <div>© {{ "now"|date("Y") }} {{ site_name }}. Рукоделие и украшения из бисера.</div>
-      <div>
-        <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
-        ·
-        <a href="tel:{{ contact_phone|replace({' ': '', '(': '', ')': '', '-': ''}) }}">{{ contact_phone }}</a>
+    <div class="container footer-inner">
+      <div class="footer-grid">
+        <div>© {{ "now"|date("Y") }} {{ site_name }}. {{ master_tagline }}</div>
+        <div class="footer-contacts">
+          <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
+          <span class="footer-sep">·</span>
+          <a href="tel:{{ contact_phone|replace({' ': '', '(': '', ')': '', '-': ''}) }}">{{ contact_phone }}</a>
+        </div>
       </div>
+      <nav class="footer-nav" aria-label="Дополнительно">
+        <a href="/about">О мастере</a>
+        <a href="/faq">Вопросы и ответы</a>
+        <a href="/contact">Контакты</a>
+        <a href="/catalog">Каталог</a>
+      </nav>
+      <p class="footer-note">Изделия ручной работы: сроки и возврат обсуждаются индивидуально.</p>
     </div>
   </footer>
   {% include 'partials/metrika.twig' %}

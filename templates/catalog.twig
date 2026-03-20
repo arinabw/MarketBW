@@ -6,24 +6,44 @@
 <section class="page-hero">
   <div class="container">
     <h1>Каталог</h1>
-    <p class="muted">Все изделия в одном месте — фильтр по категории.</p>
+    <p class="muted">Фильтр по категории, поиск и сортировка.</p>
   </div>
 </section>
 
 <section class="section section--white">
   <div class="container">
+    <form class="catalog-toolbar" method="get" action="/catalog">
+      {% if active_category %}
+      <input type="hidden" name="category" value="{{ active_category }}">
+      {% endif %}
+      <label class="catalog-toolbar__search">
+        <span class="visually-hidden">Поиск</span>
+        <input type="search" name="q" value="{{ search_q }}" placeholder="Поиск по названию" autocomplete="off">
+      </label>
+      <label class="catalog-toolbar__sort">
+        <span class="visually-hidden">Сортировка</span>
+        <select name="sort">
+          <option value="date_desc" {{ sort == 'date_desc' ? 'selected' }}>Сначала новые</option>
+          <option value="price_asc" {{ sort == 'price_asc' ? 'selected' }}>Цена: по возрастанию</option>
+          <option value="price_desc" {{ sort == 'price_desc' ? 'selected' }}>Цена: по убыванию</option>
+        </select>
+      </label>
+      <button class="btn btn--primary catalog-toolbar__btn" type="submit">Применить</button>
+    </form>
+
     <div class="filters">
-      <a class="chip {{ active_category is empty ? 'is-active' : '' }}" href="/catalog">Все</a>
+      <a class="chip {{ active_category is empty ? 'is-active' : '' }}" href="{{ catalog_url(null, search_q, sort) }}">Все</a>
       {% for c in categories %}
-      <a class="chip {{ active_category == c.id ? 'is-active' : '' }}" href="/catalog?category={{ c.id|e('url') }}">{{ c.name }}</a>
+      <a class="chip {{ active_category == c.id ? 'is-active' : '' }}" href="{{ catalog_url(c.id, search_q, sort) }}">{{ c.name }}</a>
       {% endfor %}
     </div>
+
     <div class="grid-cards">
       {% for p in products %}
       <article class="card">
         <a href="/product/{{ p.id }}" class="card__img">
           {% set img = p.images[0] ?? '/images/placeholder.svg' %}
-          <img src="{{ img }}" alt="{{ p.name }}">
+          <img src="{{ img }}" alt="{{ p.name }}" loading="lazy" width="400" height="400">
         </a>
         <div class="card__body">
           <h2 class="card__title"><a href="/product/{{ p.id }}">{{ p.name }}</a></h2>
@@ -33,7 +53,7 @@
         </div>
       </article>
       {% else %}
-      <p class="muted">В этой категории пока пусто. <a href="/catalog">Сбросить фильтр</a>.</p>
+      <p class="muted empty-hint">Ничего не найдено. <a href="/catalog">Сбросить фильтры</a> или измените запрос.</p>
       {% endfor %}
     </div>
   </div>

@@ -28,14 +28,26 @@ return function (App $app, ContainerInterface $container): void {
     });
 
     $app->get('/catalog', function (Request $request, Response $response) use ($db, $view): Response {
-        $q = $request->getQueryParams();
-        $cat = isset($q['category']) ? (string) $q['category'] : null;
+        $qp = $request->getQueryParams();
+        $cat = isset($qp['category']) ? (string) $qp['category'] : null;
+        $search = isset($qp['q']) ? trim((string) $qp['q']) : null;
+        $search = ($search !== null && $search !== '') ? $search : null;
+        $sort = isset($qp['sort']) ? (string) $qp['sort'] : 'date_desc';
+        if (!in_array($sort, ['date_desc', 'price_asc', 'price_desc'], true)) {
+            $sort = 'date_desc';
+        }
         $database = $db();
         return $view()->render($response, 'catalog.twig', [
-            'products' => $database->products($cat),
+            'products' => $database->products($cat, $search, $sort),
             'categories' => $database->categories(),
             'active_category' => $cat,
+            'search_q' => $search ?? '',
+            'sort' => $sort,
         ]);
+    });
+
+    $app->get('/about', function (Request $request, Response $response) use ($view): Response {
+        return $view()->render($response, 'about.twig', []);
     });
 
     $app->get('/product/{id}', function (Request $request, Response $response, array $args) use ($db, $view): Response {
@@ -44,15 +56,42 @@ return function (App $app, ContainerInterface $container): void {
         if (!$product) {
             return $view()->render($response->withStatus(404), '404.twig', []);
         }
+        $categoryName = null;
+        foreach ($database->categories() as $c) {
+            if ($c['id'] === $product['category']) {
+                $categoryName = $c['name'];
+                break;
+            }
+        }
         return $view()->render($response, 'product.twig', [
             'product' => $product,
+            'category_name' => $categoryName,
             'categories' => $database->categories(),
             'reviews' => $database->reviews((string) $args['id']),
         ]);
     });
 
     $app->get('/contact', function (Request $request, Response $response) use ($view): Response {
-        return $view()->render($response, 'contact.twig', []);
+        $qp = $request->getQueryParams();
+        $sent = isset($qp['sent']) && $qp['sent'] === '1';
+        $formError = isset($qp['error']) && $qp['error'] === '1';
+        return $view()->render($response, 'contact.twig', [
+            'sent' => $sent,
+            'form_error' => $formError,
+        ]);
+    });
+
+    $app->post('/contact', function (Request $request, Response $response): Response {
+        $data = (array) $request->getParsedBody();
+        if (!isset($data['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $data['csrf'])) {
+            return $response->withHeader('Location', '/contact?error=1')->withStatus(302);
+        }
+        $name = trim((string) ($data['name'] ?? ''));
+        $message = trim((string) ($data['message'] ?? ''));
+        if ($name === '' || $message === '') {
+            return $response->withHeader('Location', '/contact?error=1')->withStatus(302);
+        }
+        return $response->withHeader('Location', '/contact?sent=1')->withStatus(302);
     });
 
     $app->get('/faq', function (Request $request, Response $response) use ($db, $view): Response {
@@ -85,6 +124,7 @@ return function (App $app, ContainerInterface $container): void {
         $pass = trim((string) ($data['password'] ?? ''));
         if ($db()->authenticate($user, $pass)) {
             $_SESSION['admin'] = true;
+            $_SESSION['admin_username'] = $user;
             return $response->withHeader('Location', '/admin')->withStatus(302);
         }
         return $view()->render($response, 'admin/login.twig', ['error' => 'Неверный логин или пароль']);
@@ -92,7 +132,7 @@ return function (App $app, ContainerInterface $container): void {
 
     $app->post('/admin/logout', function (Request $request, Response $response): Response {
         $_SESSION['admin'] = false;
-        unset($_SESSION['admin']);
+        unset($_SESSION['admin'], $_SESSION['admin_username']);
         return $response->withHeader('Location', '/admin/login')->withStatus(302);
     })->add($adminGuard);
 
@@ -105,6 +145,46 @@ return function (App $app, ContainerInterface $container): void {
                 'product_count' => $pc,
                 'category_count' => $cc,
                 'admin_section' => 'dash',
+            ]);
+        });
+
+        $group->get('/password', function (Request $request, Response $response) use ($view): Response {
+            return $view()->render($response, 'admin/password.twig', [
+                'admin_section' => 'password',
+            ]);
+        });
+
+        $group->post('/password', function (Request $request, Response $response) use ($db, $view): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $user = (string) ($_SESSION['admin_username'] ?? 'admin');
+            $old = (string) ($_POST['old_password'] ?? '');
+            $new = (string) ($_POST['new_password'] ?? '');
+            $again = (string) ($_POST['new_password_confirm'] ?? '');
+            if (!$db()->authenticate($user, $old)) {
+                return $view()->render($response, 'admin/password.twig', [
+                    'error' => 'Неверный текущий пароль',
+                    'admin_section' => 'password',
+                ]);
+            }
+            if (strlen($new) < 8) {
+                return $view()->render($response, 'admin/password.twig', [
+                    'error' => 'Новый пароль — не короче 8 символов',
+                    'admin_section' => 'password',
+                ]);
+            }
+            if ($new !== $again) {
+                return $view()->render($response, 'admin/password.twig', [
+                    'error' => 'Пароли не совпадают',
+                    'admin_section' => 'password',
+                ]);
+            }
+            $db()->updatePassword($user, $new);
+            return $view()->render($response, 'admin/password.twig', [
+                'success' => 'Пароль обновлён',
+                'admin_section' => 'password',
             ]);
         });
 

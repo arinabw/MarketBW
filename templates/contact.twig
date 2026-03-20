@@ -12,23 +12,35 @@
 
 <section class="section section--white">
   <div class="container contact-grid">
-    <div class="box">
-      <h2 style="font-family:var(--display);margin-top:0">Контакты</h2>
+    <div class="box contact-card">
+      <h2 class="box__title">Контакты</h2>
       <p><strong>Телефон:</strong> <a href="tel:{{ contact_phone|replace({' ': '', '(': '', ')': '', '-': ''}) }}">{{ contact_phone }}</a></p>
-      <p><strong>Email:</strong> <a href="mailto:{{ contact_email }}">{{ contact_email }}</a></p>
-      <p class="muted" style="margin-bottom:0">Соцсети: 
-        <a href="{{ social_instagram }}">Instagram</a> · 
-        <a href="{{ social_telegram }}">Telegram</a> · 
+      <p><strong>Email:</strong> <a href="mailto:{{ contact_email }}?subject={{ 'Заказ с сайта '|url_encode }}{{ site_name|url_encode }}">{{ contact_email }}</a></p>
+      <p class="contact-card__social">Соцсети:
+        <a href="{{ social_instagram }}">Instagram</a> ·
+        <a href="{{ social_telegram }}">Telegram</a> ·
         <a href="{{ social_vk }}">ВКонтакте</a>
       </p>
+      {% if contact_whatsapp != '' %}
+      <p><a class="btn btn--wa" href="{{ whatsapp_url() }}" target="_blank" rel="noopener">Написать в WhatsApp</a></p>
+      {% endif %}
+      {% if social_telegram != '#' %}
+      <p><a class="btn btn--tg" href="{{ social_telegram }}" target="_blank" rel="noopener">Открыть Telegram</a></p>
+      {% endif %}
     </div>
-    <div class="box">
-      <h2 style="font-family:var(--display);margin-top:0">Написать сообщение</h2>
-      <p class="muted" style="margin-top:0">Форма демонстрационная — напишите на email или в мессенджер.</p>
-      <form id="contact-form" onsubmit="event.preventDefault();alert('Спасибо! Напишите на email — так сообщение точно дойдёт.');">
+    <div class="box contact-card">
+      <h2 class="box__title">Написать сообщение</h2>
+      {% if sent %}
+      <p class="alert alert--success">Спасибо! Я получила вашу заявку. Ответ обычно в течение суток — проверьте почту или мессенджер.</p>
+      {% endif %}
+      {% if form_error %}
+      <p class="alert">Укажите имя и текст сообщения.</p>
+      {% endif %}
+      <form class="contact-form" method="post" action="/contact">
+        <input type="hidden" name="csrf" value="{{ csrf_token() }}">
         <div class="form-row">
           <label for="name">Имя</label>
-          <input id="name" name="name" type="text" autocomplete="name">
+          <input id="name" name="name" type="text" autocomplete="name" required>
         </div>
         <div class="form-row">
           <label for="email">Email</label>
@@ -36,10 +48,11 @@
         </div>
         <div class="form-row">
           <label for="msg">Сообщение</label>
-          <textarea id="msg" name="message"></textarea>
+          <textarea id="msg" name="message" required rows="5"></textarea>
         </div>
         <button class="btn btn--primary" type="submit">Отправить</button>
       </form>
+      <p class="muted contact-hint">После отправки вы вернётесь на эту страницу с подтверждением. Также можно написать на почту или в мессенджер — ответ быстрее.</p>
     </div>
   </div>
 </section>

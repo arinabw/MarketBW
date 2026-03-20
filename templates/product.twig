@@ -3,9 +3,19 @@
 {% block title %}{{ product.name }} — {{ site_name }}{% endblock %}
 
 {% block body %}
-<section class="section section--white" style="padding-top:1rem">
+<section class="section section--tight section--white">
   <div class="container">
-    <p><a href="/catalog">← Вернуться в каталог</a></p>
+    <nav class="breadcrumbs" aria-label="Навигация">
+      <a href="/">Главная</a>
+      <span class="breadcrumbs__sep">/</span>
+      <a href="/catalog">Каталог</a>
+      {% if category_name %}
+      <span class="breadcrumbs__sep">/</span>
+      <a href="{{ catalog_url(product.category, null, null) }}">{{ category_name }}</a>
+      {% endif %}
+      <span class="breadcrumbs__sep">/</span>
+      <span class="breadcrumbs__current">{{ product.name }}</span>
+    </nav>
   </div>
 </section>
 
@@ -14,35 +24,53 @@
     <div>
       <div class="gallery-main">
         {% set main = product.images[0] ?? '/images/placeholder.svg' %}
-        <img id="main-img" src="{{ main }}" alt="{{ product.name }}" width="600" height="600" style="width:100%;height:auto;display:block">
+        <img id="main-img" src="{{ main }}" alt="{{ product.name }}" width="600" height="600" class="gallery-main__img">
       </div>
       {% if product.images|length > 1 %}
       <div class="thumbs" role="tablist">
         {% for img in product.images %}
-        <button type="button" data-src="{{ img }}" class="{{ loop.first ? 'is-active' : '' }}" aria-label="Миниатюра {{ loop.index }}">
-          <img src="{{ img }}" alt="" width="72" height="72" style="width:100%;height:100%;object-fit:cover">
+        <button type="button" data-src="{{ img }}" class="thumb-btn {{ loop.first ? 'is-active' : '' }}" aria-label="Миниатюра {{ loop.index }}">
+          <img src="{{ img }}" alt="" width="72" height="72" class="thumb-btn__img">
         </button>
         {% endfor %}
       </div>
       {% endif %}
     </div>
-    <div>
-      <h1 style="font-family:var(--display);margin-top:0">{{ product.name }}</h1>
-      <p style="font-size:1.35rem;font-weight:700;color:var(--primary-dark)">{{ product.price|price_rub }}</p>
-      <p class="muted">{{ product.description }}</p>
-      <p><strong>Техника:</strong> {{ product.technique }}</p>
-      {% if product.size %}<p><strong>Размер:</strong> {{ product.size }}</p>{% endif %}
-      <p><strong>В наличии:</strong> {{ product.in_stock ? 'да' : 'нет' }}</p>
+    <div class="product-info">
+      <h1 class="product-info__title">{{ product.name }}</h1>
+      <p class="product-info__price">{{ product.price|price_rub }}</p>
+      <p class="muted product-info__desc">{{ product.description }}</p>
+      <dl class="product-meta">
+        <div><dt>Техника</dt><dd>{{ product.technique }}</dd></div>
+        {% if product.size %}<div><dt>Размер</dt><dd>{{ product.size }}</dd></div>{% endif %}
+        <div><dt>В наличии</dt><dd>{{ product.in_stock ? 'да' : 'под заказ' }}</dd></div>
+      </dl>
       {% if product.materials|length %}
-      <p><strong>Материалы:</strong></p>
+      <p class="product-info__label"><strong>Материалы</strong></p>
       <ul class="meta-list">
         {% for m in product.materials %}
         <li>{{ m }}</li>
         {% endfor %}
       </ul>
       {% endif %}
-      <div class="btn-row">
-        <a class="btn btn--primary" href="/contact">Заказать / вопрос</a>
+
+      <div class="order-steps">
+        <h2 class="order-steps__title">Как заказать</h2>
+        <ol class="order-steps__list">
+          <li>Напишите в <a href="/contact">контакты</a> или в мессенджер — укажите изделие или идею.</li>
+          <li>Согласуем детали, срок и стоимость.</li>
+          <li>После подтверждения — изготовление и отправка.</li>
+        </ol>
+      </div>
+
+      <div class="btn-row product-actions">
+        <a class="btn btn--primary" href="/contact">Заказать или задать вопрос</a>
+        {% if social_telegram != '#' %}
+        <a class="btn btn--tg" href="{{ social_telegram }}" target="_blank" rel="noopener">Telegram</a>
+        {% endif %}
+        {% if contact_whatsapp != '' %}
+        <a class="btn btn--wa" href="{{ whatsapp_url() }}" target="_blank" rel="noopener">WhatsApp</a>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -58,7 +86,8 @@
         <span>{{ r.author }}</span>
         <span class="muted">{{ r.date|slice(0, 10) }}</span>
       </div>
-      <p class="muted" style="margin:0">{{ r.text }}</p>
+      <p class="stars-rating" aria-label="Оценка {{ r.rating }} из 5">{{ r.rating|stars }}</p>
+      <p class="muted review__text">{{ r.text }}</p>
     </div>
     {% endfor %}
   </div>
@@ -71,11 +100,11 @@
 (function () {
   var main = document.getElementById('main-img');
   if (!main) return;
-  document.querySelectorAll('.thumbs button').forEach(function (btn) {
+  document.querySelectorAll('.thumb-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var src = btn.getAttribute('data-src');
       if (src) main.src = src;
-      document.querySelectorAll('.thumbs button').forEach(function (b) { b.classList.remove('is-active'); });
+      document.querySelectorAll('.thumb-btn').forEach(function (b) { b.classList.remove('is-active'); });
       btn.classList.add('is-active');
     });
   });

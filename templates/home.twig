@@ -5,7 +5,7 @@
   <div class="container hero__grid">
     <div>
       <div class="badge">✨ {{ site_name }} — бисерные чудеса</div>
-      <h1>Маленькие чудеса <span style="color:var(--primary)">из бисера</span></h1>
+      <h1>Маленькие чудеса <span class="hero__accent">из бисера</span></h1>
       <p class="lead">Уникальные украшения ручной работы — с любовью и вниманием к каждой детали.</p>
       <div class="btn-row">
         <a class="btn btn--primary" href="/catalog">Открыть каталог</a>
@@ -13,8 +13,8 @@
       </div>
     </div>
     <div class="hero-art">
-      <div style="border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border)">
-        <img src="/images/hero-beadwork.svg" alt="Украшения из бисера" width="600" height="400">
+      <div class="hero-art__frame">
+        <img src="/images/hero-beadwork.svg" alt="Украшения из бисера" width="600" height="400" loading="eager">
       </div>
     </div>
   </div>
@@ -26,9 +26,9 @@
     <p class="section-sub">Выберите направление и откройте для себя каталог изделий.</p>
     <div class="grid-cards">
       {% for c in categories %}
-      <a class="card" href="/catalog?category={{ c.id|e('url') }}" style="text-decoration:none;color:inherit">
+      <a class="card card--link" href="{{ catalog_url(c.id, null, null) }}">
         <div class="card__img">
-          <img src="{{ c.image }}" alt="{{ c.name }}">
+          <img src="{{ c.image }}" alt="{{ c.name }}" loading="lazy" width="400" height="400">
         </div>
         <div class="card__body">
           <h3 class="card__title">{{ c.name }}</h3>
@@ -50,7 +50,7 @@
       <article class="card">
         <a href="/product/{{ p.id }}" class="card__img">
           {% set img = p.images[0] ?? '/images/placeholder.svg' %}
-          <img src="{{ img }}" alt="{{ p.name }}">
+          <img src="{{ img }}" alt="{{ p.name }}" loading="lazy" width="400" height="400">
         </a>
         <div class="card__body">
           <h3 class="card__title"><a href="/product/{{ p.id }}">{{ p.name }}</a></h3>
@@ -60,7 +60,7 @@
         </div>
       </article>
       {% else %}
-      <p class="muted">Пока нет избранных товаров — загляните в <a href="/catalog">каталог</a>.</p>
+      <p class="muted empty-hint">Пока нет избранных товаров — загляните в <a href="/catalog">каталог</a>.</p>
       {% endfor %}
     </div>
   </div>
@@ -70,14 +70,15 @@
   <div class="container">
     <h2 class="section-title">Отзывы</h2>
     <p class="section-sub">Несколько слов от покупательниц.</p>
-    <div class="grid-cards">
+    <div class="grid-cards reviews-grid">
       {% for r in reviews %}
       <div class="review">
         <div class="review__head">
           <span>{{ r.author }}</span>
           <span class="muted">{{ r.date|slice(0, 10) }}</span>
         </div>
-        <p class="muted" style="margin:0">{{ r.text }}</p>
+        <p class="stars-rating" aria-label="Оценка {{ r.rating }} из 5">{{ r.rating|stars }}</p>
+        <p class="muted review__text">{{ r.text }}</p>
       </div>
       {% endfor %}
     </div>

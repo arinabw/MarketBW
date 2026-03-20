@@ -1,0 +1,12 @@
+{# Компактные ссылки на соцсети — дублируют настройки #}
+<div class="social-icons" role="navigation" aria-label="Соцсети">
+  {% if social_instagram != '#' %}
+  <a class="social-icons__link" href="{{ social_instagram }}" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram">IG</a>
+  {% endif %}
+  {% if social_telegram != '#' %}
+  <a class="social-icons__link" href="{{ social_telegram }}" target="_blank" rel="noopener noreferrer" title="Telegram" aria-label="Telegram">TG</a>
+  {% endif %}
+  {% if social_vk != '#' %}
+  <a class="social-icons__link" href="{{ social_vk }}" target="_blank" rel="noopener noreferrer" title="ВКонтакте" aria-label="ВКонтакте">VK</a>
+  {% endif %}
+</div>

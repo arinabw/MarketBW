@@ -1,0 +1,26 @@
+{% extends "base.twig" %}
+
+{% block title %}О мастере — {{ site_name }}{% endblock %}
+
+{% block body %}
+<section class="page-hero">
+  <div class="container">
+    <h1>О мастере</h1>
+    <p class="muted">{{ master_tagline }}</p>
+  </div>
+</section>
+
+<section class="section section--white">
+  <div class="container about-page">
+    <div class="about-page__intro box">
+      <h2 class="about-page__name">{{ master_name }}</h2>
+      <p>Я создаю украшения из бисера вручную — колье, браслеты, серьги и другие изделия. Каждая работа уникальна: подбираю цвета, фурнитуру и технику плетения так, чтобы украшение гармонировало с вашим образом.</p>
+      <p>Работаю с качественным бисером (PRECIOSA, TOHO, Miyuki), нитками и фурнитурой, которые не теряют вид со временем. Если хотите что-то особенное — напишите: обсудим идею, сроки и стоимость.</p>
+    </div>
+    <div class="about-page__cta">
+      <a class="btn btn--primary" href="/catalog">Смотреть каталог</a>
+      <a class="btn btn--ghost" href="/contact">Связаться</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -25,4 +25,8 @@ return [
     'social_instagram' => $envStr('SOCIAL_INSTAGRAM', '#'),
     'social_telegram' => $envStr('SOCIAL_TELEGRAM', '#'),
     'social_vk' => $envStr('SOCIAL_VK', '#'),
+    /** Только цифры, например 79991234567 — для wa.me */
+    'contact_whatsapp' => $envStr('CONTACT_WHATSAPP', ''),
+    'master_name' => $envStr('MASTER_NAME', 'Мастер'),
+    'master_tagline' => $envStr('MASTER_TAGLINE', 'Украшения из бисера ручной работы'),
 ];
