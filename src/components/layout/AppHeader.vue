@@ -33,7 +33,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 <template>
   <header
     class="sticky top-0 z-50 transition-all duration-300 border-b"
-    :class="scrolled ? 'bg-white/95 backdrop-blur-md shadow-soft border-surface-200' : 'bg-white border-transparent'"
+    :class="scrolled ? 'bg-[#A24C61]/95 backdrop-blur-md shadow-soft border-white/20' : 'bg-[#A24C61] border-transparent'"
   >
     <div class="container-custom">
       <div class="flex items-center justify-between h-16 md:h-18">
@@ -54,13 +54,13 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
             :to="item.href"
             class="text-sm font-medium tracking-wide transition-colors duration-200 relative py-1"
             :class="isActive(item.href)
-              ? 'text-primary-600'
-              : 'text-text-secondary hover:text-primary-500'"
+              ? 'text-white'
+              : 'text-white/80 hover:text-white'"
           >
             {{ item.name }}
             <span
               v-if="isActive(item.href)"
-              class="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full"
+              class="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-white rounded-full"
             ></span>
           </RouterLink>
         </nav>
@@ -68,7 +68,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         <div class="flex items-center gap-4">
           <a
             :href="`tel:${env.contactPhone}`"
-            class="hidden lg:flex items-center gap-2 text-sm text-text-secondary hover:text-primary-500 transition-colors"
+            class="hidden lg:flex items-center gap-2 text-sm text-white/80 hover:text-white transition-colors"
           >
             <Phone class="w-4 h-4" />
             <span class="font-medium">{{ env.contactPhone }}</span>
@@ -102,8 +102,8 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
               :to="item.href"
               class="block px-4 py-3 rounded-xl text-sm font-medium transition-colors"
               :class="isActive(item.href)
-                ? 'bg-primary-50 text-primary-600'
-                : 'text-text-secondary hover:bg-surface-50 hover:text-primary-500'"
+                ? 'bg-[#A24C61] text-white'
+                : 'text-text-secondary hover:bg-[#A24C61]/10 hover:text-[#A24C61]'"
               @click="menuStore.closeMenu"
             >
               {{ item.name }}
@@ -111,14 +111,14 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
             <div class="pt-3 mt-2 border-t border-surface-200 space-y-0.5">
               <a
                 :href="`tel:${env.contactPhone}`"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-text-secondary hover:text-primary-500 hover:bg-surface-50 transition-colors"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-text-secondary hover:text-[#A24C61] hover:bg-[#A24C61]/10 transition-colors"
               >
                 <Phone class="w-4 h-4" />
                 <span>{{ env.contactPhone }}</span>
               </a>
               <a
                 :href="`mailto:${env.contactEmail}`"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-text-secondary hover:text-primary-500 hover:bg-surface-50 transition-colors"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-text-secondary hover:text-[#A24C61] hover:bg-[#A24C61]/10 transition-colors"
               >
                 <Mail class="w-4 h-4" />
                 <span>{{ env.contactEmail }}</span>
