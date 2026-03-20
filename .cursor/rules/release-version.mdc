@@ -1,0 +1,14 @@
+---
+description: Семвер, релизы, коммит и push
+alwaysApply: true
+---
+
+# Релизы MarketBW
+
+После значимых изменений (фиксы, фичи), если пользователь не отменил явно:
+
+1. Поднять **семвер** относительно текущего значения в `VERSION` и `composer.json` (patch/minor/major по смыслу).
+2. Синхронно обновить: `VERSION`, `composer.json` → `"version"`, строку **Версия:** в `README.md`, `LABEL org.opencontainers.image.version` в `docker/Dockerfile`.
+3. Выполнить **`git add`**, осмысленный **`git commit`**, **`git push`** в `main` (или текущую ветку), если есть доступ к git и сеть.
+
+Таблица файлов — в `README.md` (раздел «Версионирование релизов»).
