@@ -54,7 +54,8 @@ $app->addBodyParsingMiddleware();
 $twig = $container->get('twig');
 $app->add(TwigMiddleware::create($app, $twig));
 
-$app->add(static function ($request, $handler) {
+// Не static: Slim привязывает замыкание к контейнеру; static ломает MiddlewareDispatcher.
+$app->add(function ($request, $handler) {
     if (session_status() !== PHP_SESSION_ACTIVE) {
         session_start([
             'cookie_httponly' => true,

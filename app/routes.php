@@ -61,7 +61,7 @@ return static function (App $app, ContainerInterface $container): void {
         ]);
     });
 
-    $adminGuard = static function (Request $request, $handler): Response {
+    $adminGuard = function (Request $request, $handler): Response {
         $path = $request->getUri()->getPath();
         if (str_starts_with($path, '/admin/login')) {
             return $handler->handle($request);
