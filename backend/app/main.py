@@ -95,6 +95,21 @@ def api_products():
         raise HTTPException(status_code=500, detail="Ошибка при получении товаров")
 
 
+@api.get("/products/{pid}")
+def api_product_by_id(pid: str):
+    try:
+        from app.database import get_products
+        products = get_products()
+        product = next((p for p in products if p["id"] == pid), None)
+        if not product:
+            raise HTTPException(status_code=404, detail="Товар не найден")
+        return product
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(status_code=500, detail="Ошибка при получении товара")
+
+
 @api.get("/reviews")
 def api_reviews(product_id: str | None = None):
     try:
@@ -180,9 +195,15 @@ def api_logout():
 
 app.include_router(api)
 
+# Раздача статики из dist
 _assets = DIST_DIR / "assets"
 if _assets.is_dir():
     app.mount("/assets", StaticFiles(directory=str(_assets)), name="assets")
+
+# Раздача изображений из public/images
+_public_images = BASE_DIR / "public" / "images"
+if _public_images.is_dir():
+    app.mount("/images", StaticFiles(directory=str(_public_images)), name="images")
 
 
 def _serve_dist_or_spa(full_path: str) -> FileResponse:

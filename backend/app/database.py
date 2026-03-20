@@ -79,6 +79,8 @@ def init_db() -> None:
                 ("1", "admin", "admin123"),
             )
         seed_content_if_empty(conn)
+        # Установить все товары в наличии
+        update_all_products_in_stock()
 
 
 def _category_row(r: sqlite3.Row) -> dict:
@@ -304,3 +306,9 @@ def authenticate_user(username: str, password: str) -> bool:
     if not row:
         return False
     return row["password_hash"] == password
+
+
+def update_all_products_in_stock() -> None:
+    """Устанавливает все товары в наличии."""
+    with get_conn() as conn:
+        conn.execute("UPDATE products SET in_stock = 1")

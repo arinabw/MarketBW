@@ -9,8 +9,7 @@ export const getProducts = async () => {
 }
 
 export const getProductById = async (id) => {
-  const products = await getProducts()
-  return products.find(p => p.id === id)
+  return apiGet(`/products/${id}`)
 }
 
 export const getFeaturedProducts = async () => {

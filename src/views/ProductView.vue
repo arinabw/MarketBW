@@ -125,7 +125,7 @@ const prevImage = () => {
                 {{ product.name }}
               </h1>
               <p class="text-2xl md:text-3xl font-bold text-primary-600 mb-4">
-                {{ formatPrice(product.price) }}ни
+                {{ formatPrice(product.price) }}
               </p>
               <div class="flex items-center gap-2">
                 <span v-if="product.inStock" class="px-3.5 py-1.5 bg-green-50 text-green-700 rounded-full text-xs font-semibold">
