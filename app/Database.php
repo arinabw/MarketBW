@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use PDO;
+use PDOException;
 
 final class Database
 {
@@ -148,22 +149,35 @@ SQL;
 
     public function authenticate(string $username, string $password): bool
     {
-        $st = $this->pdo->prepare('SELECT password_hash FROM users WHERE username = ?');
+        $username = trim($username);
+        $password = trim($password);
+
+        $st = $this->pdo->prepare('SELECT password_hash, username FROM users WHERE LOWER(username) = LOWER(?)');
         $st->execute([$username]);
         $row = $st->fetch();
         if (!$row) {
             return false;
         }
-        $hash = $row['password_hash'];
-        if (password_get_info($hash)['algo'] !== 0) {
-            return password_verify($password, $hash);
-        }
-        if (hash_equals($hash, $password)) {
-            $newHash = password_hash($password, PASSWORD_DEFAULT);
-            $up = $this->pdo->prepare('UPDATE users SET password_hash = ? WHERE username = ?');
-            $up->execute([$newHash, $username]);
+        $hash = (string) $row['password_hash'];
+        $dbUsername = (string) $row['username'];
+
+        // Сначала современные хэши (bcrypt/argon и т.д.)
+        if (password_verify($password, $hash)) {
             return true;
         }
+
+        // Легаси: в колонке лежал открытый пароль (старый Python)
+        if (hash_equals($hash, $password)) {
+            try {
+                $newHash = password_hash($password, PASSWORD_DEFAULT);
+                $up = $this->pdo->prepare('UPDATE users SET password_hash = ? WHERE username = ?');
+                $up->execute([$newHash, $dbUsername]);
+            } catch (PDOException) {
+                // БД только для чтения — вход всё равно разрешаем
+            }
+            return true;
+        }
+
         return false;
     }
 

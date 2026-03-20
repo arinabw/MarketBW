@@ -1,6 +1,6 @@
 # MarketBW (marketbw.ru)
 
-**Версия:** 3.0.3
+**Версия:** 3.0.4
 
 Сайт-визитка рукоделия (украшения из бисера). **Текущий прод-стек** — лёгкий PHP + SQLite + Twig в Docker (Nginx + PHP-FPM за Traefik).
 
@@ -82,7 +82,7 @@ docker compose up -d --build
 
 | Файл | Что править |
 |------|-------------|
-| `VERSION` | строка, например `3.0.3` |
+| `VERSION` | строка, например `3.0.4` |
 | `composer.json` | поле `"version"` |
 | `README.md` | строка **Версия:** в шапке |
 | `docker/Dockerfile` | `LABEL org.opencontainers.image.version="…"` |

@@ -81,8 +81,8 @@ return function (App $app, ContainerInterface $container): void {
 
     $app->post('/admin/login', function (Request $request, Response $response) use ($db, $view): Response {
         $data = (array) $request->getParsedBody();
-        $user = isset($data['username']) ? (string) $data['username'] : '';
-        $pass = isset($data['password']) ? (string) $data['password'] : '';
+        $user = trim((string) ($data['username'] ?? ''));
+        $pass = trim((string) ($data['password'] ?? ''));
         if ($db()->authenticate($user, $pass)) {
             $_SESSION['admin'] = true;
             return $response->withHeader('Location', '/admin')->withStatus(302);
