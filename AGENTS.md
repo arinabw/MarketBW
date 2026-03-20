@@ -23,7 +23,7 @@
 | `app/SiteContentDefaults.php` | Ключи и дефолты текстов CMS, группы для админки `adminGroups()`, `imageKeys()` |
 | `app/ProductImages.php` | Нормализация путей к фото товаров, data-URL → файлы |
 | `app/SiteUpload.php` | Загрузка картинок для раздела «Контент» → `public/images/site/` |
-| `config/settings.php` | Env: `SITE_NAME`, контакты, соцсети, пути `DATA_DIR`, `IMAGES_DIR` |
+| `config/settings.php` | Env: `SITE_NAME`, контакты, соцсети, пути `DATA_DIR`, `IMAGES_DIR`, опционально **`BASE_PATH`** (подкаталог сайта) |
 | `data/` | `marketbw.db` (на проде часто volume) |
 | `templates/` | Twig: `base.twig`, страницы, `admin/*`, `partials/*` |
 | `docker/` | Dockerfile, nginx, compose, `deploy.sh`, `env.example` |

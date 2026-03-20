@@ -1,6 +1,6 @@
 # MarketBW (marketbw.ru)
 
-**Версия:** 3.1.0
+**Версия:** 3.1.1
 
 Сайт-визитка рукоделия (украшения из бисера). **Текущий прод-стек** — лёгкий PHP + SQLite + Twig в Docker (Nginx + PHP-FPM за Traefik).
 
@@ -50,9 +50,11 @@ php -S localhost:8080 -t public
 
 Переменные (опционально): скопируйте значения из `config/settings.php` или задайте `DATA_DIR`, `IMAGES_DIR`, `CONTACT_EMAIL` и т.д. в окружении.
 
+Если сайт открывается **не из корня домена** (например `https://example.com/shop/`), задайте в окружении **`BASE_PATH=shop`** (без слэшей) — иначе Slim не сопоставит маршруты и даст 404.
+
 ## Админка
 
-- URL: **`/admin`**
+- URL: **`/admin`** (и **`/admin/`**)
 - Логин по умолчанию после первой инициализации БД: **`admin`** / **`admin123`** — **смените пароль** после деплоя (хэш хранится в SQLite).
 
 ## Деплой (Docker + Traefik)
@@ -88,7 +90,7 @@ docker compose up -d --build
 
 | Файл | Что править |
 |------|-------------|
-| `VERSION` | строка, например `3.1.0` |
+| `VERSION` | строка, например `3.1.1` |
 | `composer.json` | поле `"version"` |
 | `README.md` | строка **Версия:** в шапке |
 | `docker/Dockerfile` | `LABEL org.opencontainers.image.version="…"` |

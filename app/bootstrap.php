@@ -101,6 +101,11 @@ $container = $containerBuilder->build();
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 
+$basePath = trim((string) ($settings['base_path'] ?? ''), '/');
+if ($basePath !== '') {
+    $app->setBasePath('/' . $basePath);
+}
+
 $app->addRoutingMiddleware();
 $app->addBodyParsingMiddleware();
 

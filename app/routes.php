@@ -147,18 +147,21 @@ return function (App $app, ContainerInterface $container): void {
         return $response->withHeader('Location', '/admin/login')->withStatus(302);
     })->add($adminGuard);
 
-    $app->group('/admin', function (RouteCollectorProxy $group) use ($db, $view, $settings): void {
-        $group->get('', function (Request $request, Response $response) use ($db, $view): Response {
-            $database = $db();
-            $pc = (int) $database->pdo()->query('SELECT COUNT(*) FROM products')->fetchColumn();
-            $cc = (int) $database->pdo()->query('SELECT COUNT(*) FROM categories')->fetchColumn();
-            return $view()->render($response, 'admin/dashboard.twig', [
-                'product_count' => $pc,
-                'category_count' => $cc,
-                'admin_section' => 'dash',
-            ]);
-        });
+    $adminDashboard = function (Request $request, Response $response) use ($db, $view): Response {
+        $database = $db();
+        $pc = (int) $database->pdo()->query('SELECT COUNT(*) FROM products')->fetchColumn();
+        $cc = (int) $database->pdo()->query('SELECT COUNT(*) FROM categories')->fetchColumn();
 
+        return $view()->render($response, 'admin/dashboard.twig', [
+            'product_count' => $pc,
+            'category_count' => $cc,
+            'admin_section' => 'dash',
+        ]);
+    };
+    $app->get('/admin', $adminDashboard)->add($adminGuard);
+    $app->get('/admin/', $adminDashboard)->add($adminGuard);
+
+    $app->group('/admin', function (RouteCollectorProxy $group) use ($db, $view, $settings): void {
         $group->get('/password', function (Request $request, Response $response) use ($view): Response {
             return $view()->render($response, 'admin/password.twig', [
                 'admin_section' => 'password',
