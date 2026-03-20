@@ -7,6 +7,11 @@ namespace App;
 use PDO;
 use PDOException;
 
+/**
+ * Доступ к SQLite: каталог, товары, отзывы, FAQ, пользователи, CMS (`site_content`).
+ *
+ * Схема и сиды: {@see Database::init()}, демо: {@see Seed::ifEmpty()}.
+ */
 final class Database
 {
     private PDO $pdo;

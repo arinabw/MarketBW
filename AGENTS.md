@@ -1,0 +1,108 @@
+# AGENTS.md — навигация по кодовой базе MarketBW
+
+Документ для **ИИ-агентов и разработчиков**: где что лежит, как течёт запрос, где менять поведение.
+
+## Назначение проекта
+
+Визитка мастера (украшения из бисера): каталог товаров, страницы «О мастере», контакты, FAQ. Админка: товары, категории, **контент сайта** (тексты/картинки из БД), FAQ, отзывы, пароль.
+
+**Стек:** PHP 8.2+, Slim 4, Twig 3, SQLite, Docker (Nginx + PHP-FPM). Фронт — CSS без сборки (`public/css/app.css`).
+
+---
+
+## Дерево репозитория (семантика папок)
+
+| Путь | Роль |
+|------|------|
+| `public/` | Document root: `index.php`, статика `css/`, `images/`, `favicon.svg` |
+| `public/index.php` | Единственная точка входа HTTP → `app/bootstrap.php` |
+| `app/bootstrap.php` | DI-контейнер, Twig, middleware (сессия, CSRF, **контент из БД**), `Database::init()`, подключение `routes.php` |
+| `app/routes.php` | Все маршруты: публичные + группа `/admin/*`; хелперы загрузки изображений внизу файла |
+| `app/Database.php` | PDO SQLite: схема, товары, категории, отзывы, FAQ, пользователи, **site_content**, смена пароля |
+| `app/Seed.php` | Демо-данные при пустой БД |
+| `app/SiteContentDefaults.php` | Ключи и дефолты текстов CMS, группы для админки `adminGroups()`, `imageKeys()` |
+| `app/ProductImages.php` | Нормализация путей к фото товаров, data-URL → файлы |
+| `app/SiteUpload.php` | Загрузка картинок для раздела «Контент» → `public/images/site/` |
+| `config/settings.php` | Env: `SITE_NAME`, контакты, соцсети, пути `DATA_DIR`, `IMAGES_DIR` |
+| `data/` | `marketbw.db` (на проде часто volume) |
+| `templates/` | Twig: `base.twig`, страницы, `admin/*`, `partials/*` |
+| `docker/` | Dockerfile, nginx, compose, `deploy.sh`, `env.example` |
+
+---
+
+## Поток запроса (обязательно понимать порядок)
+
+1. `public/index.php` вызывает `app/bootstrap.php` и `->run()`.
+2. Регистрируются middleware (Slim): в конце файла добавлен слой, который на **каждый запрос** подмешивает в Twig глобал `content` (слияние `SiteContentDefaults` + таблица `site_content`) и перезаписывает глобалы `master_*`, `contact_*`, `social_*`.
+3. Маршруты из `app/routes.php`: публичные URL и группа `/admin` с guard (кроме логина).
+4. Рендер: Twig-шаблоны; тексты с сайта — **`t('ключ')`** (ключи из `SiteContentDefaults`).
+
+**CSRF:** `$_SESSION['csrf']`, в формах `csrf_token()`, проверка в POST админки и `/contact`.
+
+---
+
+## База данных SQLite (таблицы)
+
+| Таблица | Назначение |
+|---------|------------|
+| `categories` | Категории каталога + путь к картинке категории |
+| `products` | Товары: JSON `images`, `materials`, цена, featured и т.д. |
+| `reviews` | Отзывы: опционально `product_id` |
+| `faqs` | Вопрос–ответ FAQ |
+| `users` | Админ (логин + hash пароля) |
+| `site_content` | CMS: `content_key` → `value` (переопределение дефолтов из кода/env) |
+
+Инициализация схемы: `Database::init()` при старте приложения.
+
+---
+
+## Контент сайта (CMS)
+
+- **Ключи** и строки по умолчанию: `app/SiteContentDefaults.php` (`defaults()`, `adminGroups()`, `imageKeys()`).
+- **Хранение переопределений:** `site_content`.
+- **Шаблоны:** не хардкодить длинные тексты — `{{ t('ключ') }}`; HTML-фрагменты — `|raw` где осознанно.
+- **Админка:** `GET/POST /admin/content`, шаблон `templates/admin/content.twig`.
+
+---
+
+## Админка (маршруты)
+
+| URL | Назначение |
+|-----|------------|
+| `/admin/login`, `/admin/logout` | Вход / выход |
+| `/admin` | Дашборд |
+| `/admin/content` | Редактирование текстов и hero-картинки |
+| `/admin/products`, `/admin/products/new`, `.../edit` | Товары |
+| `/admin/categories`, `...` | Категории |
+| `/admin/faqs`, `/admin/faqs/new`, `.../edit` | FAQ |
+| `/admin/reviews`, `...` | Отзывы |
+| `/admin/password` | Смена пароля |
+
+Навигация админки: `templates/admin/layout.twig`.
+
+---
+
+## Соглашения по коду
+
+- PHP: `declare(strict_types=1);`, namespace `App\` для классов в `app/`.
+- Новые маршруты — в `app/routes.php` внутри нужной группы; публичные — на уровне `$app->get/post`.
+- Загрузка файлов: товары → `ProductImages` + `handle_image_uploads`; категории → `handle_category_upload`; контент сайта → `SiteUpload`.
+- Версия релиза: см. `.cursor/rules/release-version.mdc` и `README.md`.
+
+---
+
+## Где менять типичные задачи
+
+| Задача | Место |
+|--------|--------|
+| Новая публичная страница | `app/routes.php` + `templates/*.twig`, при необходимости ключи в `SiteContentDefaults` |
+| Текст на существующей странице | Ключ в `SiteContentDefaults`, шаблон — `t('ключ')`, при необходимости поле в `adminGroups()` |
+| Стили сайта | `public/css/app.css` |
+| Env-переменные | `config/settings.php`, `docker/env.example` |
+| Деплой | `docker/deploy.sh`, `docker/Dockerfile` |
+
+---
+
+## Зависимости
+
+См. `composer.json`: Slim, slim/twig-view, Twig, php-di. Фронт без npm в репозитории.

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App;
 
-/** Загрузка картинок для раздела «Контент сайта» → /images/site/ */
+/**
+ * Загрузка файлов для CMS (раздел «Контент сайта»): сохранение в `public/images/site/`.
+ */
 final class SiteUpload
 {
     /**

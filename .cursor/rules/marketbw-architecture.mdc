@@ -1,0 +1,18 @@
+---
+description: Архитектура MarketBW — вход, слои, CMS, админка
+alwaysApply: true
+---
+
+# MarketBW — ориентир для агента
+
+Подробная карта: **`AGENTS.md`** в корне репозитория (дерево папок, поток запроса, таблицы БД, маршруты админки, соглашения).
+
+Кратко:
+
+- **HTTP:** `public/index.php` → `app/bootstrap.php` → Slim → `app/routes.php`.
+- **Данные:** SQLite `data/marketbw.db`, класс `App\Database`.
+- **Тексты на сайте:** ключи в `App\SiteContentDefaults`, переопределения в таблице `site_content`, в Twig — `t('ключ')`, глобал `content` выставляется middleware в `bootstrap.php`.
+- **Админка:** префикс `/admin`, guard сессии (кроме логина); формы с CSRF.
+- **Версии:** при релизе синхронизировать `VERSION`, `composer.json`, `README`, `docker/Dockerfile` — правило `release-version.mdc`.
+
+При добавлении фичи не раздувай diff: правь только нужные файлы; стиль как у существующего кода.

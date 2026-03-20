@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Сборка Slim 4: PHP-DI, Twig, middleware (сессия, CSRF, глобалы контента), маршруты из routes.php.
+ *
+ * @package MarketBW
+ */
+
 declare(strict_types=1);
 
 use App\Database;

@@ -1,0 +1,13 @@
+---
+description: Соглашения по Twig
+globs: templates/**/*.twig
+alwaysApply: false
+---
+
+# Twig (`templates/`)
+
+- Базовый каркас: `base.twig`; страницы расширяют его и заполняют `body` / `title` / `scripts`.
+- Статический текст с сайта: **`{{ t('ключ') }}`**, не копировать длинные строки в шаблон без ключа в `SiteContentDefaults`.
+- HTML из CMS (шаги заказа, ссылки в подсказках): только с `|raw` и доверенным контентом из админки.
+- Админка: `admin/layout.twig`, переменная `admin_section` для активного пункта меню.
+- Глобалы из `bootstrap.php`: `site_name`, `content`, контакты, `master_*`, функции `csrf_token`, `nav_is_active`, `catalog_url`, `whatsapp_url`, фильтры `price_rub`, `stars`.

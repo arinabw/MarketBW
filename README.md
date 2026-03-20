@@ -24,7 +24,13 @@ public/           # document root: index.php, css/, images/
 templates/        # Twig (сайт + /admin)
 docker/           # Dockerfile, nginx.conf, supervisord.conf, compose, env.example
 data/             # SQLite (том на сервере: ../data → /var/www/data)
+AGENTS.md         # карта кодовой базы для разработчиков и ИИ-агентов
+.cursor/rules/    # правила Cursor (архитектура, PHP, Twig, релизы)
 ```
+
+## Архитектура и навигация по коду
+
+Чтобы быстрее ориентироваться в проекте (в том числе ИИ-агентам): смотрите **`AGENTS.md`** — поток запроса, таблицы БД, маршруты админки, где менять тексты и стили. В **`.cursor/rules/`** — сжатые правила для редактора.
 
 ## Локальная разработка
 

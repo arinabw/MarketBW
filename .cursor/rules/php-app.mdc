@@ -1,0 +1,13 @@
+---
+description: Соглашения по PHP в app/
+globs: app/**/*.php
+alwaysApply: false
+---
+
+# PHP (`app/`)
+
+- Namespace `App\`, `declare(strict_types=1);`.
+- **Маршруты** только в `routes.php` (замыкания или группы); тяжёлую логику выносить в классы `app/*.php`.
+- **БД:** `Database` — единая точка SQL; новые таблицы: миграция в `init()` + методы доступа.
+- **Контент сайта:** ключи только из `SiteContentDefaults::allKeys()` при сохранении в `site_content`.
+- Загрузки изображений: `ProductImages`, `SiteUpload`, функции в конце `routes.php` — не дублировать произвольное сохранение файлов без проверки расширения.

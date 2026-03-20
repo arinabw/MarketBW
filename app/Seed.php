@@ -6,6 +6,9 @@ namespace App;
 
 use PDO;
 
+/**
+ * Демо-данные при первом запуске пустой БД. Вызывается из {@see Database::init()}.
+ */
 final class Seed
 {
     /** @param list<array{0:string,1:string,2:string,3:string}> */

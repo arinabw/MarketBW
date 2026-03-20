@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App;
 
+/**
+ * Изображения товаров в админке: нормализация путей, сохранение data-URL в `images/products/`.
+ */
 final class ProductImages
 {
     private const MAX_BYTES = 8 * 1024 * 1024;
