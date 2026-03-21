@@ -19,6 +19,8 @@ services:
       DATA_DIR: /var/www/data
       IMAGES_DIR: /var/www/images
       APP_DEBUG: ${APP_DEBUG:-false}
+      SESSION_FORCE_SECURE: ${SESSION_FORCE_SECURE:-true}
+      SESSION_COOKIE_DOMAIN: ${SESSION_COOKIE_DOMAIN:-}
       SITE_NAME: ${SITE_NAME:-Bead Wonder}
       CONTACT_EMAIL: ${CONTACT_EMAIL:-your-email@example.com}
       CONTACT_PHONE: ${CONTACT_PHONE:-+7 (999) 123-45-67}

@@ -26,6 +26,8 @@ return [
     'base_path' => $envStr('BASE_PATH', ''),
     /** Необязательно: домен cookie сессии, например `.example.com` если и www, и apex ведут в одну админку. Пусто = по умолчанию PHP (только текущий хост). */
     'session_cookie_domain' => $envStr('SESSION_COOKIE_DOMAIN', ''),
+    /** Прод за TLS-терминатором: всегда выставлять Secure на cookie сессии (если заголовки прокси не доходят до PHP). */
+    'session_force_secure' => filter_var($envStr('SESSION_FORCE_SECURE', 'false'), FILTER_VALIDATE_BOOLEAN),
     'site_name' => $envStr('SITE_NAME', 'Bead Wonder'),
     'data_dir' => $envStr('DATA_DIR', $root . '/data'),
     'images_dir' => $envStr('IMAGES_DIR', $root . '/public/images'),

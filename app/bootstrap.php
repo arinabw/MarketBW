@@ -9,6 +9,7 @@
 declare(strict_types=1);
 
 use App\Database;
+use App\HttpsDetector;
 use App\SiteContentDefaults;
 use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
@@ -115,12 +116,17 @@ $app->add(TwigMiddleware::create($app, $twig));
 // Не static: Slim привязывает замыкание к контейнеру; static ломает MiddlewareDispatcher.
 $app->add(function ($request, $handler) use ($settings) {
     if (session_status() !== PHP_SESSION_ACTIVE) {
-        $https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
-        if (!$https && isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
-            $https = strtolower((string) $_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https';
-        }
+        $https = HttpsDetector::fromServer($_SERVER)
+            || (bool) ($settings['session_force_secure'] ?? false);
         $basePath = trim((string) ($settings['base_path'] ?? ''), '/');
         $cookiePath = $basePath !== '' ? '/' . $basePath : '/';
+        $sessionDir = rtrim((string) ($settings['data_dir']), '/') . '/sessions';
+        if (!is_dir($sessionDir)) {
+            @mkdir($sessionDir, 0700, true);
+        }
+        if (is_dir($sessionDir) && is_writable($sessionDir)) {
+            session_save_path($sessionDir);
+        }
         $sessionOpts = [
             'cookie_httponly' => true,
             'cookie_samesite' => 'Lax',
