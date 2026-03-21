@@ -18,7 +18,7 @@
 
 <div class="box" style="margin-top:1rem">
   <h2 style="margin-top:0;font-size:1.1rem">Настройка записи</h2>
-  <form method="post" action="/admin/logs/toggle" class="form-row" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end">
+  <form method="post" action="{{ path('/admin/logs/toggle') }}" class="form-row" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end">
     <input type="hidden" name="csrf" value="{{ csrf_token() }}">
     <label style="display:flex;align-items:center;gap:0.35rem;cursor:pointer">
       <input type="checkbox" name="enabled" value="1" {% if audit_enabled %}checked{% endif %}>
@@ -38,10 +38,10 @@
 <div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center;margin-top:1.25rem">
   <span class="muted">Всего записей: <strong>{{ log_total }}</strong></span>
   <span style="margin-left:auto"></span>
-  <a class="btn btn--ghost {% if log_channel is null %}is-active{% endif %}" href="/admin/logs" style="padding:0.35rem 0.65rem">Все</a>
-  <a class="btn btn--ghost {% if log_channel == 'public' %}is-active{% endif %}" href="/admin/logs?channel=public" style="padding:0.35rem 0.65rem">Сайт</a>
-  <a class="btn btn--ghost {% if log_channel == 'admin' %}is-active{% endif %}" href="/admin/logs?channel=admin" style="padding:0.35rem 0.65rem">Админка</a>
-  <form method="post" action="/admin/logs/clear" class="inline-form" onsubmit="return confirm('Удалить все записи журнала?');">
+  <a class="btn btn--ghost {% if log_channel is null %}is-active{% endif %}" href="{{ path('/admin/logs') }}" style="padding:0.35rem 0.65rem">Все</a>
+  <a class="btn btn--ghost {% if log_channel == 'public' %}is-active{% endif %}" href="{{ path('/admin/logs') }}?channel=public" style="padding:0.35rem 0.65rem">Сайт</a>
+  <a class="btn btn--ghost {% if log_channel == 'admin' %}is-active{% endif %}" href="{{ path('/admin/logs') }}?channel=admin" style="padding:0.35rem 0.65rem">Админка</a>
+  <form method="post" action="{{ path('/admin/logs/clear') }}" class="inline-form" onsubmit="return confirm('Удалить все записи журнала?');">
     <input type="hidden" name="csrf" value="{{ csrf_token() }}">
     <button type="submit" class="btn btn--ghost" style="color:var(--danger,#b33)">Очистить журнал</button>
   </form>
@@ -96,10 +96,10 @@ Referer: {{ row.referer|default('—') }}
   Страница {{ log_page }} / {{ log_pages }}
   {% set q = log_channel ? ('&channel=' ~ log_channel) : '' %}
   {% if log_page > 1 %}
-  <a class="btn btn--ghost" style="padding:0.25rem 0.5rem" href="/admin/logs?page={{ log_page - 1 }}{{ q }}">← Назад</a>
+  <a class="btn btn--ghost" style="padding:0.25rem 0.5rem" href="{{ path('/admin/logs') }}?page={{ log_page - 1 }}{{ q }}">← Назад</a>
   {% endif %}
   {% if log_page < log_pages %}
-  <a class="btn btn--ghost" style="padding:0.25rem 0.5rem" href="/admin/logs?page={{ log_page + 1 }}{{ q }}">Вперёд →</a>
+  <a class="btn btn--ghost" style="padding:0.25rem 0.5rem" href="{{ path('/admin/logs') }}?page={{ log_page + 1 }}{{ q }}">Вперёд →</a>
   {% endif %}
 </nav>
 {% endif %}

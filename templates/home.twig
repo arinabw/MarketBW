@@ -20,8 +20,8 @@
       {% endif %}
       {% if layout_visible('layout.show_home_hero_buttons') %}
       <div class="btn-row">
-        <a class="btn btn--primary" href="/catalog">{{ t('home.btn_catalog') }}</a>
-        <a class="btn btn--ghost" href="/contact">{{ t('home.btn_contact') }}</a>
+        <a class="btn btn--primary" href="{{ path('/catalog') }}">{{ t('home.btn_catalog') }}</a>
+        <a class="btn btn--ghost" href="{{ path('/contact') }}">{{ t('home.btn_contact') }}</a>
       </div>
       {% endif %}
     </div>
@@ -81,15 +81,15 @@
     <div class="grid-cards">
       {% for p in featured %}
       <article class="card">
-        <a href="/product/{{ p.id }}" class="card__img">
+        <a href="{{ path('/product/' ~ p.id) }}" class="card__img">
           {% set img = p.images[0] ?? '/images/placeholder.svg' %}
           <img src="{{ img }}" alt="{{ p.name }}" loading="lazy" width="400" height="400">
         </a>
         <div class="card__body">
-          <h3 class="card__title"><a href="/product/{{ p.id }}">{{ p.name }}</a></h3>
+          <h3 class="card__title"><a href="{{ path('/product/' ~ p.id) }}">{{ p.name }}</a></h3>
           <div class="card__meta">{{ p.price|price_rub }}</div>
           <p class="card__text">{{ p.description|slice(0, 120) }}{% if p.description|length > 120 %}…{% endif %}</p>
-          <a class="card__link" href="/product/{{ p.id }}">{{ t('home.card_more') }}</a>
+          <a class="card__link" href="{{ path('/product/' ~ p.id) }}">{{ t('home.card_more') }}</a>
         </div>
       </article>
       {% else %}

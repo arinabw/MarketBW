@@ -19,7 +19,7 @@
 
 <section class="section section--white">
   <div class="container">
-    <form class="catalog-toolbar" method="get" action="/catalog">
+    <form class="catalog-toolbar" method="get" action="{{ path('/catalog') }}">
       {% if active_category %}
       <input type="hidden" name="category" value="{{ active_category }}">
       {% endif %}
@@ -48,15 +48,15 @@
     <div class="grid-cards">
       {% for p in products %}
       <article class="card">
-        <a href="/product/{{ p.id }}" class="card__img">
+        <a href="{{ path('/product/' ~ p.id) }}" class="card__img">
           {% set img = p.images[0] ?? '/images/placeholder.svg' %}
           <img src="{{ img }}" alt="{{ p.name }}" loading="lazy" width="400" height="400">
         </a>
         <div class="card__body">
-          <h2 class="card__title"><a href="/product/{{ p.id }}">{{ p.name }}</a></h2>
+          <h2 class="card__title"><a href="{{ path('/product/' ~ p.id) }}">{{ p.name }}</a></h2>
           <div class="card__meta">{{ p.price|price_rub }}</div>
           <p class="card__text">{{ p.description|slice(0, 110) }}{% if p.description|length > 110 %}…{% endif %}</p>
-          <a class="card__link" href="/product/{{ p.id }}">{{ t('catalog.card_open') }}</a>
+          <a class="card__link" href="{{ path('/product/' ~ p.id) }}">{{ t('catalog.card_open') }}</a>
         </div>
       </article>
       {% else %}

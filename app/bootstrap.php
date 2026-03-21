@@ -53,12 +53,30 @@ $containerBuilder->addDefinitions([
         $env->addFilter(new \Twig\TwigFilter('price_rub', function ($v): string {
             return number_format((float) $v, 0, ',', ' ') . ' ₽';
         }));
-        $env->addFunction(new \Twig\TwigFunction('nav_is_active', function (string $path): bool {
+        $env->addFunction(new \Twig\TwigFunction('path', function (string $p) use ($settings): string {
+            $p = '/' . ltrim($p, '/');
+            $bp = trim((string) ($settings['base_path'] ?? ''), '/');
+
+            return ($bp !== '' ? '/' . $bp : '') . $p;
+        }));
+        $env->addFunction(new \Twig\TwigFunction('nav_is_active', function (string $path) use ($settings): bool {
+            $bp = trim((string) ($settings['base_path'] ?? ''), '/');
+            $prefix = $bp !== '' ? '/' . $bp : '';
             $uri = $_SERVER['REQUEST_URI'] ?? '/';
             $cur = parse_url($uri, PHP_URL_PATH) ?: '/';
+            if ($prefix !== '' && str_starts_with($cur, $prefix)) {
+                $cur = substr($cur, strlen($prefix));
+                if ($cur === '' || $cur === false) {
+                    $cur = '/';
+                } elseif (!str_starts_with($cur, '/')) {
+                    $cur = '/' . $cur;
+                }
+            }
+            $path = '/' . ltrim($path, '/');
             if ($path === '/') {
                 return $cur === '/' || $cur === '';
             }
+
             return str_starts_with($cur, $path);
         }));
         $env->addFunction(new \Twig\TwigFunction('phone_digits', function (string $phone): string {
@@ -82,7 +100,7 @@ $containerBuilder->addDefinitions([
             $r = max(0, min(5, (int) $rating));
             return str_repeat('★', $r) . str_repeat('☆', 5 - $r);
         }));
-        $env->addFunction(new \Twig\TwigFunction('catalog_url', function (?string $category = null, ?string $search = null, ?string $sort = null): string {
+        $env->addFunction(new \Twig\TwigFunction('catalog_url', function (?string $category = null, ?string $search = null, ?string $sort = null) use ($settings): string {
             $params = [];
             if ($category !== null && $category !== '') {
                 $params['category'] = $category;
@@ -93,8 +111,12 @@ $containerBuilder->addDefinitions([
             if ($sort !== null && $sort !== '' && $sort !== 'date_desc') {
                 $params['sort'] = $sort;
             }
+            $bp = trim((string) ($settings['base_path'] ?? ''), '/');
+            $pref = $bp !== '' ? '/' . $bp : '';
+            $base = $pref . '/catalog';
             $qs = http_build_query($params);
-            return $qs !== '' ? '/catalog?' . $qs : '/catalog';
+
+            return $qs !== '' ? $base . '?' . $qs : $base;
         }));
         $env->addFunction(new \Twig\TwigFunction('layout_visible', function (\Twig\Environment $twigEnv, string $key): bool {
             $c = (string) (($twigEnv->getGlobals()['content'] ?? [])[$key] ?? '1');

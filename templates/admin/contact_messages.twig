@@ -16,10 +16,10 @@
 <div style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;margin-top:1.25rem">
   <span class="muted">Всего в фильтре: <strong>{{ cm_total }}</strong></span>
   <span style="margin-left:auto"></span>
-  <a class="btn btn--ghost {% if cm_status is null %}is-active{% endif %}" href="/admin/contact-messages" style="padding:0.35rem 0.65rem">Все ({{ cm_counts.all }})</a>
-  <a class="btn btn--ghost {% if cm_status == 'new' %}is-active{% endif %}" href="/admin/contact-messages?status=new" style="padding:0.35rem 0.65rem">Новые ({{ cm_counts.new }})</a>
-  <a class="btn btn--ghost {% if cm_status == 'done' %}is-active{% endif %}" href="/admin/contact-messages?status=done" style="padding:0.35rem 0.65rem">Обработаны ({{ cm_counts.done }})</a>
-  <a class="btn btn--ghost {% if cm_status == 'archived' %}is-active{% endif %}" href="/admin/contact-messages?status=archived" style="padding:0.35rem 0.65rem">Архив ({{ cm_counts.archived }})</a>
+  <a class="btn btn--ghost {% if cm_status is null %}is-active{% endif %}" href="{{ path('/admin/contact-messages') }}" style="padding:0.35rem 0.65rem">Все ({{ cm_counts.all }})</a>
+  <a class="btn btn--ghost {% if cm_status == 'new' %}is-active{% endif %}" href="{{ path('/admin/contact-messages') }}?status=new" style="padding:0.35rem 0.65rem">Новые ({{ cm_counts.new }})</a>
+  <a class="btn btn--ghost {% if cm_status == 'done' %}is-active{% endif %}" href="{{ path('/admin/contact-messages') }}?status=done" style="padding:0.35rem 0.65rem">Обработаны ({{ cm_counts.done }})</a>
+  <a class="btn btn--ghost {% if cm_status == 'archived' %}is-active{% endif %}" href="{{ path('/admin/contact-messages') }}?status=archived" style="padding:0.35rem 0.65rem">Архив ({{ cm_counts.archived }})</a>
 </div>
 
 <div class="table-wrap" style="margin-top:1rem">
@@ -54,7 +54,7 @@
           <span class="badge-cm badge-cm--archived">архив</span>
           {% endif %}
         </td>
-        <td><a href="/admin/contact-messages/{{ m.id }}">Открыть</a></td>
+        <td><a href="{{ path('/admin/contact-messages/' ~ m.id) }}">Открыть</a></td>
       </tr>
       {% else %}
       <tr><td colspan="7" class="muted">Нет заявок.</td></tr>
@@ -68,10 +68,10 @@
   Страница {{ cm_page }} из {{ cm_pages }}
   {% set q = cm_status ? ('?status=' ~ cm_status ~ '&') : '?' %}
   {% if cm_page > 1 %}
-  <a href="/admin/contact-messages{{ q }}page={{ cm_page - 1 }}">← назад</a>
+  <a href="{{ path('/admin/contact-messages') }}{{ q }}page={{ cm_page - 1 }}">← назад</a>
   {% endif %}
   {% if cm_page < cm_pages %}
-  <a href="/admin/contact-messages{{ q }}page={{ cm_page + 1 }}">вперёд →</a>
+  <a href="{{ path('/admin/contact-messages') }}{{ q }}page={{ cm_page + 1 }}">вперёд →</a>
   {% endif %}
 </p>
 {% endif %}

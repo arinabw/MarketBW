@@ -154,13 +154,6 @@ final class SiteContentDefaults
         ];
     }
 
-    /**
-     * Подстановка %SITE% и %TAGLINE% в meta.description.
-     *
-     * @param array<string, string> $merged
-     *
-     * @return array<string, string>
-     */
     /** @return list<string> */
     public static function imageKeys(): array
     {
@@ -170,12 +163,7 @@ final class SiteContentDefaults
     }
 
     /**
-     * Группы для формы админки: заголовок секции => список ключей.
-     *
-     * @return array<string, list<string>>
-     */
-    /**
-     * Секции админки «Видимость» (ключ => список чекбоксов).
+     * Секции админки «Видимость» (заголовок => список ключей чекбоксов).
      *
      * @return array<string, list<string>>
      */

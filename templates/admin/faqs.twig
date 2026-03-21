@@ -4,8 +4,8 @@
 
 {% block content %}
 <h1 style="font-family:var(--display);margin-top:0">Вопросы и ответы</h1>
-<p><a class="btn btn--primary" href="/admin/faqs/new">Добавить вопрос</a>
-  <a class="btn btn--ghost" href="/admin/content">Заголовки страницы FAQ</a></p>
+<p><a class="btn btn--primary" href="{{ path('/admin/faqs/new') }}">Добавить вопрос</a>
+  <a class="btn btn--ghost" href="{{ path('/admin/content') }}">Заголовки страницы FAQ</a></p>
 <div class="table-wrap" style="margin-top:1rem">
   <table>
     <thead>
@@ -21,15 +21,15 @@
         <td>{{ f.question }}</td>
         <td><code>{{ f.category }}</code></td>
         <td style="white-space:nowrap">
-          <a href="/admin/faqs/{{ f.id }}/edit">Изменить</a>
-          <form class="inline-form" method="post" action="/admin/faqs/{{ f.id }}/delete" style="margin-left:0.5rem" onsubmit="return confirm('Удалить?');">
+          <a href="{{ path('/admin/faqs/' ~ f.id ~ '/edit') }}">Изменить</a>
+          <form class="inline-form" method="post" action="{{ path('/admin/faqs/' ~ f.id ~ '/delete') }}" style="margin-left:0.5rem" onsubmit="return confirm('Удалить?');">
             <input type="hidden" name="csrf" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn--ghost" style="padding:0.25rem 0.5rem;font-size:0.85rem">Удалить</button>
           </form>
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="3" class="muted">Нет записей — <a href="/admin/faqs/new">добавить</a>.</td></tr>
+      <tr><td colspan="3" class="muted">Нет записей — <a href="{{ path('/admin/faqs/new') }}">добавить</a>.</td></tr>
       {% endfor %}
     </tbody>
   </table>

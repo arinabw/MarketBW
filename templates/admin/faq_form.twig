@@ -23,6 +23,6 @@
     <input id="category" name="category" value="{{ f.category|default(faq ? faq.category : 'general') }}" placeholder="order, shipping, care…">
   </div>
   <button class="btn btn--primary" type="submit">Сохранить</button>
-  <a class="btn btn--ghost" href="/admin/faqs">Отмена</a>
+  <a class="btn btn--ghost" href="{{ path('/admin/faqs') }}">Отмена</a>
 </form>
 {% endblock %}

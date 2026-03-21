@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1 style="font-family:var(--display);margin-top:0">Товары</h1>
-<p><a class="btn btn--primary" href="/admin/products/create">Добавить товар</a></p>
+<p><a class="btn btn--primary" href="{{ path('/admin/products/create') }}">Добавить товар</a></p>
 <div class="table-wrap" style="margin-top:1rem">
   <table>
     <thead>
@@ -21,24 +21,24 @@
       <tr>
         <td class="admin-col-thumb">
           {% if p.images|length %}
-          <a href="/product/{{ p.id }}" target="_blank" rel="noopener" title="Открыть на сайте"><img class="admin-table-thumb" src="{{ p.images[0] }}" alt="" loading="lazy" width="56" height="56"></a>
+          <a href="{{ path('/product/' ~ p.id) }}" target="_blank" rel="noopener" title="Открыть на сайте"><img class="admin-table-thumb" src="{{ p.images[0] }}" alt="" loading="lazy" width="56" height="56"></a>
           {% else %}
           <span class="muted" title="Нет фото">—</span>
           {% endif %}
         </td>
-        <td><a href="/product/{{ p.id }}" target="_blank" rel="noopener">{{ p.name }}</a></td>
+        <td><a href="{{ path('/product/' ~ p.id) }}" target="_blank" rel="noopener">{{ p.name }}</a></td>
         <td>{{ p.price|price_rub }}</td>
         <td>{{ p.category }}</td>
         <td style="white-space:nowrap">
-          <a href="/admin/products/{{ p.id }}/edit">Изменить</a>
-          <form class="inline-form" method="post" action="/admin/products/{{ p.id }}/delete" style="margin-left:0.5rem" onsubmit="return confirm('Удалить товар?');">
+          <a href="{{ path('/admin/products/' ~ p.id ~ '/edit') }}">Изменить</a>
+          <form class="inline-form" method="post" action="{{ path('/admin/products/' ~ p.id ~ '/delete') }}" style="margin-left:0.5rem" onsubmit="return confirm('Удалить товар?');">
             <input type="hidden" name="csrf" value="{{ csrf_token() }}">
             <button type="submit" class="btn btn--ghost" style="padding:0.25rem 0.5rem;font-size:0.85rem">Удалить</button>
           </form>
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="5" class="muted">Нет товаров — <a href="/admin/products/create">создать</a>.</td></tr>
+      <tr><td colspan="5" class="muted">Нет товаров — <a href="{{ path('/admin/products/create') }}">создать</a>.</td></tr>
       {% endfor %}
     </tbody>
   </table>

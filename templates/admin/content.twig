@@ -8,7 +8,7 @@
 {% if saved %}
 <div class="alert alert--success">Сохранено.</div>
 {% endif %}
-<form method="post" action="/admin/content" enctype="multipart/form-data" class="box admin-content-form" style="margin-top:1rem">
+<form method="post" action="{{ path('/admin/content') }}" enctype="multipart/form-data" class="box admin-content-form" style="margin-top:1rem">
   <input type="hidden" name="csrf" value="{{ csrf_token() }}">
   {% for title, keys in content_groups %}
   <fieldset class="admin-fieldset">

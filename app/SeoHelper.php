@@ -127,7 +127,7 @@ final class SeoHelper
             $data['material'] = implode(', ', array_map(static fn ($m): string => (string) $m, $materials));
         }
 
-        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        return self::encodeJsonLd($data);
     }
 
     /**
@@ -194,7 +194,7 @@ final class SeoHelper
             ];
         }
 
-        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        return self::encodeJsonLd($data);
     }
 
     /**
@@ -214,10 +214,22 @@ final class SeoHelper
             $pos++;
         }
 
-        return json_encode([
+        return self::encodeJsonLd([
             '@context' => 'https://schema.org',
             '@type' => 'BreadcrumbList',
             'itemListElement' => $elements,
-        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private static function encodeJsonLd(array $data): string
+    {
+        try {
+            return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return '';
+        }
     }
 }

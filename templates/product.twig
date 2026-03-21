@@ -25,9 +25,9 @@
 <section class="section section--tight section--white">
   <div class="container">
     <nav class="breadcrumbs" aria-label="Навигация">
-      <a href="/">{{ t('product.breadcrumb_home') }}</a>
+      <a href="{{ path('/') }}">{{ t('product.breadcrumb_home') }}</a>
       <span class="breadcrumbs__sep">/</span>
-      <a href="/catalog">{{ t('product.breadcrumb_catalog') }}</a>
+      <a href="{{ path('/catalog') }}">{{ t('product.breadcrumb_catalog') }}</a>
       {% if category_name %}
       <span class="breadcrumbs__sep">/</span>
       <a href="{{ catalog_url(product.category, null, null) }}">{{ category_name }}</a>
@@ -108,7 +108,7 @@
       {% if layout_visible('layout.show_product_btn_order') or (layout_visible('layout.show_product_btn_telegram') and social_telegram != '#') or (layout_visible('layout.show_product_btn_whatsapp') and contact_whatsapp != '') %}
       <div class="btn-row product-actions">
         {% if layout_visible('layout.show_product_btn_order') %}
-        <a class="btn btn--primary" href="/contact?product={{ product.id|url_encode }}">{{ t('product.btn_order') }}</a>
+        <a class="btn btn--primary" href="{{ path('/contact') }}?product={{ product.id|url_encode }}">{{ t('product.btn_order') }}</a>
         {% endif %}
         {% if layout_visible('layout.show_product_btn_telegram') and social_telegram != '#' %}
         <a class="btn btn--tg" href="{{ social_telegram }}" target="_blank" rel="noopener">Telegram</a>

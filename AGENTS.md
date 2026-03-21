@@ -42,6 +42,8 @@
 
 **SEO:** в `templates/base.twig` — canonical, `hreflang`, Open Graph, Twitter Card, JSON-LD; middleware в `bootstrap.php` выставляет `seo_canonical_url`, `seo_absolute_base`. На страницах каталога, товара, о мастере, контактов, FAQ в `head` выводится **BreadcrumbList** (данные из `app/routes.php` + `SeoHelper::buildBreadcrumbJsonLd`). Публичные маршруты `GET /robots.txt`, `GET /sitemap.xml`. Дефолт **`PUBLIC_SITE_URL`** — `https://marketbw.ru` в `config/settings.php`; переопределение через env (см. `docker/env.example`).
 
+**URL с `BASE_PATH`:** в Twig функция **`path('/foo')`** (и обновлённые **`catalog_url`**, **`nav_is_active`**) учитывают префикс из `settings['base_path']`. Ссылки и формы в шаблонах используют `path(...)`, чтобы подкаталог (`/shop/...`) работал согласованно.
+
 ---
 
 ## База данных SQLite (таблицы)

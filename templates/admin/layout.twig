@@ -4,32 +4,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>{% block title %}Админка{% endblock %} — {{ site_name }}</title>
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="/favicon.svg">
+  <link rel="icon" href="{{ path('/favicon.svg') }}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{{ path('/favicon.svg') }}">
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="{{ path('/css/app.css') }}">
 </head>
 <body>
   <div class="admin-wrap">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem">
       <strong>Админка</strong>
-      <form class="inline-form" method="post" action="/admin/logout">
+      <form class="inline-form" method="post" action="{{ path('/admin/logout') }}">
         <input type="hidden" name="csrf" value="{{ csrf_token() }}">
         <button class="btn btn--ghost" type="submit">Выйти</button>
       </form>
     </div>
     <nav class="admin-nav" aria-label="Админ-меню">
-      <a href="/admin" class="{{ (admin_section|default('')) == 'dash' ? 'is-active' : '' }}">Обзор</a>
-      <a href="/admin/content" class="{{ (admin_section|default('')) == 'content' ? 'is-active' : '' }}">Контент</a>
-      <a href="/admin/products" class="{{ (admin_section|default('')) == 'products' ? 'is-active' : '' }}">Товары</a>
-      <a href="/admin/categories" class="{{ (admin_section|default('')) == 'cats' ? 'is-active' : '' }}">Категории</a>
-      <a href="/admin/faqs" class="{{ (admin_section|default('')) == 'faqs' ? 'is-active' : '' }}">FAQ</a>
-      <a href="/admin/reviews" class="{{ (admin_section|default('')) == 'reviews' ? 'is-active' : '' }}">Отзывы</a>
-      <a href="/admin/contact-messages" class="{{ (admin_section|default('')) == 'contact_messages' ? 'is-active' : '' }}">Заявки</a>
-      <a href="/admin/logs" class="{{ (admin_section|default('')) == 'logs' ? 'is-active' : '' }}">Журнал</a>
-      <a href="/admin/database" class="{{ (admin_section|default('')) == 'database' ? 'is-active' : '' }}">БД</a>
-      <a href="/admin/password" class="{{ (admin_section|default('')) == 'password' ? 'is-active' : '' }}">Пароль</a>
-      <a href="/" target="_blank" rel="noopener">Сайт →</a>
+      <a href="{{ path('/admin') }}" class="{{ (admin_section|default('')) == 'dash' ? 'is-active' : '' }}">Обзор</a>
+      <a href="{{ path('/admin/content') }}" class="{{ (admin_section|default('')) == 'content' ? 'is-active' : '' }}">Контент</a>
+      <a href="{{ path('/admin/products') }}" class="{{ (admin_section|default('')) == 'products' ? 'is-active' : '' }}">Товары</a>
+      <a href="{{ path('/admin/categories') }}" class="{{ (admin_section|default('')) == 'cats' ? 'is-active' : '' }}">Категории</a>
+      <a href="{{ path('/admin/faqs') }}" class="{{ (admin_section|default('')) == 'faqs' ? 'is-active' : '' }}">FAQ</a>
+      <a href="{{ path('/admin/reviews') }}" class="{{ (admin_section|default('')) == 'reviews' ? 'is-active' : '' }}">Отзывы</a>
+      <a href="{{ path('/admin/contact-messages') }}" class="{{ (admin_section|default('')) == 'contact_messages' ? 'is-active' : '' }}">Заявки</a>
+      <a href="{{ path('/admin/logs') }}" class="{{ (admin_section|default('')) == 'logs' ? 'is-active' : '' }}">Журнал</a>
+      <a href="{{ path('/admin/database') }}" class="{{ (admin_section|default('')) == 'database' ? 'is-active' : '' }}">БД</a>
+      <a href="{{ path('/admin/password') }}" class="{{ (admin_section|default('')) == 'password' ? 'is-active' : '' }}">Пароль</a>
+      <a href="{{ path('/') }}" target="_blank" rel="noopener">Сайт →</a>
     </nav>
     {% block content %}{% endblock %}
   </div>

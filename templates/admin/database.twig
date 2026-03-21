@@ -9,7 +9,7 @@
   Колонка <code>password_hash</code> в <code>users</code> в файле заменена на заглушку — реальные хэши не попадают в выгрузку.
 </p>
 
-<form method="post" action="/admin/database/export" class="box" style="margin-bottom:1.25rem;display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center">
+<form method="post" action="{{ path('/admin/database/export') }}" class="box" style="margin-bottom:1.25rem;display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center">
   <input type="hidden" name="csrf" value="{{ csrf_token() }}">
   <button type="submit" class="btn btn--primary">Выгрузить все данные в Excel</button>
   <span class="muted" style="font-size:0.9rem">Файл: <code>marketbw-db-… .xls</code></span>

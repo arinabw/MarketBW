@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Вход — админка {{ site_name }}</title>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="{{ path('/css/app.css') }}">
 </head>
 <body>
   <div class="admin-wrap" style="max-width:420px">
@@ -13,7 +13,7 @@
     {% if error is defined %}
     <div class="alert">{{ error }}</div>
     {% endif %}
-    <form method="post" action="/admin/login" class="box">
+    <form method="post" action="{{ path('/admin/login') }}" class="box">
       <div class="form-row">
         <label for="username">Логин</label>
         <input id="username" name="username" type="text" required autocomplete="username">
@@ -24,7 +24,7 @@
       </div>
       <button class="btn btn--primary" type="submit">Войти</button>
     </form>
-    <p class="muted" style="margin-top:1rem"><a href="/">← На сайт</a></p>
+    <p class="muted" style="margin-top:1rem"><a href="{{ path('/') }}">← На сайт</a></p>
   </div>
 </body>
 </html>
