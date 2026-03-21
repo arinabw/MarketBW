@@ -64,7 +64,7 @@
       </div>
 
       <div class="btn-row product-actions">
-        <a class="btn btn--primary" href="/contact">{{ t('product.btn_order') }}</a>
+        <a class="btn btn--primary" href="/contact?product={{ product.id|url_encode }}">{{ t('product.btn_order') }}</a>
         {% if social_telegram != '#' %}
         <a class="btn btn--tg" href="{{ social_telegram }}" target="_blank" rel="noopener">Telegram</a>
         {% endif %}

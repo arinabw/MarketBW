@@ -94,26 +94,56 @@ return function (App $app, ContainerInterface $container): void {
         ]);
     });
 
-    $app->get('/contact', function (Request $request, Response $response) use ($view): Response {
+    $app->get('/contact', function (Request $request, Response $response) use ($db, $view): Response {
         $qp = $request->getQueryParams();
         $sent = isset($qp['sent']) && $qp['sent'] === '1';
         $formError = isset($qp['error']) && $qp['error'] === '1';
+        $orderProductId = '';
+        $orderMessagePrefill = '';
+        $pid = isset($qp['product']) ? trim((string) $qp['product']) : '';
+        if ($pid !== '') {
+            $database = $db();
+            $p = $database->productById($pid);
+            if ($p !== null) {
+                $orderProductId = $pid;
+                $catName = null;
+                foreach ($database->categories() as $c) {
+                    if ($c['id'] === $p['category']) {
+                        $catName = (string) $c['name'];
+                        break;
+                    }
+                }
+                $orderMessagePrefill = marketbw_contact_order_draft($p, $catName);
+            }
+        }
+
         return $view()->render($response, 'contact.twig', [
             'sent' => $sent,
             'form_error' => $formError,
+            'order_product_id' => $orderProductId,
+            'order_message_prefill' => $orderMessagePrefill,
         ]);
     });
 
     $app->post('/contact', function (Request $request, Response $response) use ($db, $withBase): Response {
         $data = (array) $request->getParsedBody();
+        $productRef = trim((string) ($data['product_ref'] ?? ''));
+        $errLoc = function () use ($withBase, $db, $productRef): string {
+            $q = '?error=1';
+            if ($productRef !== '' && $db()->productById($productRef) !== null) {
+                $q .= '&product=' . rawurlencode($productRef);
+            }
+
+            return $withBase('/contact') . $q;
+        };
         if (!isset($data['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $data['csrf'])) {
-            return $response->withHeader('Location', $withBase('/contact') . '?error=1')->withStatus(302);
+            return $response->withHeader('Location', $errLoc())->withStatus(302);
         }
         $name = trim((string) ($data['name'] ?? ''));
         $email = trim((string) ($data['email'] ?? ''));
         $message = trim((string) ($data['message'] ?? ''));
         if ($name === '' || $message === '') {
-            return $response->withHeader('Location', $withBase('/contact') . '?error=1')->withStatus(302);
+            return $response->withHeader('Location', $errLoc())->withStatus(302);
         }
         $ua = $request->getServerParams()['HTTP_USER_AGENT'] ?? null;
         $db()->createContactMessage(
@@ -831,6 +861,51 @@ return function (App $app, ContainerInterface $container): void {
         });
     })->add($adminGuard);
 };
+
+/**
+ * Черновик сообщения в контакты при заказе с карточки товара.
+ *
+ * @param array<string, mixed> $product результат {@see Database::productById()}
+ */
+function marketbw_contact_order_draft(array $product, ?string $categoryName): string
+{
+    $name = (string) ($product['name'] ?? '');
+    $price = number_format((float) ($product['price'] ?? 0), 0, ',', ' ') . ' ₽';
+    $id = (string) ($product['id'] ?? '');
+    $technique = (string) ($product['technique'] ?? '');
+    $lines = [
+        'Здравствуйте! Хочу заказать изделие с сайта:',
+        '',
+        'Название: ' . $name,
+        'Цена: ' . $price,
+        'ID товара на сайте: ' . $id,
+    ];
+    if ($categoryName !== null && $categoryName !== '') {
+        $lines[] = 'Категория: ' . $categoryName;
+    }
+    if ($technique !== '') {
+        $lines[] = 'Техника: ' . $technique;
+    }
+    $size = trim((string) ($product['size'] ?? ''));
+    if ($size !== '') {
+        $lines[] = 'Размер: ' . $size;
+    }
+    $materials = $product['materials'] ?? [];
+    if (is_array($materials) && $materials !== []) {
+        $matStrs = [];
+        foreach ($materials as $m) {
+            $matStrs[] = (string) $m;
+        }
+        $lines[] = 'Материалы: ' . implode(', ', $matStrs);
+    }
+    $stock = !empty($product['in_stock']);
+    $lines[] = 'Наличие на момент заказа: ' . ($stock ? 'в наличии' : 'нет в наличии');
+    $lines[] = '';
+    $lines[] = 'Комментарий к заказу (уточнения, доставка, сроки):';
+    $lines[] = '';
+
+    return implode("\n", $lines);
+}
 
 function marketbw_client_ip(Request $request): string
 {

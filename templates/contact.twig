@@ -38,6 +38,9 @@
       {% endif %}
       <form class="contact-form" method="post" action="/contact">
         <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+        {% if order_product_id != '' %}
+        <input type="hidden" name="product_ref" value="{{ order_product_id }}">
+        {% endif %}
         <div class="form-row">
           <label for="name">{{ t('contact.form_name') }}</label>
           <input id="name" name="name" type="text" autocomplete="name" required>
@@ -48,7 +51,7 @@
         </div>
         <div class="form-row">
           <label for="msg">{{ t('contact.form_message') }}</label>
-          <textarea id="msg" name="message" required rows="5"></textarea>
+          <textarea id="msg" name="message" required rows="{% if order_message_prefill != '' %}10{% else %}5{% endif %}">{{ order_message_prefill }}</textarea>
         </div>
         <button class="btn btn--primary" type="submit">{{ t('contact.form_submit') }}</button>
       </form>
