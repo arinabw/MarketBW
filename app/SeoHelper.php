@@ -50,12 +50,33 @@ final class SeoHelper
     }
 
     /**
+     * Тематика сайта для schema.org knowsAbout (рукоделие, бисер, подарки).
+     *
+     * @return list<string>
+     */
+    public static function thematicKnowsAbout(): array
+    {
+        return [
+            'Бисероплетение',
+            'Украшения ручной работы',
+            'Рукоделие',
+            'Подарки ручной работы',
+            'Изделия из бисера',
+        ];
+    }
+
+    /**
      * Полный URL страницы товара для schema.org.
      *
      * @param array<string, mixed> $product
      */
-    public static function buildProductJsonLd(array $product, string $pageUrl, string $absoluteBase): string
-    {
+    public static function buildProductJsonLd(
+        array $product,
+        string $pageUrl,
+        string $absoluteBase,
+        ?string $categoryName = null,
+        string $brandName = '',
+    ): string {
         $imgs = [];
         foreach ($product['images'] ?? [] as $img) {
             if (!is_string($img) || $img === '') {
@@ -92,12 +113,26 @@ final class SeoHelper
         if ($imgs !== []) {
             $data['image'] = count($imgs) === 1 ? $imgs[0] : $imgs;
         }
+        if ($categoryName !== null && $categoryName !== '') {
+            $data['category'] = $categoryName;
+        }
+        if ($brandName !== '') {
+            $data['brand'] = [
+                '@type' => 'Brand',
+                'name' => $brandName,
+            ];
+        }
+        $materials = $product['materials'] ?? [];
+        if (is_array($materials) && $materials !== []) {
+            $data['material'] = implode(', ', array_map(static fn ($m): string => (string) $m, $materials));
+        }
 
         return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
     }
 
     /**
      * @param list<string> $sameAs
+     * @param list<string> $knowsAbout
      */
     public static function buildOrganizationJsonLd(
         string $name,
@@ -106,11 +141,13 @@ final class SeoHelper
         string $phone,
         string $email,
         array $sameAs,
+        array $knowsAbout = [],
+        ?string $keywords = null,
     ): string {
         $same = array_values(array_filter($sameAs, static fn (string $u): bool => $u !== '' && $u !== '#'));
         $data = [
             '@context' => 'https://schema.org',
-            '@type' => 'LocalBusiness',
+            '@type' => ['LocalBusiness', 'JewelryStore'],
             'name' => $name,
             'description' => $description,
             'url' => $siteUrl,
@@ -124,11 +161,17 @@ final class SeoHelper
         if ($same !== []) {
             $data['sameAs'] = $same;
         }
+        if ($knowsAbout !== []) {
+            $data['knowsAbout'] = $knowsAbout;
+        }
+        if ($keywords !== null && $keywords !== '') {
+            $data['keywords'] = $keywords;
+        }
 
         return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
     }
 
-    public static function buildWebSiteJsonLd(string $name, string $url, string $description): string
+    public static function buildWebSiteJsonLd(string $name, string $url, string $description, ?string $searchUrlTemplate = null): string
     {
         $data = [
             '@context' => 'https://schema.org',
@@ -140,7 +183,41 @@ final class SeoHelper
         if ($description !== '') {
             $data['description'] = $description;
         }
+        if ($searchUrlTemplate !== null && $searchUrlTemplate !== '') {
+            $data['potentialAction'] = [
+                '@type' => 'SearchAction',
+                'target' => [
+                    '@type' => 'EntryPoint',
+                    'urlTemplate' => $searchUrlTemplate,
+                ],
+                'query-input' => 'required name=search_term_string',
+            ];
+        }
 
         return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * @param list<array{name: string, url: string}> $items
+     */
+    public static function buildBreadcrumbJsonLd(array $items): string
+    {
+        $elements = [];
+        $pos = 1;
+        foreach ($items as $it) {
+            $elements[] = [
+                '@type' => 'ListItem',
+                'position' => $pos,
+                'name' => $it['name'],
+                'item' => $it['url'],
+            ];
+            $pos++;
+        }
+
+        return json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => $elements,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
     }
 }

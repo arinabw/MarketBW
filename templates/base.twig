@@ -7,6 +7,10 @@
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
   {% endblock %}
   <meta name="description" content="{% block meta_description %}{{ t('meta.description') }}{% endblock %}">
+  {% set _kw = t('meta.keywords')|trim %}
+  {% if _kw != '' %}
+  <meta name="keywords" content="{{ _kw }}">
+  {% endif %}
   <title>{% block title %}{{ site_name }}{% endblock %}</title>
   {% if seo_canonical_url != '' %}
   <link rel="canonical" href="{{ seo_canonical_url }}">

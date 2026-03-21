@@ -1,6 +1,6 @@
 {% extends "base.twig" %}
 
-{% block meta_description %}{{ t('home.hero_lead')|slice(0, 120) }} — {{ site_name }}. {{ master_tagline|slice(0, 80) }}{% endblock %}
+{% block meta_description %}{{ t('meta.description') }}{% endblock %}
 
 {% block body %}
 {% if layout_visible('layout.show_home_hero') %}

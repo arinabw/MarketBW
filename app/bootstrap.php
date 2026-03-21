@@ -202,6 +202,7 @@ $app->add(function ($request, $handler) use ($container, $app) {
         (string) ($merged['social.telegram'] ?? ''),
         (string) ($merged['social.vk'] ?? ''),
     ], static fn (string $u): bool => $u !== '' && $u !== '#'));
+    $kwMeta = trim((string) ($merged['meta.keywords'] ?? ''));
     $env->addGlobal(
         'seo_organization_json_ld',
         $homeUrl !== ''
@@ -212,13 +213,22 @@ $app->add(function ($request, $handler) use ($container, $app) {
                 (string) ($merged['contact.phone'] ?? $settings['contact_phone']),
                 (string) ($merged['contact.email'] ?? $settings['contact_email']),
                 $sameAs,
+                SeoHelper::thematicKnowsAbout(),
+                $kwMeta !== '' ? $kwMeta : null,
             )
             : ''
     );
+    $bp = trim($app->getBasePath(), '/');
+    $searchTpl = $base !== '' ? rtrim($base, '/') . ($bp !== '' ? '/' . $bp : '') . '/catalog?q={search_term_string}' : '';
     $env->addGlobal(
         'seo_website_json_ld',
         $homeUrl !== ''
-            ? SeoHelper::buildWebSiteJsonLd((string) ($settings['site_name'] ?? ''), $homeUrl, $orgDesc)
+            ? SeoHelper::buildWebSiteJsonLd(
+                (string) ($settings['site_name'] ?? ''),
+                $homeUrl,
+                $orgDesc,
+                $searchTpl !== '' ? $searchTpl : null,
+            )
             : ''
     );
 

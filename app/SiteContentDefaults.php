@@ -34,7 +34,8 @@ final class SiteContentDefaults
             'social.telegram' => (string) ($settings['social_telegram'] ?? '#'),
             'social.vk' => (string) ($settings['social_vk'] ?? '#'),
 
-            'meta.description' => '%TAGLINE% — %SITE%, украшения из бисера ручной работы.',
+            'meta.description' => '%SITE% — %TAGLINE% Авторские украшения и изделия из бисера: колье, браслеты, серьги. Рукоделие и оригинальные подарки ручной работы.',
+            'meta.keywords' => 'украшения из бисера, бисероплетение, рукоделие, подарки ручной работы, авторские украшения, изделия из бисера, %SITE%',
 
             'layout.show_home_hero' => '1',
             'layout.show_home_categories' => '1',
@@ -53,15 +54,15 @@ final class SiteContentDefaults
             'home.badge_suffix' => ' — бисерные чудеса',
             'home.hero_title' => 'Маленькие чудеса ',
             'home.hero_title_accent' => 'из бисера',
-            'home.hero_lead' => 'Уникальные украшения ручной работы — с любовью и вниманием к каждой детали.',
+            'home.hero_lead' => 'Уникальные украшения и изделия из бисера ручной работы — отличный подарок и результат рукоделия мастера с любовью к деталям.',
             'home.btn_catalog' => 'Открыть каталог',
             'home.btn_contact' => 'Связаться с мастером',
             'home.hero_image' => '/images/hero-lace.png',
-            'home.hero_image_alt' => 'Нежный кружевной узор',
+            'home.hero_image_alt' => 'Украшение из бисера — рукоделие, авторская работа для подарка',
             'home.section_categories_title' => 'Категории',
-            'home.section_categories_sub' => 'Выберите направление и откройте для себя каталог изделий.',
+            'home.section_categories_sub' => 'Выберите направление: украшения, подарки и изделия из бисера в каталоге рукоделия.',
             'home.section_featured_title' => 'Избранное',
-            'home.section_featured_sub' => 'Подборка актуальных работ в наличии.',
+            'home.section_featured_sub' => 'Подборка актуальных работ в наличии — украшения и подарки из бисера.',
             'home.featured_empty' => 'Пока нет избранных товаров — загляните в <a href="/catalog">каталог</a>.',
             'home.section_reviews_title' => 'Отзывы',
             'home.section_reviews_sub' => 'Несколько слов от покупательниц.',
@@ -94,7 +95,7 @@ final class SiteContentDefaults
             'contact.form_hint' => 'Заявка попадает в личный кабинет мастера (раздел «Заявки»). Также можно написать на почту или в мессенджер.',
 
             'catalog.page_title' => 'Каталог',
-            'catalog.page_sub' => 'Фильтр по категории, поиск и сортировка.',
+            'catalog.page_sub' => 'Каталог украшений и изделий из бисера: фильтр по категории, поиск и сортировка. Подарки и рукоделие на заказ.',
             'catalog.search_placeholder' => 'Поиск по названию',
             'catalog.sort_new' => 'Сначала новые',
             'catalog.sort_price_asc' => 'Цена: по возрастанию',
@@ -105,7 +106,7 @@ final class SiteContentDefaults
             'catalog.empty_hint' => 'Ничего не найдено. <a href="/catalog">Сбросить фильтры</a> или измените запрос.',
 
             'faq.page_title' => 'Вопросы и ответы',
-            'faq.page_sub' => 'Коротко о заказах, доставке и уходе за изделиями.',
+            'faq.page_sub' => 'Заказ украшений из бисера, доставка подарков ручной работы и уход за изделиями.',
 
             'product.breadcrumb_home' => 'Главная',
             'product.breadcrumb_catalog' => 'Каталог',
@@ -173,7 +174,7 @@ final class SiteContentDefaults
                 'brand.master_name', 'brand.tagline', 'contact.email', 'contact.phone', 'contact.whatsapp',
                 'social.instagram', 'social.telegram', 'social.vk',
             ],
-            'SEO' => ['meta.description'],
+            'SEO' => ['meta.description', 'meta.keywords'],
             'Шапка и меню' => [
                 'header.logo_suffix', 'nav.home', 'nav.catalog', 'nav.about', 'nav.contact', 'nav.faq',
             ],
@@ -226,7 +227,8 @@ final class SiteContentDefaults
             'social.instagram' => 'Instagram URL',
             'social.telegram' => 'Telegram URL',
             'social.vk' => 'ВКонтакте URL',
-            'meta.description' => 'Meta description (подставьте %SITE% и %TAGLINE%)',
+            'meta.description' => 'Meta description (подставьте %SITE% и %TAGLINE%; 150–160 символов желательно)',
+            'meta.keywords' => 'Meta keywords (через запятую; для Яндекса; %SITE% и %TAGLINE%)',
             'layout.show_home_hero' => 'Главная: блок «герой» (заголовок, текст, кнопки, картинка)',
             'layout.show_home_categories' => 'Главная: блок «Категории»',
             'layout.show_home_featured' => 'Главная: блок «Избранное»',
@@ -258,6 +260,13 @@ final class SiteContentDefaults
                 ['%SITE%', '%TAGLINE%'],
                 [$siteName, $tag],
                 $merged['meta.description']
+            );
+        }
+        if (isset($merged['meta.keywords'])) {
+            $merged['meta.keywords'] = str_replace(
+                ['%SITE%', '%TAGLINE%'],
+                [$siteName, $tag],
+                $merged['meta.keywords']
             );
         }
 

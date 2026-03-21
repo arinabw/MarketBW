@@ -103,7 +103,7 @@ return function (App $app, ContainerInterface $container): void {
         ]);
     });
 
-    $app->get('/catalog', function (Request $request, Response $response) use ($db, $view): Response {
+    $app->get('/catalog', function (Request $request, Response $response) use ($db, $view, $settings, $app, $withBase): Response {
         $qp = $request->getQueryParams();
         $cat = isset($qp['category']) ? (string) $qp['category'] : null;
         $search = isset($qp['q']) ? trim((string) $qp['q']) : null;
@@ -113,17 +113,42 @@ return function (App $app, ContainerInterface $container): void {
             $sort = 'date_desc';
         }
         $database = $db();
+        $pub = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
+        $bcItems = [
+            ['name' => 'Главная', 'url' => rtrim($pub, '/') . '/'],
+            ['name' => 'Каталог', 'url' => rtrim($pub, '/') . $withBase('/catalog')],
+        ];
+        if ($cat !== null && $cat !== '') {
+            foreach ($database->categories() as $c) {
+                if ($c['id'] === $cat) {
+                    $bcItems[] = [
+                        'name' => (string) $c['name'],
+                        'url' => rtrim($pub, '/') . $withBase('/catalog?' . http_build_query(['category' => $cat])),
+                    ];
+                    break;
+                }
+            }
+        }
+
         return $view()->render($response, 'catalog.twig', [
             'products' => $database->products($cat, $search, $sort),
             'categories' => $database->categories(),
             'active_category' => $cat,
             'search_q' => $search ?? '',
             'sort' => $sort,
+            'breadcrumb_json_ld' => $pub !== '' ? SeoHelper::buildBreadcrumbJsonLd($bcItems) : '',
         ]);
     });
 
-    $app->get('/about', function (Request $request, Response $response) use ($view): Response {
-        return $view()->render($response, 'about.twig', []);
+    $app->get('/about', function (Request $request, Response $response) use ($view, $settings, $app, $withBase): Response {
+        $pub = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
+
+        return $view()->render($response, 'about.twig', [
+            'breadcrumb_json_ld' => $pub !== '' ? SeoHelper::buildBreadcrumbJsonLd([
+                ['name' => 'Главная', 'url' => rtrim($pub, '/') . '/'],
+                ['name' => 'О мастере', 'url' => rtrim($pub, '/') . $withBase('/about')],
+            ]) : '',
+        ]);
     });
 
     $app->get('/product/{id}', function (Request $request, Response $response, array $args) use ($db, $view, $settings, $app, $withBase): Response {
@@ -141,9 +166,32 @@ return function (App $app, ContainerInterface $container): void {
         }
         $pub = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
         $pageUrl = $pub !== '' ? rtrim($pub, '/') . $withBase('/product/' . $args['id']) : '';
+        $siteName = (string) ($settings()['site_name'] ?? '');
         $productJsonLd = ($pageUrl !== '' && $pub !== '')
-            ? SeoHelper::buildProductJsonLd($product, $pageUrl, $pub)
+            ? SeoHelper::buildProductJsonLd(
+                $product,
+                $pageUrl,
+                $pub,
+                $categoryName !== null ? (string) $categoryName : null,
+                $siteName,
+            )
             : '';
+
+        $bcItems = [
+            ['name' => 'Главная', 'url' => rtrim($pub, '/') . '/'],
+            ['name' => 'Каталог', 'url' => rtrim($pub, '/') . $withBase('/catalog')],
+        ];
+        if ($categoryName !== null && $categoryName !== '' && isset($product['category'])) {
+            $bcItems[] = [
+                'name' => (string) $categoryName,
+                'url' => rtrim($pub, '/') . $withBase('/catalog?' . http_build_query(['category' => (string) $product['category']])),
+            ];
+        }
+        $bcItems[] = [
+            'name' => (string) ($product['name'] ?? ''),
+            'url' => $pageUrl,
+        ];
+        $breadcrumbJsonLd = ($pub !== '' && $pageUrl !== '') ? SeoHelper::buildBreadcrumbJsonLd($bcItems) : '';
 
         return $view()->render($response, 'product.twig', [
             'product' => $product,
@@ -151,10 +199,11 @@ return function (App $app, ContainerInterface $container): void {
             'categories' => $database->categories(),
             'reviews' => $database->reviews((string) $args['id']),
             'product_json_ld' => $productJsonLd,
+            'breadcrumb_json_ld' => $breadcrumbJsonLd,
         ]);
     });
 
-    $app->get('/contact', function (Request $request, Response $response) use ($db, $view): Response {
+    $app->get('/contact', function (Request $request, Response $response) use ($db, $view, $settings, $app, $withBase): Response {
         $qp = $request->getQueryParams();
         $sent = isset($qp['sent']) && $qp['sent'] === '1';
         $formError = isset($qp['error']) && $qp['error'] === '1';
@@ -177,11 +226,17 @@ return function (App $app, ContainerInterface $container): void {
             }
         }
 
+        $pub = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
+
         return $view()->render($response, 'contact.twig', [
             'sent' => $sent,
             'form_error' => $formError,
             'order_product_id' => $orderProductId,
             'order_message_prefill' => $orderMessagePrefill,
+            'breadcrumb_json_ld' => $pub !== '' ? SeoHelper::buildBreadcrumbJsonLd([
+                ['name' => 'Главная', 'url' => rtrim($pub, '/') . '/'],
+                ['name' => 'Контакты', 'url' => rtrim($pub, '/') . $withBase('/contact')],
+            ]) : '',
         ]);
     });
 
@@ -217,9 +272,15 @@ return function (App $app, ContainerInterface $container): void {
         return $response->withHeader('Location', $withBase('/contact') . '?sent=1')->withStatus(302);
     });
 
-    $app->get('/faq', function (Request $request, Response $response) use ($db, $view): Response {
+    $app->get('/faq', function (Request $request, Response $response) use ($db, $view, $settings, $app, $withBase): Response {
+        $pub = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
+
         return $view()->render($response, 'faq.twig', [
             'faqs' => $db()->faqs(),
+            'breadcrumb_json_ld' => $pub !== '' ? SeoHelper::buildBreadcrumbJsonLd([
+                ['name' => 'Главная', 'url' => rtrim($pub, '/') . '/'],
+                ['name' => 'Вопросы и ответы', 'url' => rtrim($pub, '/') . $withBase('/faq')],
+            ]) : '',
         ]);
     });
 

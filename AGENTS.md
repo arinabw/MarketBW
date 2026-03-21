@@ -24,7 +24,7 @@
 | `app/ProductImages.php` | Нормализация путей к фото товаров, data-URL → файлы |
 | `app/SiteUpload.php` | Загрузка картинок для раздела «Контент» → `public/images/site/` |
 | `config/settings.php` | Env: `SITE_NAME`, контакты, соцсети, пути `DATA_DIR`, `IMAGES_DIR`, опционально **`BASE_PATH`**, **`PUBLIC_SITE_URL`** (канонический URL для SEO) |
-| `app/SeoHelper.php` | Абсолютный origin сайта, JSON-LD Organization / WebSite / Product |
+| `app/SeoHelper.php` | Абсолютный origin сайта, JSON-LD Organization / WebSite / Product / BreadcrumbList |
 | `data/` | `marketbw.db` (на проде часто volume) |
 | `templates/` | Twig: `base.twig`, страницы, `admin/*`, `partials/*` |
 | `docker/` | Dockerfile, nginx, compose, `deploy.sh`, `env.example` |
@@ -40,7 +40,7 @@
 
 **CSRF:** `$_SESSION['csrf']`, в формах `csrf_token()`, проверка в POST админки и `/contact`.
 
-**SEO:** в `templates/base.twig` — canonical, `hreflang`, Open Graph, Twitter Card, JSON-LD; middleware в `bootstrap.php` выставляет `seo_canonical_url`, `seo_absolute_base`. Публичные маршруты `GET /robots.txt`, `GET /sitemap.xml`. Дефолт **`PUBLIC_SITE_URL`** — `https://marketbw.ru` в `config/settings.php`; переопределение через env (см. `docker/env.example`).
+**SEO:** в `templates/base.twig` — canonical, `hreflang`, Open Graph, Twitter Card, JSON-LD; middleware в `bootstrap.php` выставляет `seo_canonical_url`, `seo_absolute_base`. На страницах каталога, товара, о мастере, контактов, FAQ в `head` выводится **BreadcrumbList** (данные из `app/routes.php` + `SeoHelper::buildBreadcrumbJsonLd`). Публичные маршруты `GET /robots.txt`, `GET /sitemap.xml`. Дефолт **`PUBLIC_SITE_URL`** — `https://marketbw.ru` в `config/settings.php`; переопределение через env (см. `docker/env.example`).
 
 ---
 

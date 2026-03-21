@@ -38,7 +38,7 @@
       </div>
       <input type="file" name="img_{{ key|replace({'.':'_'}) }}" accept=".jpg,.jpeg,.png,.gif,.webp,.svg">
       {% else %}
-      <textarea name="content[{{ key }}]" id="c-{{ key|replace({'.':'-'}) }}" rows="{% if key in ['about.intro_p1','about.intro_p2','contact.form_success','meta.description','product.order_step_1','product.order_step_2','product.order_step_3'] %}4{% else %}2{% endif %}">{{ content[key]|default('') }}</textarea>
+      <textarea name="content[{{ key }}]" id="c-{{ key|replace({'.':'-'}) }}" rows="{% if key in ['about.intro_p1','about.intro_p2','contact.form_success','meta.description','meta.keywords','product.order_step_1','product.order_step_2','product.order_step_3'] %}4{% else %}2{% endif %}">{{ content[key]|default('') }}</textarea>
       {% endif %}
       {% endif %}
     </div>

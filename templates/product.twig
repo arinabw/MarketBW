@@ -12,6 +12,9 @@
 {% endif %}
 {% endblock %}
 {% block head_structured_extra %}
+{% if breadcrumb_json_ld is defined and breadcrumb_json_ld != '' %}
+<script type="application/ld+json">{{ breadcrumb_json_ld|raw }}</script>
+{% endif %}
 {% if product_json_ld is defined and product_json_ld != '' %}
 <script type="application/ld+json">{{ product_json_ld|raw }}</script>
 {% endif %}

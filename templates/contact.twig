@@ -3,6 +3,12 @@
 {% block title %}{{ t('contact.page_title') }} — {{ site_name }}{% endblock %}
 {% block meta_description %}{{ t('contact.page_title') }} — {{ t('contact.page_sub')|slice(0, 140) }}{% endblock %}
 
+{% block head_structured_extra %}
+{% if breadcrumb_json_ld is defined and breadcrumb_json_ld != '' %}
+<script type="application/ld+json">{{ breadcrumb_json_ld|raw }}</script>
+{% endif %}
+{% endblock %}
+
 {% block body %}
 <section class="page-hero">
   <div class="container">
