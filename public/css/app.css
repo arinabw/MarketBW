@@ -589,6 +589,40 @@ textarea {
   border-color: var(--primary);
 }
 
+.badge-log {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 0.12em 0.4em;
+  border-radius: 4px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.badge-log--admin {
+  background: #ede4f7;
+  color: #4a2c7a;
+}
+
+.badge-log--public {
+  background: #e8f4ec;
+  color: #1f5c2e;
+}
+
+.admin-log-table .admin-log-json {
+  font-size: 0.75rem;
+  max-width: min(32rem, 90vw);
+  max-height: 14rem;
+  overflow: auto;
+  margin: 0.35rem 0 0;
+  padding: 0.5rem 0.65rem;
+  background: #f6f6f8;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .admin-upload-label {
   margin: 0 0 0.4rem;
   font-size: 0.82rem;

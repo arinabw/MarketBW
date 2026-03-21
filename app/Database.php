@@ -86,6 +86,24 @@ CREATE TABLE IF NOT EXISTS site_content (
     content_key TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS audit_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at TEXT NOT NULL,
+    channel TEXT NOT NULL,
+    method TEXT NOT NULL,
+    path TEXT NOT NULL,
+    query_string TEXT,
+    status_code INTEGER NOT NULL,
+    duration_ms INTEGER NOT NULL,
+    ip TEXT NOT NULL,
+    user_agent TEXT,
+    admin_username TEXT,
+    referer TEXT,
+    context_json TEXT NOT NULL DEFAULT '{}'
+);
+CREATE INDEX IF NOT EXISTS idx_audit_log_created ON audit_log (created_at);
+CREATE INDEX IF NOT EXISTS idx_audit_log_channel ON audit_log (channel);
 SQL;
         $this->pdo->exec($schema);
 
@@ -499,5 +517,130 @@ SQL;
     public function deleteReview(string $id): void
     {
         $this->pdo->prepare('DELETE FROM reviews WHERE id = ?')->execute([$id]);
+    }
+
+    public function appendAuditLog(
+        string $channel,
+        string $method,
+        string $path,
+        ?string $queryString,
+        int $statusCode,
+        int $durationMs,
+        string $ip,
+        string $userAgent,
+        ?string $adminUsername,
+        ?string $referer,
+        string $contextJson,
+    ): void {
+        $this->pdo->prepare(
+            'INSERT INTO audit_log (
+                created_at, channel, method, path, query_string, status_code, duration_ms,
+                ip, user_agent, admin_username, referer, context_json
+            ) VALUES (datetime(\'now\'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        )->execute([
+            $channel,
+            $method,
+            $path,
+            $queryString,
+            $statusCode,
+            $durationMs,
+            $ip,
+            $userAgent,
+            $adminUsername,
+            $referer,
+            $contextJson,
+        ]);
+        $this->pruneAuditLogIfNeeded();
+    }
+
+    private function pruneAuditLogIfNeeded(): void
+    {
+        $maxRows = 25000;
+        $keep = 20000;
+        $c = (int) $this->pdo->query('SELECT COUNT(*) FROM audit_log')->fetchColumn();
+        if ($c <= $maxRows) {
+            return;
+        }
+        $del = $c - $keep;
+        $st = $this->pdo->prepare(
+            'DELETE FROM audit_log WHERE rowid IN (
+                SELECT rowid FROM audit_log ORDER BY id ASC LIMIT ?
+            )'
+        );
+        $st->bindValue(1, $del, PDO::PARAM_INT);
+        $st->execute();
+    }
+
+    /** @return list<array<string, mixed>> */
+    public function auditLogs(?string $channel, int $limit, int $offset): array
+    {
+        $limit = max(1, min(200, $limit));
+        $offset = max(0, $offset);
+        if ($channel === 'admin' || $channel === 'public') {
+            $st = $this->pdo->prepare(
+                'SELECT * FROM audit_log WHERE channel = ? ORDER BY id DESC LIMIT ? OFFSET ?'
+            );
+            $st->bindValue(1, $channel, PDO::PARAM_STR);
+            $st->bindValue(2, $limit, PDO::PARAM_INT);
+            $st->bindValue(3, $offset, PDO::PARAM_INT);
+            $st->execute();
+        } else {
+            $st = $this->pdo->prepare('SELECT * FROM audit_log ORDER BY id DESC LIMIT ? OFFSET ?');
+            $st->bindValue(1, $limit, PDO::PARAM_INT);
+            $st->bindValue(2, $offset, PDO::PARAM_INT);
+            $st->execute();
+        }
+        $rows = $st->fetchAll();
+
+        return $rows ?: [];
+    }
+
+    public function auditLogsCount(?string $channel): int
+    {
+        if ($channel === 'admin' || $channel === 'public') {
+            $st = $this->pdo->prepare('SELECT COUNT(*) FROM audit_log WHERE channel = ?');
+            $st->execute([$channel]);
+        } else {
+            $st = $this->pdo->query('SELECT COUNT(*) FROM audit_log');
+        }
+
+        return (int) $st->fetchColumn();
+    }
+
+    public function clearAuditLogs(): void
+    {
+        $this->pdo->exec('DELETE FROM audit_log');
+    }
+
+    /**
+     * Одно значение CMS (дефолт из кода + переопределение в site_content).
+     *
+     * @param array<string, mixed> $settings
+     */
+    public function getSingleSiteContent(string $key, array $settings): string
+    {
+        $defaults = SiteContentDefaults::defaults($settings);
+        $base = (string) ($defaults[$key] ?? '');
+        $st = $this->pdo->prepare('SELECT value FROM site_content WHERE content_key = ?');
+        $st->execute([$key]);
+        $row = $st->fetchColumn();
+
+        return $row !== false ? (string) $row : $base;
+    }
+
+    /** @param array<string, mixed> $settings */
+    public function isAuditLogEnabled(array $settings): bool
+    {
+        $v = strtolower(trim($this->getSingleSiteContent('audit.log_enabled', $settings)));
+
+        return $v === '1' || $v === 'true' || $v === 'yes' || $v === 'on';
+    }
+
+    /** @param array<string, mixed> $settings */
+    public function isAuditLogVerbose(array $settings): bool
+    {
+        $v = strtolower(trim($this->getSingleSiteContent('audit.log_verbose', $settings)));
+
+        return $v === '1' || $v === 'true' || $v === 'yes' || $v === 'on';
     }
 }

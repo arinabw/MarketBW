@@ -1,0 +1,106 @@
+{% extends "admin/layout.twig" %}
+
+{% block title %}Журнал событий{% endblock %}
+
+{% block content %}
+<h1 style="font-family:var(--display);margin-top:0">Журнал событий</h1>
+<p class="muted" style="max-width:52rem">
+  При включённой записи в БД фиксируется каждый HTTP-запрос к сайту и админке: метод, путь, код ответа, время, IP, User-Agent, пользователь админки (если есть).
+  Значения полей форм и пароли в лог не пишутся — только имена полей (в подробном режиме). Лимит таблицы ~25 000 строк, старые удаляются автоматически.
+</p>
+
+{% if saved %}
+<div class="alert" style="margin-top:1rem">Настройки журнала сохранены.</div>
+{% endif %}
+{% if cleared %}
+<div class="alert" style="margin-top:1rem">Журнал очищен.</div>
+{% endif %}
+
+<div class="box" style="margin-top:1rem">
+  <h2 style="margin-top:0;font-size:1.1rem">Настройка записи</h2>
+  <form method="post" action="/admin/logs/toggle" class="form-row" style="display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-end">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <label style="display:flex;align-items:center;gap:0.35rem;cursor:pointer">
+      <input type="checkbox" name="enabled" value="1" {% if audit_enabled %}checked{% endif %}>
+      Записывать все запросы в БД
+    </label>
+    <label style="display:flex;align-items:center;gap:0.35rem;cursor:pointer">
+      <input type="checkbox" name="verbose" value="1" {% if audit_verbose %}checked{% endif %}>
+      Подробный режим (query, referer, имена полей POST и загрузок)
+    </label>
+    <button type="submit" class="btn btn--primary">Сохранить</button>
+  </form>
+  <p class="muted" style="margin-bottom:0;margin-top:0.75rem;font-size:0.9rem">
+    Те же ключи можно править в разделе «Контент» → «Журнал событий (аудит)».
+  </p>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center;margin-top:1.25rem">
+  <span class="muted">Всего записей: <strong>{{ log_total }}</strong></span>
+  <span style="margin-left:auto"></span>
+  <a class="btn btn--ghost {% if log_channel is null %}is-active{% endif %}" href="/admin/logs" style="padding:0.35rem 0.65rem">Все</a>
+  <a class="btn btn--ghost {% if log_channel == 'public' %}is-active{% endif %}" href="/admin/logs?channel=public" style="padding:0.35rem 0.65rem">Сайт</a>
+  <a class="btn btn--ghost {% if log_channel == 'admin' %}is-active{% endif %}" href="/admin/logs?channel=admin" style="padding:0.35rem 0.65rem">Админка</a>
+  <form method="post" action="/admin/logs/clear" class="inline-form" onsubmit="return confirm('Удалить все записи журнала?');">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn--ghost" style="color:var(--danger,#b33)">Очистить журнал</button>
+  </form>
+</div>
+
+<div class="table-wrap" style="margin-top:1rem">
+  <table class="admin-log-table">
+    <thead>
+      <tr>
+        <th>Время (UTC)</th>
+        <th>Канал</th>
+        <th>Метод</th>
+        <th>Путь</th>
+        <th>Код</th>
+        <th>мс</th>
+        <th>IP</th>
+        <th>Админ</th>
+        <th>Детали</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in logs %}
+      <tr>
+        <td class="muted" style="white-space:nowrap;font-size:0.85rem">{{ row.created_at }}</td>
+        <td><span class="badge-log badge-log--{{ row.channel }}">{{ row.channel }}</span></td>
+        <td><code>{{ row.method }}</code></td>
+        <td style="max-width:14rem;word-break:break-all;font-size:0.9rem">{{ row.path }}{% if row.query_string %}<span class="muted">?{{ row.query_string }}</span>{% endif %}</td>
+        <td>{{ row.status_code }}</td>
+        <td class="muted">{{ row.duration_ms }}</td>
+        <td class="muted" style="font-size:0.85rem">{{ row.ip }}</td>
+        <td class="muted" style="font-size:0.85rem">{{ row.admin_username|default('—') }}</td>
+        <td>
+          <details>
+            <summary style="cursor:pointer;font-size:0.9rem">Подробно</summary>
+            <pre class="admin-log-json">User-Agent: {{ row.user_agent|default('—') }}
+
+Referer: {{ row.referer|default('—') }}
+
+{{ row.context_json }}</pre>
+          </details>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="9" class="muted">Записей пока нет. Включите запись выше и откройте страницы сайта.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if log_pages > 1 %}
+<nav class="muted" style="margin-top:1rem;display:flex;flex-wrap:wrap;gap:0.35rem;align-items:center">
+  Страница {{ log_page }} / {{ log_pages }}
+  {% set q = log_channel ? ('&channel=' ~ log_channel) : '' %}
+  {% if log_page > 1 %}
+  <a class="btn btn--ghost" style="padding:0.25rem 0.5rem" href="/admin/logs?page={{ log_page - 1 }}{{ q }}">← Назад</a>
+  {% endif %}
+  {% if log_page < log_pages %}
+  <a class="btn btn--ghost" style="padding:0.25rem 0.5rem" href="/admin/logs?page={{ log_page + 1 }}{{ q }}">Вперёд →</a>
+  {% endif %}
+</nav>
+{% endif %}
+{% endblock %}

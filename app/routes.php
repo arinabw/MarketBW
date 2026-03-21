@@ -650,6 +650,57 @@ return function (App $app, ContainerInterface $container): void {
 
             return $response->withHeader('Location', $withBase('/admin/reviews'))->withStatus(302);
         });
+
+        $group->get('/logs', function (Request $request, Response $response) use ($db, $view, $settings): Response {
+            $qp = $request->getQueryParams();
+            $page = max(1, (int) ($qp['page'] ?? 1));
+            $ch = isset($qp['channel']) ? trim((string) $qp['channel']) : '';
+            $channel = ($ch === 'admin' || $ch === 'public') ? $ch : null;
+            $perPage = 80;
+            $total = $db()->auditLogsCount($channel);
+            $pages = max(1, (int) ceil($total / $perPage));
+            if ($page > $pages) {
+                $page = $pages;
+            }
+            $offset = ($page - 1) * $perPage;
+            return $view()->render($response, 'admin/logs.twig', [
+                'admin_section' => 'logs',
+                'logs' => $db()->auditLogs($channel, $perPage, $offset),
+                'log_total' => $total,
+                'log_page' => $page,
+                'log_pages' => $pages,
+                'log_channel' => $channel,
+                'audit_enabled' => $db()->isAuditLogEnabled($settings()),
+                'audit_verbose' => $db()->isAuditLogVerbose($settings()),
+                'saved' => isset($qp['saved']) && $qp['saved'] === '1',
+                'cleared' => isset($qp['cleared']) && $qp['cleared'] === '1',
+            ]);
+        });
+
+        $group->post('/logs/toggle', function (Request $request, Response $response) use ($db, $withBase): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $on = isset($_POST['enabled']) && (string) $_POST['enabled'] === '1';
+            $verbose = isset($_POST['verbose']) && (string) $_POST['verbose'] === '1';
+            $db()->saveSiteContent([
+                'audit.log_enabled' => $on ? '1' : '0',
+                'audit.log_verbose' => $verbose ? '1' : '0',
+            ]);
+
+            return $response->withHeader('Location', $withBase('/admin/logs') . '?saved=1')->withStatus(302);
+        });
+
+        $group->post('/logs/clear', function (Request $request, Response $response) use ($db, $withBase): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $db()->clearAuditLogs();
+
+            return $response->withHeader('Location', $withBase('/admin/logs') . '?cleared=1')->withStatus(302);
+        });
     })->add($adminGuard);
 };
 

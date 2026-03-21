@@ -8,6 +8,7 @@
 
 declare(strict_types=1);
 
+use App\AuditLogMiddleware;
 use App\Database;
 use App\HttpsDetector;
 use App\SiteContentDefaults;
@@ -171,5 +172,7 @@ $app->add(function ($request, $handler) use ($container) {
 
     return $handler->handle($request);
 });
+
+$app->add(new AuditLogMiddleware($container->get(Database::class), $settings));
 
 return $app;

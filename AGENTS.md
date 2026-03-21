@@ -51,6 +51,7 @@
 | `faqs` | Вопрос–ответ FAQ |
 | `users` | Админ (логин + hash пароля) |
 | `site_content` | CMS: `content_key` → `value` (переопределение дефолтов из кода/env) |
+| `audit_log` | Журнал запросов (если включено `audit.log_enabled`); пишет `AuditLogMiddleware` |
 
 Инициализация схемы: `Database::init()` при старте приложения.
 
@@ -76,6 +77,7 @@
 | `/admin/categories`, `...` | Категории |
 | `/admin/faqs`, `/admin/faqs/new`, `.../edit` | FAQ |
 | `/admin/reviews`, `...` | Отзывы |
+| `/admin/logs` | Журнал HTTP-событий (таблица `audit_log`, включается ключами `audit.log_*` в CMS) |
 | `/admin/password` | Смена пароля |
 
 Навигация админки: `templates/admin/layout.twig`.

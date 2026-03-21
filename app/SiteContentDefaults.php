@@ -117,6 +117,9 @@ final class SiteContentDefaults
             'product.reviews_title' => 'Отзывы об этом изделии',
 
             'error404.text' => 'Такой страницы нет. Перейдите в каталог или на главную.',
+
+            'audit.log_enabled' => '0',
+            'audit.log_verbose' => '1',
         ];
     }
 
@@ -182,6 +185,10 @@ final class SiteContentDefaults
                 'product.btn_order', 'product.reviews_title',
             ],
             'Ошибка 404' => ['error404.text'],
+            'Журнал событий (аудит)' => [
+                'audit.log_enabled',
+                'audit.log_verbose',
+            ],
         ];
     }
 
@@ -204,6 +211,8 @@ final class SiteContentDefaults
             'nav.contact' => 'Меню: Контакты',
             'nav.faq' => 'Меню: FAQ',
             'home.hero_image' => 'Главная: картинка hero (путь или загрузка)',
+            'audit.log_enabled' => 'Журнал: включить запись всех HTTP-запросов (1 = да, 0 = нет)',
+            'audit.log_verbose' => 'Журнал: подробный режим (query string, referer, имена полей POST/файлов; 1/0)',
             default => $key,
         };
     }
