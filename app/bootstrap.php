@@ -118,7 +118,7 @@ $containerBuilder->addDefinitions([
 
             return false;
         }, ['needs_environment' => true]));
-        $env->addFunction(new \Twig\TwigFunction('absolute_url', function (string $path, \Twig\Environment $twigEnv): string {
+        $env->addFunction(new \Twig\TwigFunction('absolute_url', function (\Twig\Environment $twigEnv, string $path): string {
             $base = (string) ($twigEnv->getGlobals()['seo_absolute_base'] ?? '');
             $path = '/' . ltrim($path, '/');
 
