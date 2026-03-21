@@ -121,17 +121,20 @@ install() {
 
 update() {
   local no_cache=""
-  if [ "${2:-}" = "--no-cache" ] || [ "${1:-}" = "--no-cache" ]; then
-    no_cache="--no-cache"
-  fi
+  local force_rebuild=""
+  for a in "$@"; do
+    case "$a" in
+      --no-cache) no_cache="--no-cache" ;;
+      --force) force_rebuild="1" ;;
+    esac
+  done
 
   log_info "Обновление MarketBW..."
   require_env_file
 
-  log_info "Остановка контейнера..."
-  compose down
-
+  local head_before=""
   if [ -d "$REPO_ROOT/.git" ]; then
+    head_before="$(git -C "$REPO_ROOT" rev-parse HEAD 2>/dev/null || true)"
     # С auto-update.sh и cron: BRANCH=main|master|… (или GIT_BRANCH)
     local branch="${GIT_BRANCH:-${BRANCH:-main}}"
     log_info "git pull origin $branch..."
@@ -142,11 +145,26 @@ update() {
     elif git -C "$REPO_ROOT" pull origin master; then
       log_warn "Подтянут master."
     else
-      log_warn "git pull не удался (сеть или конфликт)."
+      log_error "git pull не удался — контейнеры не трогаю (избегаем цикла down/up каждую минуту при сбое pull)."
+      exit 1
     fi
   else
     log_warn "Нет .git в $REPO_ROOT — пропускаю git pull."
   fi
+
+  local head_after=""
+  if [ -d "$REPO_ROOT/.git" ]; then
+    head_after="$(git -C "$REPO_ROOT" rev-parse HEAD 2>/dev/null || true)"
+  fi
+
+  if [ -z "$force_rebuild" ] && [ -n "$head_before" ] && [ "$head_before" = "$head_after" ]; then
+    log_info "Репозиторий не сменил коммит после pull — пересборка и перезапуск compose пропущены."
+    log_info "Принудительно: $0 update --force или update --force --no-cache"
+    return 0
+  fi
+
+  log_info "Остановка контейнера..."
+  compose down
 
   log_info "Сборка образа${no_cache:+ (без кэша)}..."
   if [ -n "$no_cache" ]; then
@@ -210,8 +228,10 @@ usage() {
   echo "Использование: $0 {install|update|update --no-cache|rebuild|restart|stop|logs|status|clean}"
   echo ""
   echo "  install          — первая установка (проверка сети Traefik)"
-  echo "  update           — git pull + build + up"
-  echo "  update --no-cache — как update, с docker compose build --no-cache"
+  echo "  update              — git pull; build+up только если сменился коммит"
+  echo "  update --force      — всегда down + build + up после pull"
+  echo "  update --no-cache   — как update, сборка без кэша"
+  echo "  update --force --no-cache — принудительно и без кэша"
   echo "  rebuild          — build --no-cache + up без git"
   echo "  restart|stop|logs|status|clean"
   echo ""

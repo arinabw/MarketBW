@@ -1,5 +1,7 @@
 #!/bin/bash
 # Автообновление MarketBW по cron при появлении новых коммитов на origin.
+# Срабатывание: только если есть коммиты на origin/$BRANCH, которых нет в HEAD
+# (git rev-list --count HEAD..origin/$BRANCH > 0). Иначе выход без deploy.
 #
 # ВАЖНО: нельзя «exec deploy.sh» — процесс заменяется и снимается flock, тогда cron
 # каждую минуту пишет в тот же лог параллельно с docker build (лог перемешивается).
@@ -62,20 +64,24 @@ if ! git fetch origin 2>/dev/null; then
   exit 0
 fi
 
-LOCAL=$(git rev-parse HEAD 2>/dev/null)
-REMOTE=$(git rev-parse "origin/$BRANCH" 2>/dev/null)
+REMOTE_REF="origin/$BRANCH"
+REMOTE=$(git rev-parse "$REMOTE_REF" 2>/dev/null)
 
 if [ -z "$REMOTE" ]; then
-  log_msg "Нет origin/$BRANCH после fetch, выход."
+  log_msg "Нет $REMOTE_REF после fetch, выход."
   exit 0
 fi
 
-if [ "$LOCAL" = "$REMOTE" ]; then
-  log_msg "Обновлений нет (ветка $BRANCH, $(git rev-parse --short HEAD)), выход."
+# Только «отставание» от удалённой ветки: коммиты на origin, которых нет в HEAD.
+# Сравнение HEAD == origin/… даёт ложные срабатывания при другой локальной ветке/merge-base.
+BEHIND=$(git rev-list --count "HEAD..$REMOTE_REF" 2>/dev/null || echo 0)
+
+if [ "${BEHIND:-0}" -eq 0 ]; then
+  log_msg "Новых коммитов на $REMOTE_REF нет (behind=0, $(git rev-parse --short HEAD)), выход."
   exit 0
 fi
 
-log_msg "Есть коммиты на origin/$BRANCH, запуск deploy.sh update…"
+log_msg "На $REMOTE_REF на $BEHIND коммит(ов) впереди локального HEAD, запуск deploy.sh update…"
 # Не exec — иначе этот процесс исчезает и отпускает RUN_LOCK до завершения сборки.
 bash "$SCRIPT_DIR/deploy.sh" update
 log_msg "deploy.sh update завершён."
