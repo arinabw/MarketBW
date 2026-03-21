@@ -23,7 +23,8 @@
 | `app/SiteContentDefaults.php` | Ключи и дефолты текстов CMS, группы для админки `adminGroups()`, `imageKeys()` |
 | `app/ProductImages.php` | Нормализация путей к фото товаров, data-URL → файлы |
 | `app/SiteUpload.php` | Загрузка картинок для раздела «Контент» → `public/images/site/` |
-| `config/settings.php` | Env: `SITE_NAME`, контакты, соцсети, пути `DATA_DIR`, `IMAGES_DIR`, опционально **`BASE_PATH`** (подкаталог сайта) |
+| `config/settings.php` | Env: `SITE_NAME`, контакты, соцсети, пути `DATA_DIR`, `IMAGES_DIR`, опционально **`BASE_PATH`**, **`PUBLIC_SITE_URL`** (канонический URL для SEO) |
+| `app/SeoHelper.php` | Абсолютный origin сайта, JSON-LD Organization / WebSite / Product |
 | `data/` | `marketbw.db` (на проде часто volume) |
 | `templates/` | Twig: `base.twig`, страницы, `admin/*`, `partials/*` |
 | `docker/` | Dockerfile, nginx, compose, `deploy.sh`, `env.example` |
@@ -38,6 +39,8 @@
 4. Рендер: Twig-шаблоны; тексты с сайта — **`t('ключ')`** (ключи из `SiteContentDefaults`).
 
 **CSRF:** `$_SESSION['csrf']`, в формах `csrf_token()`, проверка в POST админки и `/contact`.
+
+**SEO:** в `templates/base.twig` — canonical, `hreflang`, Open Graph, Twitter Card, JSON-LD; middleware в `bootstrap.php` выставляет `seo_canonical_url`, `seo_absolute_base`. Публичные маршруты `GET /robots.txt`, `GET /sitemap.xml`. На проде задать **`PUBLIC_SITE_URL`** в env (см. `docker/env.example`).
 
 ---
 

@@ -176,6 +176,25 @@ SQL;
     }
 
     /** @return list<array<string, mixed>> */
+    /**
+     * @return list<string>
+     */
+    public function allProductIds(): array
+    {
+        $st = $this->pdo->query('SELECT id FROM products ORDER BY created_at DESC');
+        if (!$st) {
+            return [];
+        }
+        $out = [];
+        foreach ($st->fetchAll(PDO::FETCH_COLUMN) as $id) {
+            if (is_string($id) && $id !== '') {
+                $out[] = $id;
+            }
+        }
+
+        return $out;
+    }
+
     public function featuredProducts(int $limit = 8): array
     {
         $st = $this->pdo->prepare(

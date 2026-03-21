@@ -11,6 +11,7 @@ declare(strict_types=1);
 use App\AuditLogMiddleware;
 use App\Database;
 use App\HttpsDetector;
+use App\SeoHelper;
 use App\SiteContentDefaults;
 use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
@@ -95,6 +96,12 @@ $containerBuilder->addDefinitions([
             $qs = http_build_query($params);
             return $qs !== '' ? '/catalog?' . $qs : '/catalog';
         }));
+        $env->addFunction(new \Twig\TwigFunction('absolute_url', function (string $path, \Twig\Environment $twigEnv): string {
+            $base = (string) ($twigEnv->getGlobals()['seo_absolute_base'] ?? '');
+            $path = '/' . ltrim($path, '/');
+
+            return $base !== '' ? rtrim($base, '/') . $path : $path;
+        }, ['needs_environment' => true]));
         return $twig;
     },
 ]);
@@ -157,7 +164,7 @@ $container->get(Database::class)->init();
 
 (require __DIR__ . '/routes.php')($app, $container);
 
-$app->add(function ($request, $handler) use ($container) {
+$app->add(function ($request, $handler) use ($container, $app) {
     $settings = $container->get('settings');
     $merged = $container->get(Database::class)->getMergedSiteContent($settings);
     $env = $container->get('twig')->getEnvironment();
@@ -170,6 +177,44 @@ $app->add(function ($request, $handler) use ($container) {
     $env->addGlobal('social_instagram', $merged['social.instagram'] ?? $settings['social_instagram']);
     $env->addGlobal('social_telegram', $merged['social.telegram'] ?? $settings['social_telegram']);
     $env->addGlobal('social_vk', $merged['social.vk'] ?? $settings['social_vk']);
+
+    $base = SeoHelper::resolvePublicBase($request, $settings, $app->getBasePath());
+    $path = $request->getUri()->getPath();
+    $canonical = $base !== '' ? rtrim($base, '/') . $path : $path;
+    $env->addGlobal('seo_absolute_base', $base);
+    $env->addGlobal('seo_canonical_url', $canonical);
+    $hero = (string) ($merged['home.hero_image'] ?? '');
+    $ogDefault = ($hero !== '' && str_starts_with($hero, '/') && $base !== '')
+        ? rtrim($base, '/') . $hero
+        : '';
+    $env->addGlobal('seo_default_og_image', $ogDefault);
+    $homeUrl = $base !== '' ? rtrim($base, '/') . '/' : '';
+    $orgName = (string) ($merged['brand.master_name'] ?? $settings['site_name']);
+    $orgDesc = (string) ($merged['meta.description'] ?? '');
+    $sameAs = array_values(array_filter([
+        (string) ($merged['social.instagram'] ?? ''),
+        (string) ($merged['social.telegram'] ?? ''),
+        (string) ($merged['social.vk'] ?? ''),
+    ], static fn (string $u): bool => $u !== '' && $u !== '#'));
+    $env->addGlobal(
+        'seo_organization_json_ld',
+        $homeUrl !== ''
+            ? SeoHelper::buildOrganizationJsonLd(
+                $orgName,
+                $orgDesc,
+                $homeUrl,
+                (string) ($merged['contact.phone'] ?? $settings['contact_phone']),
+                (string) ($merged['contact.email'] ?? $settings['contact_email']),
+                $sameAs,
+            )
+            : ''
+    );
+    $env->addGlobal(
+        'seo_website_json_ld',
+        $homeUrl !== ''
+            ? SeoHelper::buildWebSiteJsonLd((string) ($settings['site_name'] ?? ''), $homeUrl, $orgDesc)
+            : ''
+    );
 
     return $handler->handle($request);
 });

@@ -1,6 +1,7 @@
 {% extends "base.twig" %}
 
 {% block title %}{{ t('catalog.page_title') }} — {{ site_name }}{% endblock %}
+{% block meta_description %}{{ t('catalog.page_title') }} — {{ t('catalog.page_sub') }} {{ site_name }}.{% endblock %}
 
 {% block body %}
 <section class="page-hero">

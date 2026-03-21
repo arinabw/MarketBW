@@ -1,6 +1,7 @@
 {% extends "base.twig" %}
 
 {% block title %}{{ t('contact.page_title') }} — {{ site_name }}{% endblock %}
+{% block meta_description %}{{ t('contact.page_title') }} — {{ t('contact.page_sub')|slice(0, 140) }}{% endblock %}
 
 {% block body %}
 <section class="page-hero">

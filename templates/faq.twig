@@ -1,6 +1,7 @@
 {% extends "base.twig" %}
 
 {% block title %}{{ t('faq.page_title') }} — {{ site_name }}{% endblock %}
+{% block meta_description %}{{ t('faq.page_title') }} — вопросы и ответы. {{ site_name }}, {{ master_tagline|slice(0, 80) }}.{% endblock %}
 
 {% block body %}
 <section class="page-hero">

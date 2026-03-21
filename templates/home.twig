@@ -1,5 +1,7 @@
 {% extends "base.twig" %}
 
+{% block meta_description %}{{ t('home.hero_lead')|slice(0, 120) }} — {{ site_name }}. {{ master_tagline|slice(0, 80) }}{% endblock %}
+
 {% block body %}
 <section class="hero">
   <div class="container hero__grid">

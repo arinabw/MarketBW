@@ -1,6 +1,6 @@
 # MarketBW (marketbw.ru)
 
-**Версия:** 3.5.1
+**Версия:** 3.6.0
 
 Сайт-визитка рукоделия (украшения из бисера). **Текущий прод-стек** — лёгкий PHP + SQLite + Twig в Docker (Nginx + PHP-FPM за Traefik). Опциональный **журнал HTTP-событий** в БД (`/admin/logs`, ключи `audit.log_*` в разделе «Контент»).
 
@@ -87,6 +87,13 @@ docker compose up -d --build
 ### Админка: 502 на странице нового товара
 
 Если **`/admin/products/new`** отвечает **502 Bad Gateway**, откройте **`/admin/products/create`** — это тот же экран и форма (дублирующий маршрут в приложении). Частая причина — правила WAF/ModSecurity на слове `new` в пути. Если 502 на **всех** страницах админки, смотрите логи **PHP-FPM** и **Nginx** на сервере (падение воркера, таймаут, нехватка памяти).
+
+## SEO (Яндекс, Google)
+
+- В `.env` задайте **`PUBLIC_SITE_URL`** — полный адрес без завершающего слэша (например `https://marketbw.ru` или `https://example.com/shop` при установке в подкаталоге). От этого зависят **canonical**, **Open Graph**, абсолютные URL в **`/sitemap.xml`**. Если переменная пуста, базовый URL берётся из заголовков запроса (`Host`, `X-Forwarded-*`).
+- Карта сайта: **`/sitemap.xml`** (главная, каталог, категории, товары, о мастере, контакты, FAQ). **`/robots.txt`** — `Allow: /`, закрыта админка, указан Sitemap.
+- Уникальные **meta description** на главной, каталоге, товаре (обрезка описания), о мастере, FAQ, контактах. Общий текст по умолчанию — ключ **`meta.description`** в разделе «Контент». На каждой странице — **JSON-LD** (WebSite, Organization; на карточке товара — **Product** + Offer).
+- В кабинетах [Яндекс.Вебмастер](https://webmaster.yandex.ru/) и [Google Search Console](https://search.google.com/search-console) добавьте сайт и URL sitemap.
 
 Если после **отправки формы** вас выкидывает на **логин**: (1) сессии пишутся в **`data/sessions`** на томе с БД — общие для реплик и переживают рестарт; (2) в **`docker-compose.yml`** по умолчанию **`SESSION_FORCE_SECURE=true`** — cookie с `Secure` при внешнем HTTPS; (3) заголовки **`X-Forwarded-Proto`**, **`Forwarded`**, **`X-Forwarded-SSL`** учитываются в коде и при необходимости пробрасываются из Nginx в PHP; (4) при **www** и **apex** задайте **`SESSION_COOKIE_DOMAIN=.ваш-домен.ru`**. Если ходите к контейнеру по **чистому HTTP** (без TLS), задайте **`SESSION_FORCE_SECURE=false`**. Редиректы учитывают **`BASE_PATH`**.
 

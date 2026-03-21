@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 use App\Database;
 use App\DatabaseExcelExport;
+use App\SeoHelper;
 use App\ProductImages;
 use App\SiteContentDefaults;
 use App\SiteUpload;
@@ -36,6 +37,58 @@ return function (App $app, ContainerInterface $container): void {
 
     $app->get('/favicon.ico', function (Request $request, Response $response) use ($withBase): Response {
         return $response->withHeader('Location', $withBase('/favicon.svg'))->withStatus(308);
+    });
+
+    $app->get('/robots.txt', function (Request $request, Response $response) use ($app, $settings, $withBase): Response {
+        $base = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
+        $bp = trim($app->getBasePath(), '/');
+        $adminPrefix = ($bp !== '' ? '/' . $bp : '') . '/admin';
+        $sitemapUrl = $base !== '' ? (rtrim($base, '/') . $withBase('/sitemap.xml')) : $withBase('/sitemap.xml');
+        $lines = [
+            'User-agent: *',
+            'Allow: /',
+            '',
+            'Disallow: ' . $adminPrefix,
+            '',
+            'Sitemap: ' . $sitemapUrl,
+        ];
+        $response->getBody()->write(implode("\n", $lines));
+
+        return $response->withHeader('Content-Type', 'text/plain; charset=UTF-8');
+    });
+
+    $app->get('/sitemap.xml', function (Request $request, Response $response) use ($app, $db, $settings, $withBase): Response {
+        $base = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
+        if ($base === '') {
+            $response->getBody()->write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"/>');
+
+            return $response->withHeader('Content-Type', 'application/xml; charset=UTF-8');
+        }
+        $urls = [];
+        $add = static function (string $path, string $changefreq = 'weekly', string $priority = '0.8') use (&$urls, $base, $withBase): void {
+            $loc = htmlspecialchars(rtrim($base, '/') . $withBase($path), ENT_XML1 | ENT_QUOTES, 'UTF-8');
+            $urls[] = '<url><loc>' . $loc . '</loc><changefreq>' . $changefreq . '</changefreq><priority>' . $priority . '</priority></url>';
+        };
+        $add('/', 'daily', '1.0');
+        $add('/catalog', 'daily', '0.9');
+        $add('/about', 'monthly', '0.7');
+        $add('/contact', 'monthly', '0.8');
+        $add('/faq', 'weekly', '0.7');
+        foreach ($db()->categories() as $c) {
+            if (!isset($c['id'])) {
+                continue;
+            }
+            $add('/catalog?' . http_build_query(['category' => (string) $c['id']]), 'weekly', '0.8');
+        }
+        foreach ($db()->allProductIds() as $pid) {
+            $add('/product/' . rawurlencode($pid), 'weekly', '0.9');
+        }
+        $body = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
+            . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n"
+            . implode("\n", $urls) . "\n</urlset>";
+        $response->getBody()->write($body);
+
+        return $response->withHeader('Content-Type', 'application/xml; charset=UTF-8');
     });
 
     $app->get('/', function (Request $request, Response $response) use ($db, $view): Response {
@@ -73,7 +126,7 @@ return function (App $app, ContainerInterface $container): void {
         return $view()->render($response, 'about.twig', []);
     });
 
-    $app->get('/product/{id}', function (Request $request, Response $response, array $args) use ($db, $view): Response {
+    $app->get('/product/{id}', function (Request $request, Response $response, array $args) use ($db, $view, $settings, $app, $withBase): Response {
         $database = $db();
         $product = $database->productById((string) $args['id']);
         if (!$product) {
@@ -86,11 +139,18 @@ return function (App $app, ContainerInterface $container): void {
                 break;
             }
         }
+        $pub = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
+        $pageUrl = $pub !== '' ? rtrim($pub, '/') . $withBase('/product/' . $args['id']) : '';
+        $productJsonLd = ($pageUrl !== '' && $pub !== '')
+            ? SeoHelper::buildProductJsonLd($product, $pageUrl, $pub)
+            : '';
+
         return $view()->render($response, 'product.twig', [
             'product' => $product,
             'category_name' => $categoryName,
             'categories' => $database->categories(),
             'reviews' => $database->reviews((string) $args['id']),
+            'product_json_ld' => $productJsonLd,
         ]);
     });
 
