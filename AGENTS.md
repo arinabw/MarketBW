@@ -72,7 +72,7 @@
 | `/admin/login`, `/admin/logout` | Вход / выход |
 | `/admin` | Дашборд |
 | `/admin/content` | Редактирование текстов и hero-картинки |
-| `/admin/products`, `/admin/products/new`, `.../edit` | Товары |
+| `/admin/products`, `/admin/products/create` (и `/products/new`), `.../edit` | Товары |
 | `/admin/categories`, `...` | Категории |
 | `/admin/faqs`, `/admin/faqs/new`, `.../edit` | FAQ |
 | `/admin/reviews`, `...` | Отзывы |

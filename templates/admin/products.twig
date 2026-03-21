@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1 style="font-family:var(--display);margin-top:0">Товары</h1>
-<p><a class="btn btn--primary" href="/admin/products/new">Добавить товар</a></p>
+<p><a class="btn btn--primary" href="/admin/products/create">Добавить товар</a></p>
 <div class="table-wrap" style="margin-top:1rem">
   <table>
     <thead>
@@ -38,7 +38,7 @@
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="5" class="muted">Нет товаров — <a href="/admin/products/new">создать</a>.</td></tr>
+      <tr><td colspan="5" class="muted">Нет товаров — <a href="/admin/products/create">создать</a>.</td></tr>
       {% endfor %}
     </tbody>
   </table>

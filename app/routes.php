@@ -210,15 +210,17 @@ return function (App $app, ContainerInterface $container): void {
             ]);
         });
 
-        $group->get('/products/new', function (Request $request, Response $response) use ($db, $view): Response {
+        $adminProductNewGet = function (Request $request, Response $response) use ($db, $view): Response {
             return $view()->render($response, 'admin/product_form.twig', [
                 'product' => null,
                 'categories' => $db()->categories(),
                 'admin_section' => 'products',
             ]);
-        });
+        };
+        $group->get('/products/new', $adminProductNewGet);
+        $group->get('/products/create', $adminProductNewGet);
 
-        $group->post('/products/new', function (Request $request, Response $response) use ($db, $view, $settings): Response {
+        $adminProductNewPost = function (Request $request, Response $response) use ($db, $view, $settings): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -258,7 +260,9 @@ return function (App $app, ContainerInterface $container): void {
             }
             $db()->createProduct($name, $desc, $price, $cat, $paths, $materials, $size, $tech, $inStock, $featured);
             return $response->withHeader('Location', '/admin/products')->withStatus(302);
-        });
+        };
+        $group->post('/products/new', $adminProductNewPost);
+        $group->post('/products/create', $adminProductNewPost);
 
         $group->get('/products/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view, $settings): Response {
             $p = $db()->productById((string) $args['id']);
