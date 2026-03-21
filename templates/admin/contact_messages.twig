@@ -1,0 +1,78 @@
+{% extends "admin/layout.twig" %}
+
+{% block title %}Заявки с сайта{% endblock %}
+
+{% block content %}
+<h1 class="admin-page-title" style="font-family:var(--display)">Заявки с сайта</h1>
+<p class="muted" style="max-width:48rem">
+  Сообщения из формы на странице «Контакты». Раньше они никуда не сохранялись; теперь каждая отправка пишется в таблицу <code>contact_messages</code>.
+  Статусы: <strong>новая</strong> — не обработана, <strong>обработана</strong> — ответили, <strong>в архиве</strong> — закрыта без удаления.
+</p>
+
+{% if deleted %}
+<div class="alert" style="margin-top:1rem">Заявка удалена.</div>
+{% endif %}
+
+<div style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;margin-top:1.25rem">
+  <span class="muted">Всего в фильтре: <strong>{{ cm_total }}</strong></span>
+  <span style="margin-left:auto"></span>
+  <a class="btn btn--ghost {% if cm_status is null %}is-active{% endif %}" href="/admin/contact-messages" style="padding:0.35rem 0.65rem">Все ({{ cm_counts.all }})</a>
+  <a class="btn btn--ghost {% if cm_status == 'new' %}is-active{% endif %}" href="/admin/contact-messages?status=new" style="padding:0.35rem 0.65rem">Новые ({{ cm_counts.new }})</a>
+  <a class="btn btn--ghost {% if cm_status == 'done' %}is-active{% endif %}" href="/admin/contact-messages?status=done" style="padding:0.35rem 0.65rem">Обработаны ({{ cm_counts.done }})</a>
+  <a class="btn btn--ghost {% if cm_status == 'archived' %}is-active{% endif %}" href="/admin/contact-messages?status=archived" style="padding:0.35rem 0.65rem">Архив ({{ cm_counts.archived }})</a>
+</div>
+
+<div class="table-wrap" style="margin-top:1rem">
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Дата</th>
+        <th>Имя</th>
+        <th>Email</th>
+        <th>Текст (начало)</th>
+        <th>Статус</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in cmessages %}
+      <tr>
+        <td class="muted">{{ m.id }}</td>
+        <td style="white-space:nowrap;font-size:0.88rem">{{ m.created_at }}</td>
+        <td>{{ m.name }}</td>
+        <td style="max-width:10rem;word-break:break-all;font-size:0.88rem">
+          {% if m.email != '' %}<a href="mailto:{{ m.email }}">{{ m.email }}</a>{% else %}—{% endif %}
+        </td>
+        <td style="max-width:18rem;font-size:0.88rem;color:var(--text-muted)">{{ m.excerpt }}{% if m.excerpt|length >= 199 %}…{% endif %}</td>
+        <td>
+          {% if m.status == 'new' %}
+          <span class="badge-cm badge-cm--new">новая</span>
+          {% elseif m.status == 'done' %}
+          <span class="badge-cm badge-cm--done">обработана</span>
+          {% else %}
+          <span class="badge-cm badge-cm--archived">архив</span>
+          {% endif %}
+        </td>
+        <td><a href="/admin/contact-messages/{{ m.id }}">Открыть</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="muted">Нет заявок.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if cm_pages > 1 %}
+<p class="muted" style="margin-top:1rem;font-size:0.9rem">
+  Страница {{ cm_page }} из {{ cm_pages }}
+  {% set q = cm_status ? ('?status=' ~ cm_status ~ '&') : '?' %}
+  {% if cm_page > 1 %}
+  <a href="/admin/contact-messages{{ q }}page={{ cm_page - 1 }}">← назад</a>
+  {% endif %}
+  {% if cm_page < cm_pages %}
+  <a href="/admin/contact-messages{{ q }}page={{ cm_page + 1 }}">вперёд →</a>
+  {% endif %}
+</p>
+{% endif %}
+{% endblock %}

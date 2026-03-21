@@ -1,0 +1,59 @@
+{% extends "admin/layout.twig" %}
+
+{% block title %}Заявка #{{ msg.id }}{% endblock %}
+
+{% block content %}
+<p class="muted" style="margin:0 0 0.5rem"><a href="/admin/contact-messages">← Все заявки</a></p>
+<h1 class="admin-page-title" style="font-family:var(--display);margin-top:0">Заявка #{{ msg.id }}</h1>
+
+{% if saved %}
+<div class="alert alert--success">Статус сохранён.</div>
+{% endif %}
+
+<div class="box" style="margin-bottom:1rem">
+  <p style="margin:0 0 0.35rem"><strong>Дата:</strong> <span class="muted">{{ msg.created_at }}</span></p>
+  <p style="margin:0 0 0.35rem"><strong>Имя:</strong> {{ msg.name }}</p>
+  <p style="margin:0 0 0.35rem"><strong>Email:</strong>
+    {% if msg.email != '' %}
+    <a href="mailto:{{ msg.email }}">{{ msg.email }}</a>
+    {% else %}
+    <span class="muted">не указан</span>
+    {% endif %}
+  </p>
+  <p style="margin:0 0 0.35rem"><strong>Статус:</strong>
+    {% if msg.status == 'new' %}
+    <span class="badge-cm badge-cm--new">новая</span>
+    {% elseif msg.status == 'done' %}
+    <span class="badge-cm badge-cm--done">обработана</span>
+    {% else %}
+    <span class="badge-cm badge-cm--archived">архив</span>
+    {% endif %}
+  </p>
+  <p style="margin:0.75rem 0 0.35rem"><strong>Сообщение</strong></p>
+  <pre style="margin:0;white-space:pre-wrap;word-break:break-word;font-family:inherit;font-size:0.95rem;line-height:1.5;background:#fffafb;padding:0.75rem;border-radius:var(--radius);border:1px solid var(--border)">{{ msg.message }}</pre>
+</div>
+
+<div class="box muted" style="font-size:0.85rem;margin-bottom:1rem">
+  <strong>Технические данные</strong> (для спама и отладки)<br>
+  IP: {{ msg.ip|default('—') }}<br>
+  User-Agent: <span style="word-break:break-all">{{ msg.user_agent|default('—') }}</span>
+</div>
+
+<div class="box" style="margin-bottom:1rem">
+  <h2 style="margin:0 0 0.75rem;font-size:1.05rem">Сменить статус</h2>
+  <form method="post" action="/admin/contact-messages/{{ msg.id }}/status" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <select name="status" style="width:auto;min-width:12rem">
+      <option value="new" {% if msg.status == 'new' %}selected{% endif %}>Новая</option>
+      <option value="done" {% if msg.status == 'done' %}selected{% endif %}>Обработана</option>
+      <option value="archived" {% if msg.status == 'archived' %}selected{% endif %}>В архиве</option>
+    </select>
+    <button type="submit" class="btn btn--primary">Сохранить</button>
+  </form>
+</div>
+
+<form method="post" action="/admin/contact-messages/{{ msg.id }}/delete" class="inline-form" onsubmit="return confirm('Удалить эту заявку безвозвратно?');">
+  <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+  <button type="submit" class="btn btn--ghost" style="color:#b33">Удалить заявку</button>
+</form>
+{% endblock %}

@@ -7,6 +7,7 @@
 <p class="muted">Краткая статистика и быстрые ссылки.</p>
 <p style="margin-bottom:1rem">
   <a class="btn btn--primary" href="/admin/content">Контент сайта</a>
+  <a class="btn btn--ghost" href="/admin/contact-messages">Заявки{% if contact_new_count > 0 %} ({{ contact_new_count }} нов.){% endif %}</a>
   <a class="btn btn--ghost" href="/admin/faqs">FAQ</a>
   <a class="btn btn--ghost" href="/admin/reviews">Отзывы</a>
 </p>
@@ -18,6 +19,11 @@
   <div class="box">
     <div class="muted" style="font-size:0.85rem">Категории</div>
     <div style="font-size:2rem;font-weight:800">{{ category_count }}</div>
+  </div>
+  <div class="box">
+    <div class="muted" style="font-size:0.85rem">Новых заявок</div>
+    <div style="font-size:2rem;font-weight:800">{{ contact_new_count }}</div>
+    <a href="/admin/contact-messages?status=new" style="font-size:0.88rem">Открыть →</a>
   </div>
 </div>
 {% endblock %}

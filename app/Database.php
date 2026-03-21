@@ -104,6 +104,19 @@ CREATE TABLE IF NOT EXISTS audit_log (
 );
 CREATE INDEX IF NOT EXISTS idx_audit_log_created ON audit_log (created_at);
 CREATE INDEX IF NOT EXISTS idx_audit_log_channel ON audit_log (channel);
+
+CREATE TABLE IF NOT EXISTS contact_messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    name TEXT NOT NULL,
+    email TEXT NOT NULL DEFAULT '',
+    message TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'new',
+    ip TEXT NOT NULL DEFAULT '',
+    user_agent TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_contact_messages_created ON contact_messages (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_contact_messages_status ON contact_messages (status);
 SQL;
         $this->pdo->exec($schema);
 
@@ -740,5 +753,104 @@ SQL;
     public static function quoteSqliteIdentifier(string $ident): string
     {
         return '"' . str_replace('"', '""', $ident) . '"';
+    }
+
+    /** @return list<string> */
+    public static function contactMessageStatuses(): array
+    {
+        return ['new', 'done', 'archived'];
+    }
+
+    public function createContactMessage(string $name, string $email, string $message, string $ip, ?string $userAgent): int
+    {
+        $name = self::clipStr(trim($name), 500);
+        $email = self::clipStr(trim($email), 320);
+        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $email = '';
+        }
+        $message = self::clipStr(trim($message), 20000);
+        $ip = self::clipStr($ip, 80);
+        $ua = $userAgent !== null ? self::clipStr($userAgent, 2000) : null;
+        $this->pdo->prepare(
+            'INSERT INTO contact_messages (name, email, message, ip, user_agent) VALUES (?, ?, ?, ?, ?)'
+        )->execute([$name, $email, $message, $ip, $ua]);
+
+        return (int) $this->pdo->lastInsertId();
+    }
+
+    public function contactMessagesCount(?string $status = null): int
+    {
+        if ($status !== null && in_array($status, self::contactMessageStatuses(), true)) {
+            $st = $this->pdo->prepare('SELECT COUNT(*) FROM contact_messages WHERE status = ?');
+            $st->execute([$status]);
+        } else {
+            $st = $this->pdo->query('SELECT COUNT(*) FROM contact_messages');
+        }
+
+        return (int) $st->fetchColumn();
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function contactMessages(?string $status, int $limit, int $offset): array
+    {
+        $limit = max(1, min(200, $limit));
+        $offset = max(0, $offset);
+        if ($status !== null && in_array($status, self::contactMessageStatuses(), true)) {
+            $st = $this->pdo->prepare(
+                'SELECT id, created_at, name, email, substr(message, 1, 200) AS excerpt, status, ip
+                 FROM contact_messages WHERE status = ? ORDER BY id DESC LIMIT ? OFFSET ?'
+            );
+            $st->bindValue(1, $status, PDO::PARAM_STR);
+            $st->bindValue(2, $limit, PDO::PARAM_INT);
+            $st->bindValue(3, $offset, PDO::PARAM_INT);
+            $st->execute();
+        } else {
+            $st = $this->pdo->prepare(
+                'SELECT id, created_at, name, email, substr(message, 1, 200) AS excerpt, status, ip
+                 FROM contact_messages ORDER BY id DESC LIMIT ? OFFSET ?'
+            );
+            $st->bindValue(1, $limit, PDO::PARAM_INT);
+            $st->bindValue(2, $offset, PDO::PARAM_INT);
+            $st->execute();
+        }
+
+        return $st->fetchAll() ?: [];
+    }
+
+    /** @return ?array<string, mixed> */
+    public function contactMessageById(int $id): ?array
+    {
+        $st = $this->pdo->prepare('SELECT * FROM contact_messages WHERE id = ?');
+        $st->execute([$id]);
+        $row = $st->fetch();
+
+        return $row ?: null;
+    }
+
+    public function contactMessageSetStatus(int $id, string $status): bool
+    {
+        if (!in_array($status, self::contactMessageStatuses(), true)) {
+            return false;
+        }
+        $st = $this->pdo->prepare('UPDATE contact_messages SET status = ? WHERE id = ?');
+        $st->execute([$status, $id]);
+
+        return $st->rowCount() > 0;
+    }
+
+    public function deleteContactMessage(int $id): void
+    {
+        $this->pdo->prepare('DELETE FROM contact_messages WHERE id = ?')->execute([$id]);
+    }
+
+    private static function clipStr(string $s, int $max): string
+    {
+        if (function_exists('mb_substr')) {
+            return mb_substr($s, 0, $max);
+        }
+
+        return substr($s, 0, $max);
     }
 }

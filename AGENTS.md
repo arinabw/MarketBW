@@ -48,6 +48,7 @@
 | `categories` | Категории каталога + путь к картинке категории |
 | `products` | Товары: JSON `images`, `materials`, цена, featured и т.д. |
 | `reviews` | Отзывы: опционально `product_id` |
+| `contact_messages` | Заявки с формы «Контакты»: имя, email, текст, статус (`new` / `done` / `archived`), IP, User-Agent |
 | `faqs` | Вопрос–ответ FAQ |
 | `users` | Админ (логин + hash пароля) |
 | `site_content` | CMS: `content_key` → `value` (переопределение дефолтов из кода/env) |
@@ -77,6 +78,7 @@
 | `/admin/categories`, `...` | Категории |
 | `/admin/faqs`, `/admin/faqs/new`, `.../edit` | FAQ |
 | `/admin/reviews`, `...` | Отзывы |
+| `/admin/contact-messages`, `.../{id}`, смена статуса и удаление POST | Заявки с сайта (`contact_messages`) |
 | `/admin/logs` | Журнал HTTP-событий (таблица `audit_log`, включается ключами `audit.log_*` в CMS) |
 | `/admin/database`, `POST /admin/database/export` | Просмотр таблиц SQLite и выгрузка в Excel (SpreadsheetML `.xls`) |
 | `/admin/password` | Смена пароля |

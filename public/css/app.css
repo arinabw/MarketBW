@@ -742,6 +742,30 @@ textarea {
   color: #1f5c2e;
 }
 
+.badge-cm {
+  display: inline-block;
+  font-size: 0.72rem;
+  padding: 0.15em 0.45em;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.badge-cm--new {
+  background: #fff3e0;
+  color: #b35c00;
+}
+
+.badge-cm--done {
+  background: #ecfdf3;
+  color: #166534;
+}
+
+.badge-cm--archived {
+  background: #f4f4f5;
+  color: #52525b;
+}
+
 .admin-log-table .admin-log-json {
   font-size: 0.75rem;
   max-width: min(32rem, 90vw);

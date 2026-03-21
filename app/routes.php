@@ -104,16 +104,26 @@ return function (App $app, ContainerInterface $container): void {
         ]);
     });
 
-    $app->post('/contact', function (Request $request, Response $response) use ($withBase): Response {
+    $app->post('/contact', function (Request $request, Response $response) use ($db, $withBase): Response {
         $data = (array) $request->getParsedBody();
         if (!isset($data['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $data['csrf'])) {
             return $response->withHeader('Location', $withBase('/contact') . '?error=1')->withStatus(302);
         }
         $name = trim((string) ($data['name'] ?? ''));
+        $email = trim((string) ($data['email'] ?? ''));
         $message = trim((string) ($data['message'] ?? ''));
         if ($name === '' || $message === '') {
             return $response->withHeader('Location', $withBase('/contact') . '?error=1')->withStatus(302);
         }
+        $ua = $request->getServerParams()['HTTP_USER_AGENT'] ?? null;
+        $db()->createContactMessage(
+            $name,
+            $email,
+            $message,
+            marketbw_client_ip($request),
+            is_string($ua) ? $ua : null
+        );
+
         return $response->withHeader('Location', $withBase('/contact') . '?sent=1')->withStatus(302);
     });
 
@@ -171,6 +181,7 @@ return function (App $app, ContainerInterface $container): void {
         return $view()->render($response, 'admin/dashboard.twig', [
             'product_count' => $pc,
             'category_count' => $cc,
+            'contact_new_count' => $database->contactMessagesCount('new'),
             'admin_section' => 'dash',
         ]);
     };
@@ -652,6 +663,84 @@ return function (App $app, ContainerInterface $container): void {
             return $response->withHeader('Location', $withBase('/admin/reviews'))->withStatus(302);
         });
 
+        $group->get('/contact-messages', function (Request $request, Response $response) use ($db, $view): Response {
+            $qp = $request->getQueryParams();
+            $page = max(1, (int) ($qp['page'] ?? 1));
+            $st = isset($qp['status']) ? trim((string) $qp['status']) : '';
+            $status = in_array($st, Database::contactMessageStatuses(), true) ? $st : null;
+            $perPage = 50;
+            $database = $db();
+            $total = $database->contactMessagesCount($status);
+            $pages = max(1, (int) ceil($total / $perPage));
+            if ($page > $pages) {
+                $page = $pages;
+            }
+            $offset = ($page - 1) * $perPage;
+
+            return $view()->render($response, 'admin/contact_messages.twig', [
+                'admin_section' => 'contact_messages',
+                'cmessages' => $database->contactMessages($status, $perPage, $offset),
+                'cm_status' => $status,
+                'cm_page' => $page,
+                'cm_pages' => $pages,
+                'cm_total' => $total,
+                'cm_counts' => [
+                    'all' => $database->contactMessagesCount(null),
+                    'new' => $database->contactMessagesCount('new'),
+                    'done' => $database->contactMessagesCount('done'),
+                    'archived' => $database->contactMessagesCount('archived'),
+                ],
+                'deleted' => isset($qp['deleted']) && $qp['deleted'] === '1',
+            ]);
+        });
+
+        $group->get('/contact-messages/{id}', function (Request $request, Response $response, array $args) use ($db, $view): Response {
+            $id = (int) $args['id'];
+            if ($id < 1) {
+                return $view()->render($response->withStatus(404), '404.twig', []);
+            }
+            $row = $db()->contactMessageById($id);
+            if (!$row) {
+                return $view()->render($response->withStatus(404), '404.twig', []);
+            }
+            $qp = $request->getQueryParams();
+
+            return $view()->render($response, 'admin/contact_message.twig', [
+                'admin_section' => 'contact_messages',
+                'msg' => $row,
+                'saved' => isset($qp['saved']) && $qp['saved'] === '1',
+            ]);
+        });
+
+        $group->post('/contact-messages/{id}/status', function (Request $request, Response $response, array $args) use ($db, $withBase): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $id = (int) $args['id'];
+            $newStatus = trim((string) ($_POST['status'] ?? ''));
+            if ($id < 1 || !in_array($newStatus, Database::contactMessageStatuses(), true)) {
+                return $response->withStatus(400);
+            }
+            $db()->contactMessageSetStatus($id, $newStatus);
+
+            return $response->withHeader('Location', $withBase('/admin/contact-messages/' . $id) . '?saved=1')->withStatus(302);
+        });
+
+        $group->post('/contact-messages/{id}/delete', function (Request $request, Response $response, array $args) use ($db, $withBase): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $id = (int) $args['id'];
+            if ($id < 1) {
+                return $response->withStatus(400);
+            }
+            $db()->deleteContactMessage($id);
+
+            return $response->withHeader('Location', $withBase('/admin/contact-messages') . '?deleted=1')->withStatus(302);
+        });
+
         $group->get('/logs', function (Request $request, Response $response) use ($db, $view, $settings): Response {
             $qp = $request->getQueryParams();
             $page = max(1, (int) ($qp['page'] ?? 1));
@@ -742,6 +831,21 @@ return function (App $app, ContainerInterface $container): void {
         });
     })->add($adminGuard);
 };
+
+function marketbw_client_ip(Request $request): string
+{
+    $s = $request->getServerParams();
+    $ip = (string) ($s['HTTP_CF_CONNECTING_IP'] ?? '');
+    if ($ip === '' && !empty($s['HTTP_X_FORWARDED_FOR'])) {
+        $parts = explode(',', (string) $s['HTTP_X_FORWARDED_FOR']);
+        $ip = trim($parts[0]);
+    }
+    if ($ip === '') {
+        $ip = (string) ($s['REMOTE_ADDR'] ?? '');
+    }
+
+    return function_exists('mb_substr') ? mb_substr($ip, 0, 80) : substr($ip, 0, 80);
+}
 
 /**
  * @return list<string>
