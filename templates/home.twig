@@ -3,32 +3,51 @@
 {% block meta_description %}{{ t('meta.description') }}{% endblock %}
 
 {% block body %}
-{% if layout_visible('layout.show_home_hero') %}
+{% set _hero_keys = ['layout.show_home_hero_badge', 'layout.show_home_hero_title', 'layout.show_home_hero_lead', 'layout.show_home_hero_buttons', 'layout.show_home_hero_image'] %}
+{% if layout_any_visible(_hero_keys) %}
 <section class="hero">
   <div class="container hero__grid">
+    {% if layout_any_visible(_hero_keys|slice(0, 4)) %}
     <div>
+      {% if layout_visible('layout.show_home_hero_badge') %}
       <div class="badge">{{ t('home.badge_prefix') }}{{ site_name }}{{ t('home.badge_suffix') }}</div>
+      {% endif %}
+      {% if layout_visible('layout.show_home_hero_title') %}
       <h1>{{ t('home.hero_title') }}<span class="hero__accent">{{ t('home.hero_title_accent') }}</span></h1>
+      {% endif %}
+      {% if layout_visible('layout.show_home_hero_lead') %}
       <p class="lead">{{ t('home.hero_lead') }}</p>
+      {% endif %}
+      {% if layout_visible('layout.show_home_hero_buttons') %}
       <div class="btn-row">
         <a class="btn btn--primary" href="/catalog">{{ t('home.btn_catalog') }}</a>
         <a class="btn btn--ghost" href="/contact">{{ t('home.btn_contact') }}</a>
       </div>
+      {% endif %}
     </div>
+    {% endif %}
+    {% if layout_visible('layout.show_home_hero_image') %}
     <div class="hero-art">
       <div class="hero-art__frame">
         <img src="{{ t('home.hero_image') }}" alt="{{ t('home.hero_image_alt') }}" width="320" height="240" loading="eager">
       </div>
     </div>
+    {% endif %}
   </div>
 </section>
 {% endif %}
 
-{% if layout_visible('layout.show_home_categories') %}
+{% set _cat_keys = ['layout.show_home_categories_title', 'layout.show_home_categories_sub', 'layout.show_home_categories_grid'] %}
+{% if categories|length and layout_any_visible(_cat_keys) %}
 <section class="section section--white">
   <div class="container">
+    {% if layout_visible('layout.show_home_categories_title') %}
     <h2 class="section-title">{{ t('home.section_categories_title') }}</h2>
+    {% endif %}
+    {% if layout_visible('layout.show_home_categories_sub') %}
     <p class="section-sub">{{ t('home.section_categories_sub') }}</p>
+    {% endif %}
+    {% if layout_visible('layout.show_home_categories_grid') %}
     <div class="grid-cards">
       {% for c in categories %}
       <a class="card card--link" href="{{ catalog_url(c.id, null, null) }}">
@@ -43,15 +62,22 @@
       </a>
       {% endfor %}
     </div>
+    {% endif %}
   </div>
 </section>
 {% endif %}
 
-{% if layout_visible('layout.show_home_featured') %}
+{% set _feat_keys = ['layout.show_home_featured_title', 'layout.show_home_featured_sub', 'layout.show_home_featured_grid'] %}
+{% if layout_any_visible(_feat_keys) %}
 <section class="section">
   <div class="container">
+    {% if layout_visible('layout.show_home_featured_title') %}
     <h2 class="section-title">{{ t('home.section_featured_title') }}</h2>
+    {% endif %}
+    {% if layout_visible('layout.show_home_featured_sub') %}
     <p class="section-sub">{{ t('home.section_featured_sub') }}</p>
+    {% endif %}
+    {% if layout_visible('layout.show_home_featured_grid') %}
     <div class="grid-cards">
       {% for p in featured %}
       <article class="card">
@@ -70,15 +96,22 @@
       <p class="muted empty-hint">{{ t('home.featured_empty')|raw }}</p>
       {% endfor %}
     </div>
+    {% endif %}
   </div>
 </section>
 {% endif %}
 
-{% if layout_visible('layout.show_home_reviews') %}
+{% set _rev_keys = ['layout.show_home_reviews_title', 'layout.show_home_reviews_sub', 'layout.show_home_reviews_grid'] %}
+{% if layout_any_visible(_rev_keys) %}
 <section class="section section--white">
   <div class="container">
+    {% if layout_visible('layout.show_home_reviews_title') %}
     <h2 class="section-title">{{ t('home.section_reviews_title') }}</h2>
+    {% endif %}
+    {% if layout_visible('layout.show_home_reviews_sub') %}
     <p class="section-sub">{{ t('home.section_reviews_sub') }}</p>
+    {% endif %}
+    {% if layout_visible('layout.show_home_reviews_grid') and reviews|length %}
     <div class="grid-cards reviews-grid">
       {% for r in reviews %}
       <div class="review">
@@ -91,6 +124,7 @@
       </div>
       {% endfor %}
     </div>
+    {% endif %}
   </div>
 </section>
 {% endif %}

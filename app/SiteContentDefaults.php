@@ -37,11 +37,35 @@ final class SiteContentDefaults
             'meta.description' => '%SITE% — %TAGLINE% Авторские украшения и изделия из бисера: колье, браслеты, серьги. Рукоделие и оригинальные подарки ручной работы.',
             'meta.keywords' => 'украшения из бисера, бисероплетение, рукоделие, подарки ручной работы, авторские украшения, изделия из бисера, %SITE%',
 
-            'layout.show_home_hero' => '1',
-            'layout.show_home_categories' => '1',
-            'layout.show_home_featured' => '1',
-            'layout.show_home_reviews' => '1',
-            'layout.show_product_reviews' => '1',
+            'layout.show_home_hero_badge' => '1',
+            'layout.show_home_hero_title' => '1',
+            'layout.show_home_hero_lead' => '1',
+            'layout.show_home_hero_buttons' => '1',
+            'layout.show_home_hero_image' => '1',
+            'layout.show_home_categories_title' => '1',
+            'layout.show_home_categories_sub' => '1',
+            'layout.show_home_categories_grid' => '1',
+            'layout.show_home_featured_title' => '1',
+            'layout.show_home_featured_sub' => '1',
+            'layout.show_home_featured_grid' => '1',
+            'layout.show_home_reviews_title' => '1',
+            'layout.show_home_reviews_sub' => '1',
+            'layout.show_home_reviews_grid' => '1',
+            'layout.show_product_breadcrumbs' => '1',
+            'layout.show_product_gallery_main' => '1',
+            'layout.show_product_gallery_thumbs' => '1',
+            'layout.show_product_title' => '1',
+            'layout.show_product_price' => '1',
+            'layout.show_product_description' => '1',
+            'layout.show_product_meta' => '1',
+            'layout.show_product_materials' => '1',
+            'layout.show_product_order_title' => '1',
+            'layout.show_product_order_steps' => '1',
+            'layout.show_product_btn_order' => '1',
+            'layout.show_product_btn_telegram' => '1',
+            'layout.show_product_btn_whatsapp' => '1',
+            'layout.show_product_reviews_title' => '1',
+            'layout.show_product_review_items' => '1',
 
             'header.logo_suffix' => 'бисер',
             'nav.home' => 'Главная',
@@ -151,25 +175,130 @@ final class SiteContentDefaults
      * @return array<string, list<string>>
      */
     /**
-     * Ключи «вкл/выкл» для блоков (чекбоксы в админке, значения 1/0).
+     * Секции админки «Видимость» (ключ => список чекбоксов).
+     *
+     * @return array<string, list<string>>
+     */
+    public static function visibilityAdminGroups(): array
+    {
+        return [
+            'Видимость: главная — блок «герой»' => [
+                'layout.show_home_hero_badge',
+                'layout.show_home_hero_title',
+                'layout.show_home_hero_lead',
+                'layout.show_home_hero_buttons',
+                'layout.show_home_hero_image',
+            ],
+            'Видимость: главная — категории' => [
+                'layout.show_home_categories_title',
+                'layout.show_home_categories_sub',
+                'layout.show_home_categories_grid',
+            ],
+            'Видимость: главная — избранное' => [
+                'layout.show_home_featured_title',
+                'layout.show_home_featured_sub',
+                'layout.show_home_featured_grid',
+            ],
+            'Видимость: главная — отзывы' => [
+                'layout.show_home_reviews_title',
+                'layout.show_home_reviews_sub',
+                'layout.show_home_reviews_grid',
+            ],
+            'Видимость: страница товара' => [
+                'layout.show_product_breadcrumbs',
+                'layout.show_product_gallery_main',
+                'layout.show_product_gallery_thumbs',
+                'layout.show_product_title',
+                'layout.show_product_price',
+                'layout.show_product_description',
+                'layout.show_product_meta',
+                'layout.show_product_materials',
+                'layout.show_product_order_title',
+                'layout.show_product_order_steps',
+                'layout.show_product_btn_order',
+                'layout.show_product_btn_telegram',
+                'layout.show_product_btn_whatsapp',
+                'layout.show_product_reviews_title',
+                'layout.show_product_review_items',
+            ],
+        ];
+    }
+
+    /**
+     * Ключи «вкл/выкл» для видимости (чекбоксы в админке, значения 1/0).
      *
      * @return list<string>
      */
     public static function layoutBooleanKeys(): array
     {
-        return [
-            'layout.show_home_hero',
-            'layout.show_home_categories',
-            'layout.show_home_featured',
-            'layout.show_home_reviews',
-            'layout.show_product_reviews',
+        $keys = [];
+        foreach (self::visibilityAdminGroups() as $group) {
+            foreach ($group as $k) {
+                $keys[] = $k;
+            }
+        }
+
+        return $keys;
+    }
+
+    /**
+     * Если в БД остались старые флаги блоков (до детальных переключателей),
+     * применяем их к дочерним ключам, пока для дочернего нет своей записи в site_content.
+     *
+     * @param array<string, string> $merged
+     * @param array<string, string> $over только то, что реально пришло из БД
+     *
+     * @return array<string, string>
+     */
+    public static function inheritLegacyLayoutToggles(array $merged, array $over): array
+    {
+        /** @var array<string, list<string>> $map */
+        $map = [
+            'layout.show_home_hero' => [
+                'layout.show_home_hero_badge',
+                'layout.show_home_hero_title',
+                'layout.show_home_hero_lead',
+                'layout.show_home_hero_buttons',
+                'layout.show_home_hero_image',
+            ],
+            'layout.show_home_categories' => [
+                'layout.show_home_categories_title',
+                'layout.show_home_categories_sub',
+                'layout.show_home_categories_grid',
+            ],
+            'layout.show_home_featured' => [
+                'layout.show_home_featured_title',
+                'layout.show_home_featured_sub',
+                'layout.show_home_featured_grid',
+            ],
+            'layout.show_home_reviews' => [
+                'layout.show_home_reviews_title',
+                'layout.show_home_reviews_sub',
+                'layout.show_home_reviews_grid',
+            ],
+            'layout.show_product_reviews' => [
+                'layout.show_product_reviews_title',
+                'layout.show_product_review_items',
+            ],
         ];
+        foreach ($map as $legacy => $children) {
+            if (!array_key_exists($legacy, $over)) {
+                continue;
+            }
+            $pv = $merged[$legacy] ?? '0';
+            foreach ($children as $ch) {
+                if (!array_key_exists($ch, $over)) {
+                    $merged[$ch] = $pv;
+                }
+            }
+        }
+
+        return $merged;
     }
 
     public static function adminGroups(): array
     {
-        return [
-            'Видимость блоков на сайте' => self::layoutBooleanKeys(),
+        return array_merge(self::visibilityAdminGroups(), [
             'Бренд, контакты и соцсети' => [
                 'brand.master_name', 'brand.tagline', 'contact.email', 'contact.phone', 'contact.whatsapp',
                 'social.instagram', 'social.telegram', 'social.vk',
@@ -229,11 +358,35 @@ final class SiteContentDefaults
             'social.vk' => 'ВКонтакте URL',
             'meta.description' => 'Meta description (подставьте %SITE% и %TAGLINE%; 150–160 символов желательно)',
             'meta.keywords' => 'Meta keywords (через запятую; для Яндекса; %SITE% и %TAGLINE%)',
-            'layout.show_home_hero' => 'Главная: блок «герой» (заголовок, текст, кнопки, картинка)',
-            'layout.show_home_categories' => 'Главная: блок «Категории»',
-            'layout.show_home_featured' => 'Главная: блок «Избранное»',
-            'layout.show_home_reviews' => 'Главная: блок «Отзывы»',
-            'layout.show_product_reviews' => 'Страница товара: блок отзывов об изделии',
+            'layout.show_home_hero_badge' => 'Главная, герой: строка-бейдж над заголовком',
+            'layout.show_home_hero_title' => 'Главная, герой: заголовок (H1)',
+            'layout.show_home_hero_lead' => 'Главная, герой: текст под заголовком',
+            'layout.show_home_hero_buttons' => 'Главная, герой: кнопки «Каталог» и «Связаться»',
+            'layout.show_home_hero_image' => 'Главная, герой: картинка справа',
+            'layout.show_home_categories_title' => 'Главная, категории: заголовок секции',
+            'layout.show_home_categories_sub' => 'Главная, категории: подзаголовок',
+            'layout.show_home_categories_grid' => 'Главная, категории: сетка карточек',
+            'layout.show_home_featured_title' => 'Главная, избранное: заголовок секции',
+            'layout.show_home_featured_sub' => 'Главная, избранное: подзаголовок',
+            'layout.show_home_featured_grid' => 'Главная, избранное: карточки товаров (и пустое состояние)',
+            'layout.show_home_reviews_title' => 'Главная, отзывы: заголовок секции',
+            'layout.show_home_reviews_sub' => 'Главная, отзывы: подзаголовок',
+            'layout.show_home_reviews_grid' => 'Главная, отзывы: список отзывов',
+            'layout.show_product_breadcrumbs' => 'Товар: хлебные крошки',
+            'layout.show_product_gallery_main' => 'Товар: главное фото',
+            'layout.show_product_gallery_thumbs' => 'Товар: миниатюры галереи',
+            'layout.show_product_title' => 'Товар: название',
+            'layout.show_product_price' => 'Товар: цена',
+            'layout.show_product_description' => 'Товар: описание',
+            'layout.show_product_meta' => 'Товар: блок «Техника / размер / наличие»',
+            'layout.show_product_materials' => 'Товар: список материалов',
+            'layout.show_product_order_title' => 'Товар: заголовок «Как заказать»',
+            'layout.show_product_order_steps' => 'Товар: нумерованные шаги заказа',
+            'layout.show_product_btn_order' => 'Товар: кнопка «Заказать / вопрос»',
+            'layout.show_product_btn_telegram' => 'Товар: кнопка Telegram',
+            'layout.show_product_btn_whatsapp' => 'Товар: кнопка WhatsApp',
+            'layout.show_product_reviews_title' => 'Товар: заголовок блока отзывов',
+            'layout.show_product_review_items' => 'Товар: сами отзывы',
             'header.logo_suffix' => 'Текст в логотипе после названия',
             'nav.home' => 'Меню: Главная',
             'nav.catalog' => 'Меню: Каталог',

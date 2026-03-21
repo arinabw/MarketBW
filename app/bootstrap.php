@@ -102,6 +102,22 @@ $containerBuilder->addDefinitions([
 
             return $v === '' || $v === '1' || $v === 'true' || $v === 'yes' || $v === 'on';
         }, ['needs_environment' => true]));
+        $env->addFunction(new \Twig\TwigFunction('layout_any_visible', function (\Twig\Environment $twigEnv, iterable $keys): bool {
+            $content = (array) (($twigEnv->getGlobals()['content'] ?? []));
+            $isOn = static function (string $key) use ($content): bool {
+                $c = (string) ($content[$key] ?? '1');
+                $v = strtolower(trim($c));
+
+                return $v === '' || $v === '1' || $v === 'true' || $v === 'yes' || $v === 'on';
+            };
+            foreach ($keys as $key) {
+                if ($isOn((string) $key)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }, ['needs_environment' => true]));
         $env->addFunction(new \Twig\TwigFunction('absolute_url', function (string $path, \Twig\Environment $twigEnv): string {
             $base = (string) ($twigEnv->getGlobals()['seo_absolute_base'] ?? '');
             $path = '/' . ltrim($path, '/');

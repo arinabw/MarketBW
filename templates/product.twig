@@ -21,6 +21,7 @@
 {% endblock %}
 
 {% block body %}
+{% if layout_visible('layout.show_product_breadcrumbs') %}
 <section class="section section--tight section--white">
   <div class="container">
     <nav class="breadcrumbs" aria-label="Навигация">
@@ -36,15 +37,22 @@
     </nav>
   </div>
 </section>
+{% endif %}
 
+{% set _gallery_left = layout_visible('layout.show_product_gallery_main') or (layout_visible('layout.show_product_gallery_thumbs') and product.images|length > 1) %}
+{% set _info_keys = ['layout.show_product_title', 'layout.show_product_price', 'layout.show_product_description', 'layout.show_product_meta', 'layout.show_product_materials', 'layout.show_product_order_title', 'layout.show_product_order_steps', 'layout.show_product_btn_order', 'layout.show_product_btn_telegram', 'layout.show_product_btn_whatsapp'] %}
+{% if _gallery_left or layout_any_visible(_info_keys) %}
 <section class="section section--white">
   <div class="container product-layout">
+    {% if _gallery_left %}
     <div>
+      {% if layout_visible('layout.show_product_gallery_main') %}
       <div class="gallery-main">
         {% set main = product.images[0] ?? '/images/placeholder.svg' %}
         <img id="main-img" src="{{ main }}" alt="{{ product.name }}" width="600" height="600" class="gallery-main__img">
       </div>
-      {% if product.images|length > 1 %}
+      {% endif %}
+      {% if layout_visible('layout.show_product_gallery_thumbs') and product.images|length > 1 %}
       <div class="thumbs" role="tablist">
         {% for img in product.images %}
         <button type="button" data-src="{{ img }}" class="thumb-btn {{ loop.first ? 'is-active' : '' }}" aria-label="Миниатюра {{ loop.index }}">
@@ -54,16 +62,26 @@
       </div>
       {% endif %}
     </div>
+    {% endif %}
+    {% if layout_any_visible(_info_keys) %}
     <div class="product-info">
+      {% if layout_visible('layout.show_product_title') %}
       <h1 class="product-info__title">{{ product.name }}</h1>
+      {% endif %}
+      {% if layout_visible('layout.show_product_price') %}
       <p class="product-info__price">{{ product.price|price_rub }}</p>
+      {% endif %}
+      {% if layout_visible('layout.show_product_description') %}
       <p class="muted product-info__desc">{{ product.description }}</p>
+      {% endif %}
+      {% if layout_visible('layout.show_product_meta') %}
       <dl class="product-meta">
         <div><dt>{{ t('product.meta_technique') }}</dt><dd>{{ product.technique }}</dd></div>
         {% if product.size %}<div><dt>{{ t('product.meta_size') }}</dt><dd>{{ product.size }}</dd></div>{% endif %}
         <div><dt>{{ t('product.meta_stock') }}</dt><dd>{{ product.in_stock ? t('product.meta_stock_yes') : t('product.meta_stock_no') }}</dd></div>
       </dl>
-      {% if product.materials|length %}
+      {% endif %}
+      {% if layout_visible('layout.show_product_materials') and product.materials|length %}
       <p class="product-info__label"><strong>{{ t('product.materials_label') }}</strong></p>
       <ul class="meta-list">
         {% for m in product.materials %}
@@ -72,32 +90,47 @@
       </ul>
       {% endif %}
 
+      {% if layout_visible('layout.show_product_order_title') or layout_visible('layout.show_product_order_steps') %}
       <div class="order-steps">
+        {% if layout_visible('layout.show_product_order_title') %}
         <h2 class="order-steps__title">{{ t('product.order_title') }}</h2>
+        {% endif %}
+        {% if layout_visible('layout.show_product_order_steps') %}
         <ol class="order-steps__list">
           <li>{{ t('product.order_step_1')|raw }}</li>
           <li>{{ t('product.order_step_2')|raw }}</li>
           <li>{{ t('product.order_step_3')|raw }}</li>
         </ol>
+        {% endif %}
       </div>
+      {% endif %}
 
+      {% if layout_visible('layout.show_product_btn_order') or (layout_visible('layout.show_product_btn_telegram') and social_telegram != '#') or (layout_visible('layout.show_product_btn_whatsapp') and contact_whatsapp != '') %}
       <div class="btn-row product-actions">
+        {% if layout_visible('layout.show_product_btn_order') %}
         <a class="btn btn--primary" href="/contact?product={{ product.id|url_encode }}">{{ t('product.btn_order') }}</a>
-        {% if social_telegram != '#' %}
+        {% endif %}
+        {% if layout_visible('layout.show_product_btn_telegram') and social_telegram != '#' %}
         <a class="btn btn--tg" href="{{ social_telegram }}" target="_blank" rel="noopener">Telegram</a>
         {% endif %}
-        {% if contact_whatsapp != '' %}
+        {% if layout_visible('layout.show_product_btn_whatsapp') and contact_whatsapp != '' %}
         <a class="btn btn--wa" href="{{ whatsapp_url() }}" target="_blank" rel="noopener">WhatsApp</a>
         {% endif %}
       </div>
+      {% endif %}
     </div>
+    {% endif %}
   </div>
 </section>
+{% endif %}
 
-{% if layout_visible('layout.show_product_reviews') and reviews|length %}
+{% if reviews|length and layout_any_visible(['layout.show_product_reviews_title', 'layout.show_product_review_items']) %}
 <section class="section">
   <div class="container">
+    {% if layout_visible('layout.show_product_reviews_title') %}
     <h2 class="section-title">{{ t('product.reviews_title') }}</h2>
+    {% endif %}
+    {% if layout_visible('layout.show_product_review_items') %}
     {% for r in reviews %}
     <div class="review">
       <div class="review__head">
@@ -108,6 +141,7 @@
       <p class="muted review__text">{{ r.text }}</p>
     </div>
     {% endfor %}
+    {% endif %}
   </div>
 </section>
 {% endif %}

@@ -442,7 +442,10 @@ SQL;
             }
         }
 
-        return SiteContentDefaults::applyMetaPlaceholders(array_merge($defaults, $over), (string) ($settings['site_name'] ?? ''));
+        $merged = array_merge($defaults, $over);
+        $merged = SiteContentDefaults::inheritLegacyLayoutToggles($merged, $over);
+
+        return SiteContentDefaults::applyMetaPlaceholders($merged, (string) ($settings['site_name'] ?? ''));
     }
 
     /**

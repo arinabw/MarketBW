@@ -63,7 +63,7 @@
 
 ## Контент сайта (CMS)
 
-- **Ключи** и строки по умолчанию: `app/SiteContentDefaults.php` (`defaults()`, `adminGroups()`, `imageKeys()`, `layoutBooleanKeys()` — чекбоксы видимости блоков).
+- **Ключи** и строки по умолчанию: `app/SiteContentDefaults.php` (`defaults()`, `adminGroups()`, `imageKeys()`, `layoutBooleanKeys()` — чекбоксы видимости отдельных элементов; старые ключи `layout.show_home_*` / `layout.show_product_reviews` из БД при отсутствии новых записей подмешиваются через `inheritLegacyLayoutToggles()` в `Database::getMergedSiteContent`).
 - **Хранение переопределений:** `site_content`.
 - **Шаблоны:** не хардкодить длинные тексты — `{{ t('ключ') }}`; HTML-фрагменты — `|raw` где осознанно.
 - **Админка:** `GET/POST /admin/content`, шаблон `templates/admin/content.twig`.
