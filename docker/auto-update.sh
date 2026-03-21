@@ -6,39 +6,47 @@
 # ВАЖНО: нельзя «exec deploy.sh» — процесс заменяется и снимается flock, тогда cron
 # каждую минуту пишет в тот же лог параллельно с docker build (лог перемешивается).
 #
-# Лог: MARKETBW_AUTO_UPDATE_LOG или /opt/webserver/log/marketbw-auto-update.log
-# Блокировка всего цикла (включая deploy): /tmp/marketbw-auto-update.run.lock
+# Логи:
+#   Каталог: MARKETBW_AUTO_UPDATE_LOG_DIR (по умолчанию /opt/webserver/log/marketbw-auto-update/)
+#   или dirname от MARKETBW_AUTO_UPDATE_LOG (обратная совместимость со старым путём к файлу).
+#   На каждое обновление (запуск deploy) — отдельный файл:
+#     marketbw-update-YYYYMMDD-HHMMSS-PID.log
+#   Сообщение «Пропуск» (занят lock) — дописывается в summary.log в том же каталоге.
+# Блокировка всего цикла (включая deploy): MARKETBW_AUTO_UPDATE_RUN_LOCK или
+#   /tmp/marketbw-auto-update.run.lock
 #
 # crontab:
 #   PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
 #   * * * * * /opt/webserver/sites/MarketBW/docker/auto-update.sh
 
-LOG_FILE="${MARKETBW_AUTO_UPDATE_LOG:-/opt/webserver/log/marketbw-auto-update.log}"
-LOG_DIR="$(dirname "$LOG_FILE")"
-if ! mkdir -p "$LOG_DIR" 2>/dev/null; then
-  LOG_FILE="/tmp/marketbw-auto-update.log"
+if [ -n "${MARKETBW_AUTO_UPDATE_LOG:-}" ]; then
+  LOG_DIR="$(dirname "$MARKETBW_AUTO_UPDATE_LOG")"
+else
+  LOG_DIR="${MARKETBW_AUTO_UPDATE_LOG_DIR:-/opt/webserver/log/marketbw-auto-update}"
 fi
+if ! mkdir -p "$LOG_DIR" 2>/dev/null; then
+  LOG_DIR="/tmp/marketbw-auto-update-logs"
+  mkdir -p "$LOG_DIR" 2>/dev/null || true
+fi
+
+SUMMARY_LOG="$LOG_DIR/summary.log"
 
 RUN_LOCK="${MARKETBW_AUTO_UPDATE_RUN_LOCK:-/tmp/marketbw-auto-update.run.lock}"
 
 # Единственный активный экземпляр на всё время (fetch → deploy/build).
-# Сообщение «Пропуск» пишем под коротким flock на сам лог — без смешивания с docker.
+# Сообщение «Пропуск» пишем под коротким flock на summary.log — без смешивания с docker.
 if command -v flock >/dev/null 2>&1; then
   exec 9>"$RUN_LOCK"
   if ! flock -n 9; then
     _skip_ts="$(date -Iseconds)"
-    flock -w 5 "$LOG_FILE" bash -c "echo \"[${_skip_ts}] Пропуск: уже идёт другой экземпляр (deploy/build), выход.\" >> \"\$1\"" _ "$LOG_FILE" || true
+    flock -w 5 "$SUMMARY_LOG" bash -c "echo \"[${_skip_ts}] Пропуск: уже идёт другой экземпляр (deploy/build), выход.\" >> \"\$1\"" _ "$SUMMARY_LOG" || true
     exit 0
   fi
 fi
 
-exec >>"$LOG_FILE" 2>&1
-
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin${PATH:+:$PATH}"
 [ -d /snap/bin ] && PATH="/snap/bin:$PATH"
 export PATH
-
-echo "[$(date -Iseconds)] === auto-update старт (лог: $LOG_FILE, user=$(id -un 2>/dev/null || echo unknown)) ==="
 
 set -euo pipefail
 
@@ -81,6 +89,10 @@ if [ "${BEHIND:-0}" -eq 0 ]; then
   exit 0
 fi
 
+UPDATE_LOG="$LOG_DIR/marketbw-update-$(date +%Y%m%d-%H%M%S)-$$.log"
+exec >>"$UPDATE_LOG" 2>&1
+
+log_msg "Начало обновления (отдельный лог: $UPDATE_LOG, user=$(id -un 2>/dev/null || echo unknown))"
 log_msg "На $REMOTE_REF на $BEHIND коммит(ов) впереди локального HEAD, запуск deploy.sh update…"
 # Не exec — иначе этот процесс исчезает и отпускает RUN_LOCK до завершения сборки.
 bash "$SCRIPT_DIR/deploy.sh" update
