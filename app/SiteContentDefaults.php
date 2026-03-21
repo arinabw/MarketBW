@@ -342,7 +342,7 @@ final class SiteContentDefaults
                 'audit.log_enabled',
                 'audit.log_verbose',
             ],
-        ];
+        ]);
     }
 
     public static function fieldLabel(string $key): string
