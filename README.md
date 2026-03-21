@@ -1,6 +1,6 @@
 # MarketBW (marketbw.ru)
 
-**Версия:** 3.7.0
+**Версия:** 3.7.1
 
 Сайт-визитка рукоделия (украшения из бисера). **Текущий прод-стек** — лёгкий PHP + SQLite + Twig в Docker (Nginx + PHP-FPM за Traefik). Опциональный **журнал HTTP-событий** в БД (`/admin/logs`, ключи `audit.log_*` в разделе «Контент»).
 
@@ -90,7 +90,7 @@ docker compose up -d --build
 
 ## SEO (Яндекс, Google)
 
-- В `.env` задайте **`PUBLIC_SITE_URL`** — полный адрес без завершающего слэша (например `https://marketbw.ru` или `https://example.com/shop` при установке в подкаталоге). От этого зависят **canonical**, **Open Graph**, абсолютные URL в **`/sitemap.xml`**. Если переменная пуста, базовый URL берётся из заголовков запроса (`Host`, `X-Forwarded-*`).
+- По умолчанию в **`config/settings.php`** задан **`PUBLIC_SITE_URL=https://marketbw.ru`** (canonical, Open Graph, **`/sitemap.xml`**). Для другого домена или подкаталога задайте **`PUBLIC_SITE_URL`** в `.env`. Если переменная явно пустая, база берётся из заголовков запроса.
 - Карта сайта: **`/sitemap.xml`** (главная, каталог, категории, товары, о мастере, контакты, FAQ). **`/robots.txt`** — `Allow: /`, закрыта админка, указан Sitemap.
 - Уникальные **meta description** на главной, каталоге, товаре (обрезка описания), о мастере, FAQ, контактах. Общий текст по умолчанию — ключ **`meta.description`** в разделе «Контент». На каждой странице — **JSON-LD** (WebSite, Organization; на карточке товара — **Product** + Offer).
 - В кабинетах [Яндекс.Вебмастер](https://webmaster.yandex.ru/) и [Google Search Console](https://search.google.com/search-console) добавьте сайт и URL sitemap.

@@ -33,7 +33,7 @@ return [
     'app_version' => $appVersion,
     'displayErrorDetails' => filter_var($envStr('APP_DEBUG', 'false'), FILTER_VALIDATE_BOOLEAN),
     /** Полный публичный URL сайта без завершающего слэша (https://site.ru или https://site.ru/shop). Для SEO: canonical, Open Graph, sitemap. Пусто — берётся из запроса (Host + X-Forwarded-*). */
-    'public_site_url' => $envStr('PUBLIC_SITE_URL', ''),
+    'public_site_url' => $envStr('PUBLIC_SITE_URL', 'https://marketbw.ru'),
     /** Префикс URL, если сайт не в корне домена (например `shop` для https://ex.com/shop/). Без слэшей по краям. */
     'base_path' => $envStr('BASE_PATH', ''),
     /** Необязательно: домен cookie сессии, например `.example.com` если и www, и apex ведут в одну админку. Пусто = по умолчанию PHP (только текущий хост). */

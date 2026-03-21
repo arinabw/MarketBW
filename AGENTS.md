@@ -40,7 +40,7 @@
 
 **CSRF:** `$_SESSION['csrf']`, в формах `csrf_token()`, проверка в POST админки и `/contact`.
 
-**SEO:** в `templates/base.twig` — canonical, `hreflang`, Open Graph, Twitter Card, JSON-LD; middleware в `bootstrap.php` выставляет `seo_canonical_url`, `seo_absolute_base`. Публичные маршруты `GET /robots.txt`, `GET /sitemap.xml`. На проде задать **`PUBLIC_SITE_URL`** в env (см. `docker/env.example`).
+**SEO:** в `templates/base.twig` — canonical, `hreflang`, Open Graph, Twitter Card, JSON-LD; middleware в `bootstrap.php` выставляет `seo_canonical_url`, `seo_absolute_base`. Публичные маршруты `GET /robots.txt`, `GET /sitemap.xml`. Дефолт **`PUBLIC_SITE_URL`** — `https://marketbw.ru` в `config/settings.php`; переопределение через env (см. `docker/env.example`).
 
 ---
 
