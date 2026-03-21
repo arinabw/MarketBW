@@ -26,3 +26,7 @@ Thumbs.db
 *.pem
 tmp/
 temp/
+
+# Загрузки CMS («Контент сайта») — живут в томе public/images на сервере, не в git
+public/images/site/*
+!public/images/site/.gitkeep
