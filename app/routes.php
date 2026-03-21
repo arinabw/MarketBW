@@ -11,6 +11,7 @@
 declare(strict_types=1);
 
 use App\Database;
+use App\DatabaseExcelExport;
 use App\ProductImages;
 use App\SiteContentDefaults;
 use App\SiteUpload;
@@ -700,6 +701,44 @@ return function (App $app, ContainerInterface $container): void {
             $db()->clearAuditLogs();
 
             return $response->withHeader('Location', $withBase('/admin/logs') . '?cleared=1')->withStatus(302);
+        });
+
+        $group->get('/database', function (Request $request, Response $response) use ($db, $view): Response {
+            $database = $db();
+            $dbTables = [];
+            foreach ($database->listSqliteTables() as $name) {
+                $preview = $database->tableRowsPreview($name, 20);
+                $columns = $preview !== [] ? array_keys($preview[0]) : $database->tableColumnNames($name);
+                $dbTables[] = [
+                    'name' => $name,
+                    'count' => $database->countTableRows($name),
+                    'preview_columns' => $columns,
+                    'preview_rows' => $preview,
+                ];
+            }
+
+            return $view()->render($response, 'admin/database.twig', [
+                'admin_section' => 'database',
+                'db_tables' => $dbTables,
+            ]);
+        });
+
+        $group->post('/database/export', function (Request $request, Response $response) use ($db): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $h = DatabaseExcelExport::openSpreadsheetXmlStream($db());
+            $body = stream_get_contents($h);
+            fclose($h);
+            $filename = 'marketbw-db-' . gmdate('Y-m-d-His') . '.xls';
+            $response->getBody()->write($body === false ? '' : $body);
+
+            return $response
+                ->withHeader('Content-Type', 'application/vnd.ms-excel; charset=UTF-8')
+                ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+                ->withHeader('Cache-Control', 'no-store, no-cache, must-revalidate')
+                ->withStatus(200);
         });
     })->add($adminGuard);
 };

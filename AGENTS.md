@@ -78,6 +78,7 @@
 | `/admin/faqs`, `/admin/faqs/new`, `.../edit` | FAQ |
 | `/admin/reviews`, `...` | Отзывы |
 | `/admin/logs` | Журнал HTTP-событий (таблица `audit_log`, включается ключами `audit.log_*` в CMS) |
+| `/admin/database`, `POST /admin/database/export` | Просмотр таблиц SQLite и выгрузка в Excel (SpreadsheetML `.xls`) |
 | `/admin/password` | Смена пароля |
 
 Навигация админки: `templates/admin/layout.twig`.

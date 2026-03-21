@@ -643,4 +643,102 @@ SQL;
 
         return $v === '1' || $v === 'true' || $v === 'yes' || $v === 'on';
     }
+
+    /**
+     * Имена пользовательских таблиц (без служебных sqlite_*).
+     *
+     * @return list<string>
+     */
+    public function listSqliteTables(): array
+    {
+        $st = $this->pdo->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
+        if (!$st) {
+            return [];
+        }
+        $out = [];
+        foreach ($st->fetchAll(PDO::FETCH_COLUMN) as $name) {
+            if (is_string($name) && $name !== '') {
+                $out[] = $name;
+            }
+        }
+
+        return $out;
+    }
+
+    public function countTableRows(string $table): int
+    {
+        $t = $this->assertKnownTable($table);
+        $st = $this->pdo->query('SELECT COUNT(*) FROM ' . self::quoteSqliteIdentifier($t));
+
+        return (int) ($st?->fetchColumn() ?? 0);
+    }
+
+    /**
+     * Имена колонок (в т.ч. для пустой таблицы).
+     *
+     * @return list<string>
+     */
+    public function tableColumnNames(string $table): array
+    {
+        $t = $this->assertKnownTable($table);
+        $st = $this->pdo->query('PRAGMA table_info(' . self::quoteSqliteIdentifier($t) . ')');
+        if (!$st) {
+            return [];
+        }
+        $cols = [];
+        foreach ($st->fetchAll() as $row) {
+            if (isset($row['name'])) {
+                $cols[] = (string) $row['name'];
+            }
+        }
+
+        return $cols;
+    }
+
+    /**
+     * Первые строки таблицы (для предпросмотра в админке).
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function tableRowsPreview(string $table, int $limit = 30): array
+    {
+        $t = $this->assertKnownTable($table);
+        $lim = max(1, min(100, $limit));
+        $st = $this->pdo->query(
+            'SELECT * FROM ' . self::quoteSqliteIdentifier($t) . ' LIMIT ' . $lim
+        );
+        $rows = $st ? $st->fetchAll() : [];
+
+        return $this->sanitizeRowsForDisplay($t, $rows);
+    }
+
+    private function assertKnownTable(string $name): string
+    {
+        if (!in_array($name, $this->listSqliteTables(), true)) {
+            throw new \InvalidArgumentException('Unknown table: ' . $name);
+        }
+
+        return $name;
+    }
+
+    /** @param list<array<string, mixed>> $rows */
+    private function sanitizeRowsForDisplay(string $table, array $rows): array
+    {
+        if ($table !== 'users') {
+            return $rows;
+        }
+        foreach ($rows as &$r) {
+            if (isset($r['password_hash'])) {
+                $r['password_hash'] = '***';
+            }
+        }
+        unset($r);
+
+        return $rows;
+    }
+
+    public static function quoteSqliteIdentifier(string $ident): string
+    {
+        return '"' . str_replace('"', '""', $ident) . '"';
+    }
 }
