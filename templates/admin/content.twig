@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1 style="font-family:var(--display);margin-top:0">Тексты и изображения</h1>
-<p class="muted">Здесь можно менять формулировки на всех страницах и путь к картинке на главной (или загрузить файл). Контакты и соцсети дублируют .env при первом запуске — после сохранения значения берутся отсюда.</p>
+<p class="muted">Здесь можно менять формулировки на всех страницах и путь к картинке на главной (или загрузить файл). В разделе «Видимость блоков» отметьте галочками, какие секции показывать на главной и на карточке товара. Контакты и соцсети дублируют .env при первом запуске — после сохранения значения берутся отсюда.</p>
 {% if saved %}
 <div class="alert alert--success">Сохранено.</div>
 {% endif %}
@@ -15,6 +15,17 @@
     <legend class="admin-fieldset__legend">{{ title }}</legend>
     {% for key in keys %}
     <div class="form-row">
+      {% if key in layout_boolean_keys %}
+      {% set raw = content[key]|default('1') %}
+      {% set lb_on = (raw|trim|lower in ['1', 'true', 'yes', 'on']) or (raw|trim == '') %}
+      <label class="admin-bool-label" for="c-{{ key|replace({'.':'-'}) }}" style="display:flex;align-items:flex-start;gap:0.55rem;cursor:pointer;font-weight:600">
+        <span style="flex-shrink:0;margin-top:0.15rem">
+          <input type="hidden" name="content[{{ key }}]" value="0">
+          <input type="checkbox" name="content[{{ key }}]" id="c-{{ key|replace({'.':'-'}) }}" value="1" {% if lb_on %}checked{% endif %}>
+        </span>
+        <span>{{ content_label(key) }}</span>
+      </label>
+      {% else %}
       <label for="c-{{ key|replace({'.':'-'}) }}">{{ content_label(key) }}</label>
       {% if key in image_keys %}
       <input type="text" name="content[{{ key }}]" id="c-{{ key|replace({'.':'-'}) }}" value="{{ content[key]|default('') }}" placeholder="/images/...">
@@ -28,6 +39,7 @@
       <input type="file" name="img_{{ key|replace({'.':'_'}) }}" accept=".jpg,.jpeg,.png,.gif,.webp,.svg">
       {% else %}
       <textarea name="content[{{ key }}]" id="c-{{ key|replace({'.':'-'}) }}" rows="{% if key in ['about.intro_p1','about.intro_p2','contact.form_success','meta.description','product.order_step_1','product.order_step_2','product.order_step_3'] %}4{% else %}2{% endif %}">{{ content[key]|default('') }}</textarea>
+      {% endif %}
       {% endif %}
     </div>
     {% endfor %}

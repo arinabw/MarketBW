@@ -96,6 +96,12 @@ $containerBuilder->addDefinitions([
             $qs = http_build_query($params);
             return $qs !== '' ? '/catalog?' . $qs : '/catalog';
         }));
+        $env->addFunction(new \Twig\TwigFunction('layout_visible', function (\Twig\Environment $twigEnv, string $key): bool {
+            $c = (string) (($twigEnv->getGlobals()['content'] ?? [])[$key] ?? '1');
+            $v = strtolower(trim($c));
+
+            return $v === '' || $v === '1' || $v === 'true' || $v === 'yes' || $v === 'on';
+        }, ['needs_environment' => true]));
         $env->addFunction(new \Twig\TwigFunction('absolute_url', function (string $path, \Twig\Environment $twigEnv): string {
             $base = (string) ($twigEnv->getGlobals()['seo_absolute_base'] ?? '');
             $path = '/' . ltrim($path, '/');

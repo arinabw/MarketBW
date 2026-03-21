@@ -36,6 +36,12 @@ final class SiteContentDefaults
 
             'meta.description' => '%TAGLINE% — %SITE%, украшения из бисера ручной работы.',
 
+            'layout.show_home_hero' => '1',
+            'layout.show_home_categories' => '1',
+            'layout.show_home_featured' => '1',
+            'layout.show_home_reviews' => '1',
+            'layout.show_product_reviews' => '1',
+
             'header.logo_suffix' => 'бисер',
             'nav.home' => 'Главная',
             'nav.catalog' => 'Каталог',
@@ -143,9 +149,26 @@ final class SiteContentDefaults
      *
      * @return array<string, list<string>>
      */
+    /**
+     * Ключи «вкл/выкл» для блоков (чекбоксы в админке, значения 1/0).
+     *
+     * @return list<string>
+     */
+    public static function layoutBooleanKeys(): array
+    {
+        return [
+            'layout.show_home_hero',
+            'layout.show_home_categories',
+            'layout.show_home_featured',
+            'layout.show_home_reviews',
+            'layout.show_product_reviews',
+        ];
+    }
+
     public static function adminGroups(): array
     {
         return [
+            'Видимость блоков на сайте' => self::layoutBooleanKeys(),
             'Бренд, контакты и соцсети' => [
                 'brand.master_name', 'brand.tagline', 'contact.email', 'contact.phone', 'contact.whatsapp',
                 'social.instagram', 'social.telegram', 'social.vk',
@@ -204,6 +227,11 @@ final class SiteContentDefaults
             'social.telegram' => 'Telegram URL',
             'social.vk' => 'ВКонтакте URL',
             'meta.description' => 'Meta description (подставьте %SITE% и %TAGLINE%)',
+            'layout.show_home_hero' => 'Главная: блок «герой» (заголовок, текст, кнопки, картинка)',
+            'layout.show_home_categories' => 'Главная: блок «Категории»',
+            'layout.show_home_featured' => 'Главная: блок «Избранное»',
+            'layout.show_home_reviews' => 'Главная: блок «Отзывы»',
+            'layout.show_product_reviews' => 'Страница товара: блок отзывов об изделии',
             'header.logo_suffix' => 'Текст в логотипе после названия',
             'nav.home' => 'Меню: Главная',
             'nav.catalog' => 'Меню: Каталог',

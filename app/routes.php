@@ -541,6 +541,7 @@ return function (App $app, ContainerInterface $container): void {
                 'content' => $db()->getMergedSiteContent($settings()),
                 'content_groups' => SiteContentDefaults::adminGroups(),
                 'image_keys' => SiteContentDefaults::imageKeys(),
+                'layout_boolean_keys' => SiteContentDefaults::layoutBooleanKeys(),
                 'saved' => $saved,
                 'admin_section' => 'content',
             ]);

@@ -3,6 +3,7 @@
 {% block meta_description %}{{ t('home.hero_lead')|slice(0, 120) }} — {{ site_name }}. {{ master_tagline|slice(0, 80) }}{% endblock %}
 
 {% block body %}
+{% if layout_visible('layout.show_home_hero') %}
 <section class="hero">
   <div class="container hero__grid">
     <div>
@@ -21,7 +22,9 @@
     </div>
   </div>
 </section>
+{% endif %}
 
+{% if layout_visible('layout.show_home_categories') %}
 <section class="section section--white">
   <div class="container">
     <h2 class="section-title">{{ t('home.section_categories_title') }}</h2>
@@ -42,7 +45,9 @@
     </div>
   </div>
 </section>
+{% endif %}
 
+{% if layout_visible('layout.show_home_featured') %}
 <section class="section">
   <div class="container">
     <h2 class="section-title">{{ t('home.section_featured_title') }}</h2>
@@ -67,7 +72,9 @@
     </div>
   </div>
 </section>
+{% endif %}
 
+{% if layout_visible('layout.show_home_reviews') %}
 <section class="section section--white">
   <div class="container">
     <h2 class="section-title">{{ t('home.section_reviews_title') }}</h2>
@@ -86,4 +93,5 @@
     </div>
   </div>
 </section>
+{% endif %}
 {% endblock %}

@@ -91,7 +91,7 @@
   </div>
 </section>
 
-{% if reviews|length %}
+{% if layout_visible('layout.show_product_reviews') and reviews|length %}
 <section class="section">
   <div class="container">
     <h2 class="section-title">{{ t('product.reviews_title') }}</h2>
