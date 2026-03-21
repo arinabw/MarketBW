@@ -274,15 +274,16 @@ img {
 
 .hero-art {
   display: block;
-  max-width: 28rem;
+  max-width: 18rem;
   margin-inline: auto;
   min-width: 0;
 }
 
 @media (min-width: 900px) {
   .hero-art {
-    max-width: none;
+    max-width: 20rem;
     margin-inline: 0;
+    justify-self: end;
   }
 }
 
