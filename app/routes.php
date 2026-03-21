@@ -26,6 +26,10 @@ return function (App $app, ContainerInterface $container): void {
     $view = fn () => $container->get('twig');
     $settings = fn (): array => $container->get('settings');
 
+    $app->get('/favicon.ico', function (Request $request, Response $response): Response {
+        return $response->withHeader('Location', '/favicon.svg')->withStatus(308);
+    });
+
     $app->get('/', function (Request $request, Response $response) use ($db, $view): Response {
         $database = $db();
         $featured = $database->featuredProducts(8);
