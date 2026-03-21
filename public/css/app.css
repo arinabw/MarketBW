@@ -293,7 +293,7 @@ img {
   overflow: hidden;
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
   background: #f5e8ec;
 }
 

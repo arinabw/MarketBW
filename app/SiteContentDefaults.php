@@ -210,7 +210,7 @@ final class SiteContentDefaults
             'nav.about' => 'Меню: О мастере',
             'nav.contact' => 'Меню: Контакты',
             'nav.faq' => 'Меню: FAQ',
-            'home.hero_image' => 'Главная: картинка hero (путь или загрузка)',
+            'home.hero_image' => 'Главная: картинка hero, лучше 4:3 (путь или загрузка)',
             'audit.log_enabled' => 'Журнал: включить запись всех HTTP-запросов (1 = да, 0 = нет)',
             'audit.log_verbose' => 'Журнал: подробный режим (query string, referer, имена полей POST/файлов; 1/0)',
             default => $key,
