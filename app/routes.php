@@ -26,8 +26,15 @@ return function (App $app, ContainerInterface $container): void {
     $view = fn () => $container->get('twig');
     $settings = fn (): array => $container->get('settings');
 
-    $app->get('/favicon.ico', function (Request $request, Response $response): Response {
-        return $response->withHeader('Location', '/favicon.svg')->withStatus(308);
+    $withBase = static function (string $path) use ($app): string {
+        $path = '/' . ltrim($path, '/');
+        $bp = $app->getBasePath();
+
+        return ($bp !== '' ? rtrim($bp, '/') : '') . $path;
+    };
+
+    $app->get('/favicon.ico', function (Request $request, Response $response) use ($withBase): Response {
+        return $response->withHeader('Location', $withBase('/favicon.svg'))->withStatus(308);
     });
 
     $app->get('/', function (Request $request, Response $response) use ($db, $view): Response {
@@ -96,17 +103,17 @@ return function (App $app, ContainerInterface $container): void {
         ]);
     });
 
-    $app->post('/contact', function (Request $request, Response $response): Response {
+    $app->post('/contact', function (Request $request, Response $response) use ($withBase): Response {
         $data = (array) $request->getParsedBody();
         if (!isset($data['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $data['csrf'])) {
-            return $response->withHeader('Location', '/contact?error=1')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/contact') . '?error=1')->withStatus(302);
         }
         $name = trim((string) ($data['name'] ?? ''));
         $message = trim((string) ($data['message'] ?? ''));
         if ($name === '' || $message === '') {
-            return $response->withHeader('Location', '/contact?error=1')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/contact') . '?error=1')->withStatus(302);
         }
-        return $response->withHeader('Location', '/contact?sent=1')->withStatus(302);
+        return $response->withHeader('Location', $withBase('/contact') . '?sent=1')->withStatus(302);
     });
 
     $app->get('/faq', function (Request $request, Response $response) use ($db, $view): Response {
@@ -115,40 +122,44 @@ return function (App $app, ContainerInterface $container): void {
         ]);
     });
 
-    $adminGuard = function (Request $request, $handler): Response {
+    $adminGuard = function (Request $request, $handler) use ($withBase): Response {
         $path = $request->getUri()->getPath();
-        if (str_starts_with($path, '/admin/login')) {
+        $loginPath = $withBase('/admin/login');
+        if (str_starts_with($path, $loginPath) || str_starts_with($path, '/admin/login')) {
             return $handler->handle($request);
         }
         if (empty($_SESSION['admin'])) {
-            return (new SlimResponse(302))->withHeader('Location', '/admin/login');
+            return (new SlimResponse(302))
+                ->withHeader('Location', $loginPath)
+                ->withStatus(302);
         }
         return $handler->handle($request);
     };
 
-    $app->get('/admin/login', function (Request $request, Response $response) use ($view): Response {
+    $app->get('/admin/login', function (Request $request, Response $response) use ($view, $withBase): Response {
         if (!empty($_SESSION['admin'])) {
-            return $response->withHeader('Location', '/admin')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin'))->withStatus(302);
         }
         return $view()->render($response, 'admin/login.twig', []);
     });
 
-    $app->post('/admin/login', function (Request $request, Response $response) use ($db, $view): Response {
+    $app->post('/admin/login', function (Request $request, Response $response) use ($db, $view, $withBase): Response {
         $data = (array) $request->getParsedBody();
         $user = trim((string) ($data['username'] ?? ''));
         $pass = trim((string) ($data['password'] ?? ''));
         if ($db()->authenticate($user, $pass)) {
+            session_regenerate_id(true);
             $_SESSION['admin'] = true;
             $_SESSION['admin_username'] = $user;
-            return $response->withHeader('Location', '/admin')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin'))->withStatus(302);
         }
         return $view()->render($response, 'admin/login.twig', ['error' => 'Неверный логин или пароль']);
     });
 
-    $app->post('/admin/logout', function (Request $request, Response $response): Response {
+    $app->post('/admin/logout', function (Request $request, Response $response) use ($withBase): Response {
         $_SESSION['admin'] = false;
         unset($_SESSION['admin'], $_SESSION['admin_username']);
-        return $response->withHeader('Location', '/admin/login')->withStatus(302);
+        return $response->withHeader('Location', $withBase('/admin/login'))->withStatus(302);
     })->add($adminGuard);
 
     $adminDashboard = function (Request $request, Response $response) use ($db, $view): Response {
@@ -165,7 +176,7 @@ return function (App $app, ContainerInterface $container): void {
     $app->get('/admin', $adminDashboard)->add($adminGuard);
     $app->get('/admin/', $adminDashboard)->add($adminGuard);
 
-    $app->group('/admin', function (RouteCollectorProxy $group) use ($db, $view, $settings): void {
+    $app->group('/admin', function (RouteCollectorProxy $group) use ($db, $view, $settings, $withBase): void {
         $group->get('/password', function (Request $request, Response $response) use ($view): Response {
             return $view()->render($response, 'admin/password.twig', [
                 'admin_section' => 'password',
@@ -224,7 +235,7 @@ return function (App $app, ContainerInterface $container): void {
         $group->get('/products/new', $adminProductNewGet);
         $group->get('/products/create', $adminProductNewGet);
 
-        $adminProductNewPost = function (Request $request, Response $response) use ($db, $view, $settings): Response {
+        $adminProductNewPost = function (Request $request, Response $response) use ($db, $view, $settings, $withBase): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -263,7 +274,7 @@ return function (App $app, ContainerInterface $container): void {
                 ]);
             }
             $db()->createProduct($name, $desc, $price, $cat, $paths, $materials, $size, $tech, $inStock, $featured);
-            return $response->withHeader('Location', '/admin/products')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin/products'))->withStatus(302);
         };
         $group->post('/products/new', $adminProductNewPost);
         $group->post('/products/create', $adminProductNewPost);
@@ -283,7 +294,7 @@ return function (App $app, ContainerInterface $container): void {
             ]);
         });
 
-        $group->post('/products/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view, $settings): Response {
+        $group->post('/products/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view, $settings, $withBase): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -331,16 +342,16 @@ return function (App $app, ContainerInterface $container): void {
                 $inStock,
                 $featured
             );
-            return $response->withHeader('Location', '/admin/products')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin/products'))->withStatus(302);
         });
 
-        $group->post('/products/{id}/delete', function (Request $request, Response $response, array $args) use ($db): Response {
+        $group->post('/products/{id}/delete', function (Request $request, Response $response, array $args) use ($db, $withBase): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
             }
             $db()->deleteProduct((string) $args['id']);
-            return $response->withHeader('Location', '/admin/products')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin/products'))->withStatus(302);
         });
 
         $group->get('/categories', function (Request $request, Response $response) use ($db, $view): Response {
@@ -357,7 +368,7 @@ return function (App $app, ContainerInterface $container): void {
             ]);
         });
 
-        $group->post('/categories/new', function (Request $request, Response $response) use ($db, $view, $settings): Response {
+        $group->post('/categories/new', function (Request $request, Response $response) use ($db, $view, $settings, $withBase): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -378,7 +389,7 @@ return function (App $app, ContainerInterface $container): void {
                 ]);
             }
             $db()->createCategory($name, $desc, $image);
-            return $response->withHeader('Location', '/admin/categories')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin/categories'))->withStatus(302);
         });
 
         $group->get('/categories/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view): Response {
@@ -394,7 +405,7 @@ return function (App $app, ContainerInterface $container): void {
             return $response->withStatus(404);
         });
 
-        $group->post('/categories/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view, $settings): Response {
+        $group->post('/categories/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view, $settings, $withBase): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -408,16 +419,16 @@ return function (App $app, ContainerInterface $container): void {
                 $image = $uploaded;
             }
             $db()->updateCategory($id, $name, $desc, $image !== '' ? $image : null);
-            return $response->withHeader('Location', '/admin/categories')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin/categories'))->withStatus(302);
         });
 
-        $group->post('/categories/{id}/delete', function (Request $request, Response $response, array $args) use ($db): Response {
+        $group->post('/categories/{id}/delete', function (Request $request, Response $response, array $args) use ($db, $withBase): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
             }
             $db()->deleteCategory((string) $args['id']);
-            return $response->withHeader('Location', '/admin/categories')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin/categories'))->withStatus(302);
         });
 
         $group->get('/content', function (Request $request, Response $response) use ($db, $view, $settings): Response {
@@ -433,7 +444,7 @@ return function (App $app, ContainerInterface $container): void {
             ]);
         });
 
-        $group->post('/content', function (Request $request, Response $response) use ($db, $settings): Response {
+        $group->post('/content', function (Request $request, Response $response) use ($db, $settings, $withBase): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -459,7 +470,7 @@ return function (App $app, ContainerInterface $container): void {
             }
             $db()->saveSiteContent($pairs);
 
-            return $response->withHeader('Location', '/admin/content?saved=1')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin/content') . '?saved=1')->withStatus(302);
         });
 
         $group->get('/faqs', function (Request $request, Response $response) use ($db, $view): Response {
@@ -476,7 +487,7 @@ return function (App $app, ContainerInterface $container): void {
             ]);
         });
 
-        $group->post('/faqs/new', function (Request $request, Response $response) use ($db, $view): Response {
+        $group->post('/faqs/new', function (Request $request, Response $response) use ($db, $view, $withBase): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -494,7 +505,7 @@ return function (App $app, ContainerInterface $container): void {
             }
             $db()->createFaq($q, $a, $cat !== '' ? $cat : 'general');
 
-            return $response->withHeader('Location', '/admin/faqs')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin/faqs'))->withStatus(302);
         });
 
         $group->get('/faqs/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view): Response {
@@ -509,7 +520,7 @@ return function (App $app, ContainerInterface $container): void {
             ]);
         });
 
-        $group->post('/faqs/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view): Response {
+        $group->post('/faqs/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view, $withBase): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -533,17 +544,17 @@ return function (App $app, ContainerInterface $container): void {
             }
             $db()->updateFaq($id, $q, $a, $cat !== '' ? $cat : 'general');
 
-            return $response->withHeader('Location', '/admin/faqs')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin/faqs'))->withStatus(302);
         });
 
-        $group->post('/faqs/{id}/delete', function (Request $request, Response $response, array $args) use ($db): Response {
+        $group->post('/faqs/{id}/delete', function (Request $request, Response $response, array $args) use ($db, $withBase): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
             }
             $db()->deleteFaq((string) $args['id']);
 
-            return $response->withHeader('Location', '/admin/faqs')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin/faqs'))->withStatus(302);
         });
 
         $group->get('/reviews', function (Request $request, Response $response) use ($db, $view): Response {
@@ -561,7 +572,7 @@ return function (App $app, ContainerInterface $container): void {
             ]);
         });
 
-        $group->post('/reviews/new', function (Request $request, Response $response) use ($db, $view): Response {
+        $group->post('/reviews/new', function (Request $request, Response $response) use ($db, $view, $withBase): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -583,7 +594,7 @@ return function (App $app, ContainerInterface $container): void {
             }
             $db()->createReview($author, $rating, $text, $date, $productId);
 
-            return $response->withHeader('Location', '/admin/reviews')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin/reviews'))->withStatus(302);
         });
 
         $group->get('/reviews/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view): Response {
@@ -599,7 +610,7 @@ return function (App $app, ContainerInterface $container): void {
             ]);
         });
 
-        $group->post('/reviews/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view): Response {
+        $group->post('/reviews/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view, $withBase): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
@@ -627,17 +638,17 @@ return function (App $app, ContainerInterface $container): void {
             }
             $db()->updateReview($id, $author, $rating, $text, $date, $productId);
 
-            return $response->withHeader('Location', '/admin/reviews')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin/reviews'))->withStatus(302);
         });
 
-        $group->post('/reviews/{id}/delete', function (Request $request, Response $response, array $args) use ($db): Response {
+        $group->post('/reviews/{id}/delete', function (Request $request, Response $response, array $args) use ($db, $withBase): Response {
             if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
                 $response->getBody()->write('CSRF');
                 return $response->withStatus(403);
             }
             $db()->deleteReview((string) $args['id']);
 
-            return $response->withHeader('Location', '/admin/reviews')->withStatus(302);
+            return $response->withHeader('Location', $withBase('/admin/reviews'))->withStatus(302);
         });
     })->add($adminGuard);
 };

@@ -113,12 +113,25 @@ $twig = $container->get('twig');
 $app->add(TwigMiddleware::create($app, $twig));
 
 // Не static: Slim привязывает замыкание к контейнеру; static ломает MiddlewareDispatcher.
-$app->add(function ($request, $handler) {
+$app->add(function ($request, $handler) use ($settings) {
     if (session_status() !== PHP_SESSION_ACTIVE) {
-        session_start([
+        $https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+        if (!$https && isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) {
+            $https = strtolower((string) $_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https';
+        }
+        $basePath = trim((string) ($settings['base_path'] ?? ''), '/');
+        $cookiePath = $basePath !== '' ? '/' . $basePath : '/';
+        $sessionOpts = [
             'cookie_httponly' => true,
             'cookie_samesite' => 'Lax',
-        ]);
+            'cookie_secure' => $https,
+            'cookie_path' => $cookiePath,
+        ];
+        $cookieDomain = trim((string) ($settings['session_cookie_domain'] ?? ''));
+        if ($cookieDomain !== '') {
+            $sessionOpts['cookie_domain'] = $cookieDomain;
+        }
+        session_start($sessionOpts);
     }
     if (empty($_SESSION['csrf'])) {
         $_SESSION['csrf'] = bin2hex(random_bytes(32));
