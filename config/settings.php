@@ -9,6 +9,15 @@ declare(strict_types=1);
 
 $root = dirname(__DIR__);
 
+$versionFile = $root . DIRECTORY_SEPARATOR . 'VERSION';
+$appVersion = '0.0.0';
+if (is_readable($versionFile)) {
+    $v = trim((string) file_get_contents($versionFile));
+    if ($v !== '') {
+        $appVersion = $v;
+    }
+}
+
 /** @return non-empty-string */
 $envStr = static function (string $key, string $default): string {
     $try = [getenv($key), $_SERVER[$key] ?? null, $_ENV[$key] ?? null];
@@ -21,6 +30,7 @@ $envStr = static function (string $key, string $default): string {
 };
 
 return [
+    'app_version' => $appVersion,
     'displayErrorDetails' => filter_var($envStr('APP_DEBUG', 'false'), FILTER_VALIDATE_BOOLEAN),
     /** Префикс URL, если сайт не в корне домена (например `shop` для https://ex.com/shop/). Без слэшей по краям. */
     'base_path' => $envStr('BASE_PATH', ''),

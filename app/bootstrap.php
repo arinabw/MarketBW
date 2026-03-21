@@ -37,6 +37,7 @@ $containerBuilder->addDefinitions([
         ]);
         $env = $twig->getEnvironment();
         $env->addGlobal('site_name', $settings['site_name']);
+        $env->addGlobal('app_version', $settings['app_version'] ?? '0.0.0');
         $env->addGlobal('contact_email', $settings['contact_email']);
         $env->addGlobal('contact_phone', $settings['contact_phone']);
         $env->addGlobal('social_instagram', $settings['social_instagram']);
