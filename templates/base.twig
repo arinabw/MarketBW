@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="{{ t('meta.description') }}">
   <title>{% block title %}{{ site_name }}{% endblock %}</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -17,14 +17,19 @@
     <div class="container">
       <div class="site-header__inner">
         <a class="logo" href="/">{{ site_name }} <span>·</span> {{ t('header.logo_suffix') }}</a>
-        <nav class="nav" aria-label="Основное меню">
-          <a href="/" class="{{ nav_is_active('/') ? 'is-active' : '' }}">{{ t('nav.home') }}</a>
-          <a href="/catalog" class="{{ nav_is_active('/catalog') ? 'is-active' : '' }}">{{ t('nav.catalog') }}</a>
-          <a href="/about" class="{{ nav_is_active('/about') ? 'is-active' : '' }}">{{ t('nav.about') }}</a>
-          <a href="/contact" class="{{ nav_is_active('/contact') ? 'is-active' : '' }}">{{ t('nav.contact') }}</a>
-          <a href="/faq" class="{{ nav_is_active('/faq') ? 'is-active' : '' }}">{{ t('nav.faq') }}</a>
-        </nav>
-        {% include 'partials/social-icons.twig' %}
+        {% include 'partials/main-nav.twig' with { nav_class: 'nav nav--desktop' } %}
+        <details class="header-drawer">
+          <summary class="header-drawer__toggle">
+            <span class="header-drawer__icon" aria-hidden="true"></span>
+            <span class="header-drawer__text">Меню</span>
+          </summary>
+          <div class="header-drawer__panel">
+            {% include 'partials/main-nav.twig' with { nav_class: 'nav nav--drawer' } %}
+          </div>
+        </details>
+        <div class="site-header__social">
+          {% include 'partials/social-icons.twig' %}
+        </div>
       </div>
     </div>
   </header>

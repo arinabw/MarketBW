@@ -1,0 +1,8 @@
+{# Один набор ссылок: десктопная полоса и мобильная панель (класс задаётся снаружи) #}
+<nav class="{{ nav_class }}" aria-label="Основное меню">
+  <a href="/" class="{{ nav_is_active('/') ? 'is-active' : '' }}">{{ t('nav.home') }}</a>
+  <a href="/catalog" class="{{ nav_is_active('/catalog') ? 'is-active' : '' }}">{{ t('nav.catalog') }}</a>
+  <a href="/about" class="{{ nav_is_active('/about') ? 'is-active' : '' }}">{{ t('nav.about') }}</a>
+  <a href="/contact" class="{{ nav_is_active('/contact') ? 'is-active' : '' }}">{{ t('nav.contact') }}</a>
+  <a href="/faq" class="{{ nav_is_active('/faq') ? 'is-active' : '' }}">{{ t('nav.faq') }}</a>
+</nav>
