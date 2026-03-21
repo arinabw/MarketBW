@@ -274,13 +274,15 @@ img {
 
 .hero-art {
   display: block;
+  /* Иначе в grid + justify-self:end ширина родителя → 0, рамка с width:100% не рисуется */
+  width: min(100%, 18rem);
   max-width: 18rem;
   margin-inline: auto;
-  min-width: 0;
 }
 
 @media (min-width: 900px) {
   .hero-art {
+    width: min(100%, 20rem);
     max-width: 20rem;
     margin-inline: 0;
     justify-self: end;
