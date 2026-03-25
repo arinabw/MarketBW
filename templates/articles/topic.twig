@@ -1,0 +1,51 @@
+{% extends "base.twig" %}
+
+{% block title %}{{ topic.name }} — {{ t('articles.page_title') }} — {{ site_name }}{% endblock %}
+{% block meta_description %}{{ topic.description|default('')|slice(0, 160) }}{% endblock %}
+
+{% block head_structured_extra %}
+{% if breadcrumb_json_ld is defined and breadcrumb_json_ld != '' %}
+<script type="application/ld+json">{{ breadcrumb_json_ld|raw }}</script>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<section class="page-hero">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Навигация">
+      <a href="{{ path('/') }}">Главная</a>
+      <span class="breadcrumb__sep">/</span>
+      <a href="{{ path('/articles') }}">{{ t('articles.breadcrumb') }}</a>
+      <span class="breadcrumb__sep">/</span>
+      <span aria-current="page">{{ topic.name }}</span>
+    </nav>
+    <h1>{{ topic.name }}</h1>
+    {% if topic.description %}
+    <p class="muted">{{ topic.description }}</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section section--white">
+  <div class="container" style="max-width:720px;margin:0 auto">
+    {% if articles|length > 0 %}
+    <ul class="article-list" role="list">
+      {% for a in articles %}
+      <li class="article-list__item">
+        <a class="article-list__link" href="{{ path('/articles/' ~ a.topic_slug ~ '/' ~ a.slug) }}">
+          <span class="article-list__title">{{ a.title }}</span>
+          {% if a.excerpt %}
+          <span class="article-list__excerpt muted">{{ a.excerpt }}</span>
+          {% endif %}
+          <span class="article-list__cta">{{ t('articles.read') }} →</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">{{ t('articles.topic_empty') }}</p>
+    <p><a href="{{ path('/articles') }}">← Все темы</a></p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

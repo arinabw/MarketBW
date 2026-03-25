@@ -16,7 +16,9 @@ use App\SeoHelper;
 use App\ProductImages;
 use App\SiteContentDefaults;
 use App\SiteUpload;
+use App\SlugHelper;
 use Psr\Container\ContainerInterface;
+use PDOException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -74,6 +76,17 @@ return function (App $app, ContainerInterface $container): void {
         $add('/about', 'monthly', '0.7');
         $add('/contact', 'monthly', '0.8');
         $add('/faq', 'weekly', '0.7');
+        $add('/articles', 'weekly', '0.75');
+        foreach ($db()->articleTopics() as $t) {
+            if (!isset($t['slug'])) {
+                continue;
+            }
+            $add('/articles/' . rawurlencode((string) $t['slug']), 'weekly', '0.72');
+        }
+        foreach ($db()->publishedArticleSlugsForSitemap() as $row) {
+            $path = '/articles/' . rawurlencode($row['topic_slug']) . '/' . rawurlencode($row['slug']);
+            $add($path, 'monthly', '0.68');
+        }
         foreach ($db()->categories() as $c) {
             if (!isset($c['id'])) {
                 continue;
@@ -280,6 +293,91 @@ return function (App $app, ContainerInterface $container): void {
             'breadcrumb_json_ld' => $pub !== '' ? SeoHelper::buildBreadcrumbJsonLd([
                 ['name' => 'Главная', 'url' => rtrim($pub, '/') . '/'],
                 ['name' => 'Вопросы и ответы', 'url' => rtrim($pub, '/') . $withBase('/faq')],
+            ]) : '',
+        ]);
+    });
+
+    $articleSlugOk = static function (string $s): bool {
+        return $s !== '' && preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $s) === 1;
+    };
+
+    $app->get('/articles/{topicSlug}/{articleSlug}', function (Request $request, Response $response, array $args) use (
+        $db,
+        $view,
+        $settings,
+        $app,
+        $withBase,
+        $articleSlugOk
+    ): Response {
+        $topicSlug = (string) $args['topicSlug'];
+        $articleSlug = (string) $args['articleSlug'];
+        if (!$articleSlugOk($topicSlug) || !$articleSlugOk($articleSlug)) {
+            return $view()->render($response->withStatus(404), '404.twig', []);
+        }
+        $row = $db()->publishedArticleBySlugs($topicSlug, $articleSlug);
+        if ($row === null) {
+            return $view()->render($response->withStatus(404), '404.twig', []);
+        }
+        $pub = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
+        $articleUrl = $pub !== '' ? rtrim($pub, '/') . $withBase('/articles/' . rawurlencode($topicSlug) . '/' . rawurlencode($articleSlug)) : '';
+        $excerpt = trim((string) ($row['excerpt'] ?? ''));
+        $desc = $excerpt !== '' ? $excerpt : mb_substr(trim(strip_tags((string) $row['body_html'])), 0, 160, 'UTF-8');
+        $updated = (string) ($row['updated_at'] ?? $row['created_at'] ?? '');
+        $jsonLd = $articleUrl !== '' && $updated !== ''
+            ? SeoHelper::buildBlogPostingJsonLd((string) $row['title'], $articleUrl, $updated, $desc)
+            : '';
+
+        return $view()->render($response, 'articles/article.twig', [
+            'article' => $row,
+            'article_meta_description' => $desc,
+            'article_json_ld' => $jsonLd,
+            'breadcrumb_json_ld' => $pub !== '' ? SeoHelper::buildBreadcrumbJsonLd([
+                ['name' => 'Главная', 'url' => rtrim($pub, '/') . '/'],
+                ['name' => 'Статьи', 'url' => rtrim($pub, '/') . $withBase('/articles')],
+                ['name' => (string) $row['topic_name'], 'url' => rtrim($pub, '/') . $withBase('/articles/' . rawurlencode($topicSlug))],
+                ['name' => (string) $row['title'], 'url' => $articleUrl],
+            ]) : '',
+        ]);
+    });
+
+    $app->get('/articles/{topicSlug}', function (Request $request, Response $response, array $args) use (
+        $db,
+        $view,
+        $settings,
+        $app,
+        $withBase,
+        $articleSlugOk
+    ): Response {
+        $topicSlug = (string) $args['topicSlug'];
+        if (!$articleSlugOk($topicSlug)) {
+            return $view()->render($response->withStatus(404), '404.twig', []);
+        }
+        $topic = $db()->articleTopicBySlug($topicSlug);
+        if ($topic === null) {
+            return $view()->render($response->withStatus(404), '404.twig', []);
+        }
+        $pub = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
+        $articles = $db()->publishedArticlesInTopic($topicSlug);
+
+        return $view()->render($response, 'articles/topic.twig', [
+            'topic' => $topic,
+            'articles' => $articles,
+            'breadcrumb_json_ld' => $pub !== '' ? SeoHelper::buildBreadcrumbJsonLd([
+                ['name' => 'Главная', 'url' => rtrim($pub, '/') . '/'],
+                ['name' => 'Статьи', 'url' => rtrim($pub, '/') . $withBase('/articles')],
+                ['name' => (string) $topic['name'], 'url' => rtrim($pub, '/') . $withBase('/articles/' . rawurlencode($topicSlug))],
+            ]) : '',
+        ]);
+    });
+
+    $app->get('/articles', function (Request $request, Response $response) use ($db, $view, $settings, $app, $withBase): Response {
+        $pub = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
+
+        return $view()->render($response, 'articles/index.twig', [
+            'topics' => $db()->articleTopics(),
+            'breadcrumb_json_ld' => $pub !== '' ? SeoHelper::buildBreadcrumbJsonLd([
+                ['name' => 'Главная', 'url' => rtrim($pub, '/') . '/'],
+                ['name' => 'Статьи', 'url' => rtrim($pub, '/') . $withBase('/articles')],
             ]) : '',
         ]);
     });
@@ -719,6 +817,142 @@ return function (App $app, ContainerInterface $container): void {
             $db()->deleteFaq((string) $args['id']);
 
             return $response->withHeader('Location', $withBase('/admin/faqs'))->withStatus(302);
+        });
+
+        $group->get('/articles', function (Request $request, Response $response) use ($db, $view): Response {
+            return $view()->render($response, 'admin/articles.twig', [
+                'articles' => $db()->adminArticlesWithTopics(),
+                'topics' => $db()->articleTopics(),
+                'admin_section' => 'articles',
+            ]);
+        });
+
+        $group->get('/articles/new', function (Request $request, Response $response) use ($db, $view): Response {
+            return $view()->render($response, 'admin/article_form.twig', [
+                'article' => null,
+                'topics' => $db()->articleTopics(),
+                'admin_section' => 'articles',
+            ]);
+        });
+
+        $group->post('/articles/new', function (Request $request, Response $response) use ($db, $view, $withBase): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $topicId = trim((string) ($_POST['topic_id'] ?? ''));
+            $title = trim((string) ($_POST['title'] ?? ''));
+            $slugIn = trim((string) ($_POST['slug'] ?? ''));
+            $slug = $slugIn !== '' ? SlugHelper::slugify($slugIn) : SlugHelper::slugify($title);
+            $excerpt = trim((string) ($_POST['excerpt'] ?? ''));
+            $bodyHtml = (string) ($_POST['body_html'] ?? '');
+            $published = isset($_POST['published']) && (string) $_POST['published'] === '1';
+            $sortOrder = (int) ($_POST['sort_order'] ?? 0);
+            if ($topicId === '' || $title === '') {
+                return $view()->render($response, 'admin/article_form.twig', [
+                    'error' => 'Укажите тему и заголовок',
+                    'article' => null,
+                    'topics' => $db()->articleTopics(),
+                    'form' => $_POST,
+                    'admin_section' => 'articles',
+                ]);
+            }
+            if (!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug)) {
+                return $view()->render($response, 'admin/article_form.twig', [
+                    'error' => 'Адрес (slug) — только латиница, цифры и дефис',
+                    'article' => null,
+                    'topics' => $db()->articleTopics(),
+                    'form' => $_POST,
+                    'admin_section' => 'articles',
+                ]);
+            }
+            try {
+                $db()->createArticle($topicId, $title, $slug, $excerpt, $bodyHtml, $published, $sortOrder);
+            } catch (PDOException) {
+                return $view()->render($response, 'admin/article_form.twig', [
+                    'error' => 'Не удалось сохранить: проверьте уникальность адреса (slug) в теме',
+                    'article' => null,
+                    'topics' => $db()->articleTopics(),
+                    'form' => $_POST,
+                    'admin_section' => 'articles',
+                ]);
+            }
+
+            return $response->withHeader('Location', $withBase('/admin/articles'))->withStatus(302);
+        });
+
+        $group->get('/articles/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view): Response {
+            $a = $db()->articleById((string) $args['id']);
+            if (!$a) {
+                return $response->withStatus(404);
+            }
+
+            return $view()->render($response, 'admin/article_form.twig', [
+                'article' => $a,
+                'topics' => $db()->articleTopics(),
+                'admin_section' => 'articles',
+            ]);
+        });
+
+        $group->post('/articles/{id}/edit', function (Request $request, Response $response, array $args) use ($db, $view, $withBase): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $id = (string) $args['id'];
+            $a = $db()->articleById($id);
+            if (!$a) {
+                return $response->withStatus(404);
+            }
+            $topicId = trim((string) ($_POST['topic_id'] ?? ''));
+            $title = trim((string) ($_POST['title'] ?? ''));
+            $slugIn = trim((string) ($_POST['slug'] ?? ''));
+            $slug = $slugIn !== '' ? SlugHelper::slugify($slugIn) : SlugHelper::slugify($title);
+            $excerpt = trim((string) ($_POST['excerpt'] ?? ''));
+            $bodyHtml = (string) ($_POST['body_html'] ?? '');
+            $published = isset($_POST['published']) && (string) $_POST['published'] === '1';
+            $sortOrder = (int) ($_POST['sort_order'] ?? 0);
+            if ($topicId === '' || $title === '') {
+                return $view()->render($response, 'admin/article_form.twig', [
+                    'error' => 'Укажите тему и заголовок',
+                    'article' => $a,
+                    'topics' => $db()->articleTopics(),
+                    'form' => $_POST,
+                    'admin_section' => 'articles',
+                ]);
+            }
+            if (!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug)) {
+                return $view()->render($response, 'admin/article_form.twig', [
+                    'error' => 'Адрес (slug) — только латиница, цифры и дефис',
+                    'article' => $a,
+                    'topics' => $db()->articleTopics(),
+                    'form' => $_POST,
+                    'admin_section' => 'articles',
+                ]);
+            }
+            try {
+                $db()->updateArticle($id, $topicId, $title, $slug, $excerpt, $bodyHtml, $published, $sortOrder);
+            } catch (PDOException) {
+                return $view()->render($response, 'admin/article_form.twig', [
+                    'error' => 'Не удалось сохранить: проверьте уникальность адреса в теме',
+                    'article' => $a,
+                    'topics' => $db()->articleTopics(),
+                    'form' => $_POST,
+                    'admin_section' => 'articles',
+                ]);
+            }
+
+            return $response->withHeader('Location', $withBase('/admin/articles'))->withStatus(302);
+        });
+
+        $group->post('/articles/{id}/delete', function (Request $request, Response $response, array $args) use ($db, $withBase): Response {
+            if (!isset($_POST['csrf']) || !hash_equals($_SESSION['csrf'] ?? '', (string) $_POST['csrf'])) {
+                $response->getBody()->write('CSRF');
+                return $response->withStatus(403);
+            }
+            $db()->deleteArticle((string) $args['id']);
+
+            return $response->withHeader('Location', $withBase('/admin/articles'))->withStatus(302);
         });
 
         $group->get('/reviews', function (Request $request, Response $response) use ($db, $view): Response {

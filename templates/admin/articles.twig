@@ -1,0 +1,44 @@
+{% extends "admin/layout.twig" %}
+
+{% block title %}Статьи{% endblock %}
+
+{% block content %}
+<h1 style="font-family:var(--display);margin-top:0">Статьи</h1>
+<p>
+  <a class="btn btn--primary" href="{{ path('/admin/articles/new') }}">Новая статья</a>
+  <a class="btn btn--ghost" href="{{ path('/articles') }}" target="_blank" rel="noopener">Открыть раздел на сайте</a>
+</p>
+<div class="table-wrap" style="margin-top:1rem">
+  <table>
+    <thead>
+      <tr>
+        <th>Заголовок</th>
+        <th>Тема</th>
+        <th>Адрес (slug)</th>
+        <th>Статус</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in articles %}
+      <tr>
+        <td>{{ a.title }}</td>
+        <td>{{ a.topic_name }}</td>
+        <td><code>{{ a.topic_slug }}/{{ a.slug }}</code></td>
+        <td>{% if a.published %}опубликовано{% else %}черновик{% endif %}</td>
+        <td style="white-space:nowrap">
+          <a href="{{ path('/admin/articles/' ~ a.id ~ '/edit') }}">Изменить</a>
+          <form class="inline-form" method="post" action="{{ path('/admin/articles/' ~ a.id ~ '/delete') }}" style="margin-left:0.5rem;display:inline" onsubmit="return confirm('Удалить статью?');">
+            <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn--ghost" style="padding:0.25rem 0.5rem;font-size:0.85rem">Удалить</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="muted">Нет статей — <a href="{{ path('/admin/articles/new') }}">добавить</a>. Темы заданы в базе (8 разделов).</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="muted" style="margin-top:1rem;font-size:0.9rem">Названия тем: {% for t in topics %}{{ t.name }}{% if not loop.last %}, {% endif %}{% endfor %}.</p>
+{% endblock %}

@@ -1209,3 +1209,147 @@ tr:last-child td {
     padding-right: 0.85rem;
   }
 }
+
+/* Раздел статей */
+.breadcrumb {
+  font-size: 0.88rem;
+  margin-bottom: 0.75rem;
+}
+
+.breadcrumb a {
+  color: var(--text-muted);
+}
+
+.breadcrumb__sep {
+  margin: 0 0.35rem;
+  opacity: 0.5;
+}
+
+.article-topic-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.article-topic-card {
+  margin: 0;
+}
+
+.article-topic-card__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.1rem 1.25rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  min-height: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.article-topic-card__link:hover {
+  text-decoration: none;
+  border-color: var(--primary);
+  box-shadow: 0 4px 20px rgba(189, 120, 128, 0.18);
+}
+
+.article-topic-card__name {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--text);
+}
+
+.article-topic-card__desc {
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.article-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.article-list__item {
+  border-bottom: 1px solid var(--border);
+}
+
+.article-list__item:last-child {
+  border-bottom: none;
+}
+
+.article-list__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 0;
+}
+
+.article-list__link:hover {
+  text-decoration: none;
+}
+
+.article-list__link:hover .article-list__title {
+  color: var(--primary-dark);
+}
+
+.article-list__title {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.article-list__excerpt {
+  font-size: 0.92rem;
+}
+
+.article-list__cta {
+  font-size: 0.88rem;
+  margin-top: 0.25rem;
+}
+
+.article-page__kicker {
+  font-size: 0.88rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.article-page__lead {
+  font-size: 1.05rem;
+  margin-top: 0.5rem;
+}
+
+.article-body {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.article-body h2,
+.article-body h3 {
+  font-family: var(--display);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.article-body p {
+  margin: 0 0 1rem;
+}
+
+.article-body ul,
+.article-body ol {
+  margin: 0 0 1rem 1.25rem;
+}
+
+.article-body img {
+  border-radius: var(--radius);
+}
+
+textarea.mono {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.9rem;
+}

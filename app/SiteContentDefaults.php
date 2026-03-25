@@ -73,6 +73,13 @@ final class SiteContentDefaults
             'nav.about' => 'О мастере',
             'nav.contact' => 'Контакты',
             'nav.faq' => 'FAQ',
+            'nav.articles' => 'Статьи',
+
+            'articles.page_title' => 'Статьи о бисере',
+            'articles.page_sub' => 'Материалы, техники, идеи и вдохновение для рукоделия.',
+            'articles.topic_empty' => 'В этой теме пока нет опубликованных материалов.',
+            'articles.read' => 'Читать',
+            'articles.breadcrumb' => 'Статьи',
 
             'home.badge_prefix' => '✨ ',
             'home.badge_suffix' => ' — бисерные чудеса',
@@ -293,7 +300,7 @@ final class SiteContentDefaults
             ],
             'SEO' => ['meta.description', 'meta.keywords'],
             'Шапка и меню' => [
-                'header.logo_suffix', 'nav.home', 'nav.catalog', 'nav.about', 'nav.contact', 'nav.faq',
+                'header.logo_suffix', 'nav.home', 'nav.catalog', 'nav.about', 'nav.contact', 'nav.faq', 'nav.articles',
             ],
             'Главная страница' => [
                 'home.badge_prefix', 'home.badge_suffix', 'home.hero_title', 'home.hero_title_accent', 'home.hero_lead',
@@ -319,6 +326,9 @@ final class SiteContentDefaults
                 'catalog.chip_all', 'catalog.card_open', 'catalog.empty_hint',
             ],
             'FAQ (заголовки страницы)' => ['faq.page_title', 'faq.page_sub'],
+            'Статьи (заголовки раздела)' => [
+                'articles.page_title', 'articles.page_sub', 'articles.topic_empty', 'articles.read', 'articles.breadcrumb',
+            ],
             'Карточка товара' => [
                 'product.breadcrumb_home', 'product.breadcrumb_catalog',
                 'product.meta_technique', 'product.meta_size', 'product.meta_stock', 'product.meta_stock_yes', 'product.meta_stock_no',
@@ -381,6 +391,12 @@ final class SiteContentDefaults
             'nav.about' => 'Меню: О мастере',
             'nav.contact' => 'Меню: Контакты',
             'nav.faq' => 'Меню: FAQ',
+            'nav.articles' => 'Меню: Статьи',
+            'articles.page_title' => 'Статьи: заголовок H1 на списке тем',
+            'articles.page_sub' => 'Статьи: подзаголовок под H1',
+            'articles.topic_empty' => 'Статьи: текст, если в теме нет опубликованных статей',
+            'articles.read' => 'Статьи: ссылка «Читать» на карточке',
+            'articles.breadcrumb' => 'Статьи: подпись в хлебных крошках',
             'home.hero_image' => 'Главная: картинка hero, лучше 4:3 (путь или загрузка)',
             'audit.log_enabled' => 'Журнал: включить запись всех HTTP-запросов (1 = да, 0 = нет)',
             'audit.log_verbose' => 'Журнал: подробный режим (query string, referer, имена полей POST/файлов; 1/0)',

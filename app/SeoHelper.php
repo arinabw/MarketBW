@@ -221,6 +221,27 @@ final class SeoHelper
         ]);
     }
 
+    public static function buildBlogPostingJsonLd(
+        string $headline,
+        string $url,
+        string $dateModified,
+        string $description = '',
+    ): string {
+        $data = [
+            '@context' => 'https://schema.org',
+            '@type' => 'BlogPosting',
+            'headline' => $headline,
+            'url' => $url,
+            'dateModified' => $dateModified,
+            'inLanguage' => 'ru-RU',
+        ];
+        if ($description !== '') {
+            $data['description'] = $description;
+        }
+
+        return self::encodeJsonLd($data);
+    }
+
     /**
      * @param array<string, mixed> $data
      */

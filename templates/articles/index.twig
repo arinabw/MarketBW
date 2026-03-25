@@ -1,0 +1,38 @@
+{% extends "base.twig" %}
+
+{% block title %}{{ t('articles.page_title') }} — {{ site_name }}{% endblock %}
+{% block meta_description %}{{ t('articles.page_sub')|slice(0, 160) }}{% endblock %}
+
+{% block head_structured_extra %}
+{% if breadcrumb_json_ld is defined and breadcrumb_json_ld != '' %}
+<script type="application/ld+json">{{ breadcrumb_json_ld|raw }}</script>
+{% endif %}
+{% endblock %}
+
+{% block body %}
+<section class="page-hero">
+  <div class="container">
+    <h1>{{ t('articles.page_title') }}</h1>
+    <p class="muted">{{ t('articles.page_sub') }}</p>
+  </div>
+</section>
+
+<section class="section section--white">
+  <div class="container">
+    <ul class="article-topic-grid" role="list">
+      {% for topic in topics %}
+      <li class="article-topic-card">
+        <a class="article-topic-card__link" href="{{ path('/articles/' ~ topic.slug) }}">
+          <span class="article-topic-card__name">{{ topic.name }}</span>
+          {% if topic.description %}
+          <span class="article-topic-card__desc muted">{{ topic.description }}</span>
+          {% endif %}
+        </a>
+      </li>
+      {% else %}
+      <li class="muted">{{ t('articles.topic_empty') }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endblock %}
