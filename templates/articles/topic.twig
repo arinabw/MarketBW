@@ -14,37 +14,49 @@
   <div class="container">
     <nav class="breadcrumb" aria-label="Навигация">
       <a href="{{ path('/') }}">Главная</a>
-      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__sep">&rsaquo;</span>
       <a href="{{ path('/articles') }}">{{ t('articles.breadcrumb') }}</a>
-      <span class="breadcrumb__sep">/</span>
+      <span class="breadcrumb__sep">&rsaquo;</span>
       <span aria-current="page">{{ topic.name }}</span>
     </nav>
-    <h1>{{ topic.name }}</h1>
-    {% if topic.description %}
-    <p class="muted">{{ topic.description }}</p>
-    {% endif %}
+    <div class="topic-hero">
+      {% if topic.icon %}
+      <span class="topic-hero__icon" aria-hidden="true">{{ topic.icon }}</span>
+      {% endif %}
+      <div>
+        <h1>{{ topic.name }}</h1>
+        {% if topic.description %}
+        <p class="muted">{{ topic.description }}</p>
+        {% endif %}
+      </div>
+    </div>
   </div>
 </section>
 
 <section class="section section--white">
-  <div class="container" style="max-width:720px;margin:0 auto">
+  <div class="container">
     {% if articles|length > 0 %}
-    <ul class="article-list" role="list">
+    <div class="article-card-list">
       {% for a in articles %}
-      <li class="article-list__item">
-        <a class="article-list__link" href="{{ path('/articles/' ~ a.topic_slug ~ '/' ~ a.slug) }}">
-          <span class="article-list__title">{{ a.title }}</span>
+      <a class="article-card" href="{{ path('/articles/' ~ a.topic_slug ~ '/' ~ a.slug) }}">
+        <span class="article-card__num" aria-hidden="true">{{ "%02d"|format(loop.index) }}</span>
+        <span class="article-card__body">
+          <span class="article-card__title">{{ a.title }}</span>
           {% if a.excerpt %}
-          <span class="article-list__excerpt muted">{{ a.excerpt }}</span>
+          <span class="article-card__excerpt">{{ a.excerpt }}</span>
           {% endif %}
-          <span class="article-list__cta">{{ t('articles.read') }} →</span>
-        </a>
-      </li>
+        </span>
+        <span class="article-card__arrow" aria-hidden="true">&rarr;</span>
+      </a>
       {% endfor %}
-    </ul>
+    </div>
+
+    <div class="topic-back">
+      <a href="{{ path('/articles') }}">&larr; Все темы</a>
+    </div>
     {% else %}
     <p class="muted">{{ t('articles.topic_empty') }}</p>
-    <p><a href="{{ path('/articles') }}">← Все темы</a></p>
+    <p><a href="{{ path('/articles') }}">&larr; Все темы</a></p>
     {% endif %}
   </div>
 </section>

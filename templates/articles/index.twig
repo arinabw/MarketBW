@@ -22,20 +22,31 @@
 
 <section class="section section--white">
   <div class="container">
-    <ul class="article-topic-grid" role="list">
+    {% if topics|length > 0 %}
+    <div class="topic-grid">
       {% for topic in topics %}
-      <li class="article-topic-card">
-        <a class="article-topic-card__link" href="{{ path('/articles/' ~ topic.slug) }}">
-          <span class="article-topic-card__name">{{ topic.name }}</span>
-          {% if topic.description %}
-          <span class="article-topic-card__desc muted">{{ topic.description }}</span>
-          {% endif %}
-        </a>
-      </li>
-      {% else %}
-      <li class="muted">{{ t('articles.topic_empty') }}</li>
+      <a class="topic-card" href="{{ path('/articles/' ~ topic.slug) }}">
+        {% if topic.icon %}
+        <span class="topic-card__icon" aria-hidden="true">{{ topic.icon }}</span>
+        {% endif %}
+        <span class="topic-card__name">{{ topic.name }}</span>
+        {% if topic.description %}
+        <span class="topic-card__desc">{{ topic.description }}</span>
+        {% endif %}
+        <span class="topic-card__footer">
+          <span class="topic-card__count">{{ topic.article_count }}
+            {%- if topic.article_count == 1 %} статья
+            {%- elseif topic.article_count >= 2 and topic.article_count <= 4 %} статьи
+            {%- else %} статей{% endif -%}
+          </span>
+          <span class="topic-card__arrow">&rarr;</span>
+        </span>
+      </a>
       {% endfor %}
-    </ul>
+    </div>
+    {% else %}
+    <p class="muted">{{ t('articles.topic_empty') }}</p>
+    {% endif %}
   </div>
 </section>
 {% endblock %}

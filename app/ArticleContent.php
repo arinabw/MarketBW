@@ -48,16 +48,24 @@ final class ArticleContent
     }
 
     /**
-     * @return list<array{slug: string, name: string, description: string}>
+     * @return list<array{slug: string, name: string, description: string, icon: string, article_count: int}>
      */
     public function topicList(): array
     {
         $out = [];
         foreach ($this->topics() as $slug => $t) {
+            $count = 0;
+            foreach ($t['articles'] ?? [] as $a) {
+                if (is_file($this->contentDir . '/' . $slug . '/' . $a['slug'] . '.html')) {
+                    $count++;
+                }
+            }
             $out[] = [
                 'slug' => $slug,
                 'name' => (string) $t['name'],
                 'description' => (string) ($t['description'] ?? ''),
+                'icon' => (string) ($t['icon'] ?? ''),
+                'article_count' => $count,
                 'sort' => (int) ($t['sort'] ?? 0),
             ];
         }
@@ -67,7 +75,7 @@ final class ArticleContent
     }
 
     /**
-     * @return array{slug: string, name: string, description: string}|null
+     * @return array{slug: string, name: string, description: string, icon: string}|null
      */
     public function topicBySlug(string $slug): ?array
     {
@@ -80,6 +88,7 @@ final class ArticleContent
             'slug' => $slug,
             'name' => (string) $t['name'],
             'description' => (string) ($t['description'] ?? ''),
+            'icon' => (string) ($t['icon'] ?? ''),
         ];
     }
 
