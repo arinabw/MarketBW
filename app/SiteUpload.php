@@ -1,12 +1,22 @@
 <?php
 
+// FILE: app/SiteUpload.php
+// VERSION: 3.10.0
+// START_MODULE_CONTRACT
+//   PURPOSE: Загрузка картинок CMS-контента в public/images/site/
+//   SCOPE: saveImage — валидация расширения, перемещение файла
+//   DEPENDS: M-SETTINGS (images_dir)
+//   LINKS: M-SITE-UPLOAD
+// END_MODULE_CONTRACT
+//
+// START_MODULE_MAP
+//   saveImage — обработка загрузки файла для CMS-ключа → /images/site/xxx.ext
+// END_MODULE_MAP
+
 declare(strict_types=1);
 
 namespace App;
 
-/**
- * Загрузка файлов для CMS (раздел «Контент сайта»): сохранение в `public/images/site/`.
- */
 final class SiteUpload
 {
     /**

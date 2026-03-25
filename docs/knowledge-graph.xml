@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <KnowledgeGraph>
-  <Project NAME="MarketBW" VERSION="3.9.0">
+  <Project NAME="MarketBW" VERSION="3.10.0">
     <keywords>бисер, украшения, handmade, каталог, статьи, CMS, PHP, Slim, Twig, SQLite</keywords>
     <annotation>Визитка мастера украшений из бисера: каталог, статьи, CMS-контент, админка. Slim 4 + Twig 3 + SQLite.</annotation>
 

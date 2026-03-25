@@ -1,13 +1,27 @@
 <?php
 
+// FILE: app/ArticleContent.php
+// VERSION: 3.10.0
+// START_MODULE_CONTRACT
+//   PURPOSE: Чтение статических статей из content/articles/ (PHP-конфиг + HTML-файлы, без БД)
+//   SCOPE: topics, topicList, topicBySlug, articlesInTopic, article, allPublishedSlugs
+//   DEPENDS: none (файловая система)
+//   LINKS: M-ARTICLE-CONTENT
+// END_MODULE_CONTRACT
+//
+// START_MODULE_MAP
+//   topics            — загрузка конфига _topics.php
+//   topicList         — список тем для index-страницы (sorted)
+//   topicBySlug       — одна тема по slug
+//   articlesInTopic   — статьи в теме (только если HTML существует)
+//   article           — полная статья: title + excerpt + body_html из файла
+//   allPublishedSlugs — все пары (topic_slug, slug) для sitemap
+// END_MODULE_MAP
+
 declare(strict_types=1);
 
 namespace App;
 
-/**
- * Чтение статических статей из content/articles/.
- * Без БД — вся информация в PHP-конфиге и HTML-файлах на диске.
- */
 final class ArticleContent
 {
     /** @var array<string, array<string, mixed>>|null */
@@ -101,6 +115,7 @@ final class ArticleContent
      */
     public function article(string $topicSlug, string $articleSlug): ?array
     {
+        // START_BLOCK_RESOLVE_ARTICLE
         $t = $this->topics()[$topicSlug] ?? null;
         if ($t === null) {
             return null;
@@ -115,6 +130,9 @@ final class ArticleContent
         if ($found === null) {
             return null;
         }
+        // END_BLOCK_RESOLVE_ARTICLE
+
+        // START_BLOCK_READ_HTML
         $htmlPath = $this->contentDir . '/' . $topicSlug . '/' . $found['slug'] . '.html';
         if (!is_file($htmlPath)) {
             return null;
@@ -128,6 +146,7 @@ final class ArticleContent
             'topic_name' => (string) $t['name'],
             'body_html' => (string) file_get_contents($htmlPath),
         ];
+        // END_BLOCK_READ_HTML
     }
 
     /**

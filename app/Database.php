@@ -7,11 +7,32 @@ namespace App;
 use PDO;
 use PDOException;
 
-/**
- * Доступ к SQLite: каталог, товары, отзывы, FAQ, пользователи, CMS (`site_content`).
- *
- * Схема и сиды: {@see Database::init()}, демо: {@see Seed::ifEmpty()}.
- */
+// FILE: app/Database.php
+// VERSION: 3.10.0
+// START_MODULE_CONTRACT
+//   PURPOSE: PDO SQLite: инициализация схемы, CRUD для products, categories, reviews, faqs, users, site_content, contact_messages, audit_log
+//   SCOPE: init, categories, products, productById, createProduct, updateProduct, deleteProduct, faqs, authenticate, getMergedSiteContent, saveSiteContent, contactMessages, appendAuditLog, changePassword
+//   DEPENDS: M-SETTINGS (data_dir)
+//   LINKS: M-DATABASE
+// END_MODULE_CONTRACT
+//
+// START_MODULE_MAP
+//   init                 — CREATE TABLE IF NOT EXISTS; вставка admin; вызов Seed
+//   categories           — все категории
+//   products             — товары с фильтрами
+//   productById          — один товар по ID
+//   createProduct        — INSERT INTO products
+//   updateProduct        — UPDATE products
+//   deleteProduct        — DELETE FROM products
+//   faqs / createFaq / updateFaq / deleteFaq — CRUD FAQ
+//   reviews              — все отзывы
+//   authenticate         — password_verify для логина
+//   getMergedSiteContent — слияние дефолтов + site_content
+//   saveSiteContent      — UPSERT в site_content
+//   contactMessages      — список заявок с фильтром
+//   appendAuditLog       — INSERT INTO audit_log
+//   changePassword       — UPDATE users SET password_hash
+// END_MODULE_MAP
 final class Database
 {
     private PDO $pdo;
@@ -36,6 +57,7 @@ final class Database
 
     public function init(): void
     {
+        // START_BLOCK_INIT_SCHEMA
         $schema = <<<'SQL'
 CREATE TABLE IF NOT EXISTS categories (
     id TEXT PRIMARY KEY,
@@ -121,6 +143,7 @@ CREATE INDEX IF NOT EXISTS idx_contact_messages_status ON contact_messages (stat
 
 SQL;
         $this->pdo->exec($schema);
+        // END_BLOCK_INIT_SCHEMA
 
         $row = $this->pdo->query("SELECT 1 FROM users WHERE username = 'admin'")->fetch();
         if (!$row) {
@@ -129,7 +152,9 @@ SQL;
             )->execute(['1', 'admin', password_hash('admin123', PASSWORD_DEFAULT)]);
         }
 
+        // START_BLOCK_SEED
         Seed::ifEmpty($this->pdo);
+        // END_BLOCK_SEED
     }
 
     /** @return list<array<string, mixed>> */
@@ -237,6 +262,7 @@ SQL;
 
     public function authenticate(string $username, string $password): bool
     {
+        // START_BLOCK_AUTHENTICATE
         $username = trim($username);
         $password = trim($password);
 
@@ -267,6 +293,7 @@ SQL;
         }
 
         return false;
+        // END_BLOCK_AUTHENTICATE
     }
 
     public function createCategory(string $name, ?string $description, string $image): string
@@ -435,6 +462,7 @@ SQL;
      */
     public function getMergedSiteContent(array $settings): array
     {
+        // START_BLOCK_MERGE_CONTENT
         $defaults = SiteContentDefaults::defaults($settings);
         $st = $this->pdo->query('SELECT content_key, value FROM site_content');
         $over = [];
@@ -448,6 +476,7 @@ SQL;
         $merged = SiteContentDefaults::inheritLegacyLayoutToggles($merged, $over);
 
         return SiteContentDefaults::applyMetaPlaceholders($merged, (string) ($settings['site_name'] ?? ''));
+        // END_BLOCK_MERGE_CONTENT
     }
 
     /**

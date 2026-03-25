@@ -1,9 +1,17 @@
 <?php
 
-/**
- * Конфигурация приложения из переменных окружения (и дефолты для локальной разработки).
- * Подключается в app/bootstrap.php как контейнер `settings`.
- */
+// FILE: config/settings.php
+// VERSION: 3.10.0
+// START_MODULE_CONTRACT
+//   PURPOSE: Конфигурация приложения из env-переменных и дефолтов
+//   SCOPE: site_name, contacts, social, paths, base_path, public_site_url, session, debug
+//   DEPENDS: none
+//   LINKS: M-SETTINGS
+// END_MODULE_CONTRACT
+//
+// START_MODULE_MAP
+//   return array — массив настроек приложения
+// END_MODULE_MAP
 
 declare(strict_types=1);
 

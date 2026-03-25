@@ -1,12 +1,24 @@
 <?php
 
+// FILE: app/ProductImages.php
+// VERSION: 3.10.0
+// START_MODULE_CONTRACT
+//   PURPOSE: Нормализация путей к фото товаров; конвертация data-URL в файлы на диске
+//   SCOPE: normalizeFromForm, migrateStoredDataUrls, saveDataUrlToFile
+//   DEPENDS: M-SETTINGS (images_dir), M-DATABASE (updateProduct при миграции)
+//   LINKS: M-PRODUCT-IMAGES
+// END_MODULE_CONTRACT
+//
+// START_MODULE_MAP
+//   normalizeFromForm      — разбор поля формы: пути /images/…, data-URL → файлы
+//   migrateStoredDataUrls  — миграция data-URL из БД в файлы при открытии формы
+//   saveDataUrlToFile      — base64 data-URL → файл products/xxx.ext
+// END_MODULE_MAP
+
 declare(strict_types=1);
 
 namespace App;
 
-/**
- * Изображения товаров в админке: нормализация путей, сохранение data-URL в `images/products/`.
- */
 final class ProductImages
 {
     private const MAX_BYTES = 8 * 1024 * 1024;

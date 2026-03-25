@@ -357,10 +357,10 @@
       <step-3 STATUS="done">CMS-контент, заявки, логи, экспорт БД, пароль</step-3>
     </Phase-3>
 
-    <Phase-4 NAME="GRACE-разметка" STATUS="in-progress">
+    <Phase-4 NAME="GRACE-разметка" STATUS="done">
       <description>Семантическая разметка, контракты модулей, граф знаний</description>
-      <step-1 STATUS="in-progress">Создание GRACE-артефактов (docs/*.xml)</step-1>
-      <step-2 STATUS="pending">Добавление MODULE_CONTRACT и START_BLOCK в PHP-файлы</step-2>
+      <step-1 STATUS="done">Создание GRACE-артефактов (docs/*.xml)</step-1>
+      <step-2 STATUS="done">Добавление MODULE_CONTRACT и START_BLOCK в PHP-файлы</step-2>
     </Phase-4>
   </Phases>
 

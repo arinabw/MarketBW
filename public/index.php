@@ -1,10 +1,13 @@
 <?php
 
-/**
- * Единственная точка входа HTTP. Подключает Slim-приложение: `app/bootstrap.php`.
- *
- * @package MarketBW
- */
+// FILE: public/index.php
+// VERSION: 3.10.0
+// START_MODULE_CONTRACT
+//   PURPOSE: Единственная точка входа HTTP — подключает bootstrap и запускает Slim
+//   SCOPE: require bootstrap.php → $app->run()
+//   DEPENDS: M-BOOTSTRAP
+//   LINKS: M-ENTRY
+// END_MODULE_CONTRACT
 
 declare(strict_types=1);
 

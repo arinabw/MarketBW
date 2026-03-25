@@ -1,12 +1,29 @@
 <?php
 
-/**
- * Регистрация всех маршрутов и вспомогательных функций загрузки файлов (товары, категории).
- *
- * Подключается из app/bootstrap.php. Админка: группа `/admin` с проверкой сессии.
- *
- * @package MarketBW
- */
+// FILE: app/routes.php
+// VERSION: 3.10.0
+// START_MODULE_CONTRACT
+//   PURPOSE: Все HTTP-маршруты: публичные страницы + группа /admin с guard; хелперы загрузки изображений
+//   SCOPE: GET /, /catalog, /product, /about, /contact, /faq, /articles, /sitemap.xml, /robots.txt; POST /contact; /admin/* CRUD
+//   DEPENDS: M-BOOTSTRAP, M-DATABASE, M-SEO, M-ARTICLE-CONTENT, M-PRODUCT-IMAGES, M-SITE-UPLOAD, M-CONTENT-DEFAULTS
+//   LINKS: M-ROUTES
+// END_MODULE_CONTRACT
+//
+// START_MODULE_MAP
+//   route /              — главная
+//   route /catalog       — каталог с фильтром по категории
+//   route /product/{id}  — страница товара
+//   route /about         — о мастере
+//   route /contact       — контакты + форма (GET/POST)
+//   route /faq           — FAQ
+//   route /articles      — статьи (index / topic / article)
+//   route /sitemap.xml   — XML-карта сайта
+//   route /robots.txt    — инструкции для ботов
+//   adminGuard           — middleware проверки сессии
+//   /admin/*             — CRUD: products, categories, faqs, reviews, content, messages, logs, db, password
+//   handle_image_uploads — хелпер загрузки фото товаров
+//   handle_category_upload — хелпер загрузки картинки категории
+// END_MODULE_MAP
 
 declare(strict_types=1);
 
@@ -58,6 +75,7 @@ return function (App $app, ContainerInterface $container): void {
         return $response->withHeader('Content-Type', 'text/plain; charset=UTF-8');
     });
 
+    // START_BLOCK_SITEMAP
     $app->get('/sitemap.xml', function (Request $request, Response $response) use ($app, $db, $settings, $withBase): Response {
         $base = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
         if ($base === '') {
@@ -99,6 +117,7 @@ return function (App $app, ContainerInterface $container): void {
 
         return $response->withHeader('Content-Type', 'application/xml; charset=UTF-8');
     });
+    // END_BLOCK_SITEMAP
 
     $app->get('/', function (Request $request, Response $response) use ($db, $view): Response {
         $database = $db();
@@ -375,6 +394,7 @@ return function (App $app, ContainerInterface $container): void {
         ]);
     });
 
+    // START_BLOCK_ADMIN_GUARD
     $adminGuard = function (Request $request, $handler) use ($withBase): Response {
         $path = $request->getUri()->getPath();
         $loginPath = $withBase('/admin/login');
@@ -388,6 +408,7 @@ return function (App $app, ContainerInterface $container): void {
         }
         return $handler->handle($request);
     };
+    // END_BLOCK_ADMIN_GUARD
 
     $app->get('/admin/login', function (Request $request, Response $response) use ($view, $withBase): Response {
         if (!empty($_SESSION['admin'])) {

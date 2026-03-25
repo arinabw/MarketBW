@@ -1,14 +1,27 @@
 <?php
 
+// FILE: app/Seed.php
+// VERSION: 3.10.0
+// START_MODULE_CONTRACT
+//   PURPOSE: Вставка демо-данных (категории, товары, отзывы, FAQ) при пустых таблицах
+//   SCOPE: ifEmpty() — проверка COUNT(*) и INSERT демо-записей
+//   DEPENDS: M-DATABASE (вызывается из Database::init())
+//   LINKS: M-SEED
+// END_MODULE_CONTRACT
+//
+// START_MODULE_MAP
+//   ifEmpty       — проверяет таблицы и вставляет демо-данные
+//   DEMO_CATEGORIES — 3 категории
+//   DEMO_REVIEWS    — 3 отзыва
+//   DEMO_FAQS       — 8 FAQ
+// END_MODULE_MAP
+
 declare(strict_types=1);
 
 namespace App;
 
 use PDO;
 
-/**
- * Демо-данные при первом запуске пустой БД. Вызывается из {@see Database::init()}.
- */
 final class Seed
 {
     /** @param list<array{0:string,1:string,2:string,3:string}> */

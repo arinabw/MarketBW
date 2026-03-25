@@ -1,10 +1,20 @@
 <?php
 
-/**
- * Сборка Slim 4: PHP-DI, Twig, middleware (сессия, CSRF, глобалы контента), маршруты из routes.php.
- *
- * @package MarketBW
- */
+// FILE: app/bootstrap.php
+// VERSION: 3.10.0
+// START_MODULE_CONTRACT
+//   PURPOSE: DI-контейнер, Twig, middleware (сессия, CSRF, CMS-контент), Database::init(), подключение routes.php
+//   SCOPE: создание Slim App, настройка контейнера, Twig-глобалы, CSRF, content middleware, SEO middleware
+//   DEPENDS: M-SETTINGS, M-DATABASE, M-CONTENT-DEFAULTS, M-SEO
+//   LINKS: M-BOOTSTRAP
+// END_MODULE_CONTRACT
+//
+// START_MODULE_MAP
+//   $container    — DI-контейнер с settings, Database, Twig
+//   $app          — настроенный Slim\App (возвращается для index.php)
+//   contentMiddleware — middleware: слияние CMS-ключей + Twig-глобалы
+//   csrfHelper        — генерация и проверка CSRF-токена
+// END_MODULE_MAP
 
 declare(strict_types=1);
 
@@ -27,6 +37,7 @@ if ($twigCache !== false && !is_dir($twigCache)) {
     @mkdir($twigCache, 0755, true);
 }
 
+// START_BLOCK_DI_CONTAINER
 $containerBuilder = new ContainerBuilder();
 $containerBuilder->addDefinitions([
     'settings' => $settings,
@@ -151,6 +162,7 @@ $containerBuilder->addDefinitions([
 ]);
 
 $container = $containerBuilder->build();
+// END_BLOCK_DI_CONTAINER
 
 AppFactory::setContainer($container);
 $app = AppFactory::create();
@@ -204,10 +216,13 @@ $app->addErrorMiddleware(
     true
 );
 
+// START_BLOCK_DB_INIT
 $container->get(Database::class)->init();
+// END_BLOCK_DB_INIT
 
 (require __DIR__ . '/routes.php')($app, $container);
 
+// START_BLOCK_CONTENT_MIDDLEWARE
 $app->add(function ($request, $handler) use ($container, $app) {
     $settings = $container->get('settings');
     $merged = $container->get(Database::class)->getMergedSiteContent($settings);
@@ -272,6 +287,7 @@ $app->add(function ($request, $handler) use ($container, $app) {
 
     return $handler->handle($request);
 });
+// END_BLOCK_CONTENT_MIDDLEWARE
 
 $app->add(new AuditLogMiddleware($container->get(Database::class), $settings));
 

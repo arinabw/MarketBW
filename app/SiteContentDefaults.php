@@ -1,13 +1,28 @@
 <?php
 
+// FILE: app/SiteContentDefaults.php
+// VERSION: 3.10.0
+// START_MODULE_CONTRACT
+//   PURPOSE: Ключи и дефолтные значения CMS-текстов; группы для админки; image/boolean ключи
+//   SCOPE: defaults, adminGroups, imageKeys, layoutBooleanKeys, fieldLabel, inheritLegacyLayoutToggles
+//   DEPENDS: none
+//   LINKS: M-CONTENT-DEFAULTS
+// END_MODULE_CONTRACT
+//
+// START_MODULE_MAP
+//   allKeys                    — список всех ключей
+//   defaults                   — массив key => default_value
+//   adminGroups                — группы ключей для формы в админке
+//   imageKeys                  — ключи с путями к картинкам
+//   layoutBooleanKeys          — чекбоксы видимости элементов
+//   fieldLabel                 — человекочитаемая метка по ключу
+//   inheritLegacyLayoutToggles — миграция устаревших layout-ключей
+// END_MODULE_MAP
+
 declare(strict_types=1);
 
 namespace App;
 
-/**
- * Ключи контента сайта и значения по умолчанию (до переопределения в БД).
- * Картинки — пути вида /images/...
- */
 final class SiteContentDefaults
 {
     /** @return list<string> */

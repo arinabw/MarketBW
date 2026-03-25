@@ -1,14 +1,31 @@
 <?php
 
+// FILE: app/SeoHelper.php
+// VERSION: 3.10.0
+// START_MODULE_CONTRACT
+//   PURPOSE: SEO-утилиты: canonical URL, JSON-LD (Organization, WebSite, Product, BreadcrumbList, BlogPosting)
+//   SCOPE: resolvePublicBase, buildOrganizationJsonLd, buildWebSiteJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd, buildBlogPostingJsonLd
+//   DEPENDS: M-SETTINGS (public_site_url)
+//   LINKS: M-SEO
+// END_MODULE_CONTRACT
+//
+// START_MODULE_MAP
+//   resolvePublicBase        — абсолютный origin из settings или request
+//   inferFromRequest         — fallback: вычисление origin из HTTP-заголовков
+//   thematicKnowsAbout      — список тем для schema.org
+//   buildProductJsonLd       — JSON-LD @type Product
+//   buildOrganizationJsonLd  — JSON-LD @type Organization
+//   buildWebSiteJsonLd       — JSON-LD @type WebSite
+//   buildBreadcrumbJsonLd    — JSON-LD @type BreadcrumbList
+//   buildBlogPostingJsonLd   — JSON-LD @type BlogPosting
+// END_MODULE_MAP
+
 declare(strict_types=1);
 
 namespace App;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-/**
- * Канонический origin сайта и JSON-LD для SEO (Яндекс, Google).
- */
 final class SeoHelper
 {
     /**
