@@ -40,7 +40,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ path('/css/app.css') }}">
+  <link rel="stylesheet" href="{{ path('/css/app.css') }}?v={{ app_version }}">
   {% if seo_website_json_ld != '' %}
   <script type="application/ld+json">{{ seo_website_json_ld|raw }}</script>
   {% endif %}
