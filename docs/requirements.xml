@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Requirements>
+  <ProjectInfo>
+    <name>MarketBW</name>
+    <annotation>Визитка мастера украшений из бисера: каталог товаров, раздел статей, контакты, FAQ. Админка для управления контентом.</annotation>
+    <keywords>бисер, украшения, handmade, каталог, статьи, CMS, PHP, Slim, Twig, SQLite</keywords>
+  </ProjectInfo>
+
+  <Actors>
+    <actor-Visitor ROLE="user">Посетитель сайта — просматривает каталог, статьи, FAQ, отправляет заявки.</actor-Visitor>
+    <actor-Admin ROLE="admin">Администратор — управляет товарами, категориями, контентом, отзывами, FAQ.</actor-Admin>
+    <actor-SearchEngine ROLE="system">Поисковые роботы — индексируют sitemap, robots.txt, JSON-LD разметку.</actor-SearchEngine>
+  </Actors>
+
+  <UseCases>
+    <UC-CATALOG ACTOR="Visitor" PRIORITY="high">
+      <action>Просматривает каталог товаров с фильтрацией по категориям</action>
+      <goal>Выбрать понравившееся украшение из бисера</goal>
+      <precondition>Каталог содержит хотя бы одну категорию и один товар</precondition>
+      <acceptance>Товары отображаются с фото, ценой, описанием; фильтр по категории работает</acceptance>
+      <flow>DF-CATALOG</flow>
+    </UC-CATALOG>
+
+    <UC-PRODUCT-VIEW ACTOR="Visitor" PRIORITY="high">
+      <action>Открывает страницу отдельного товара</action>
+      <goal>Увидеть подробное описание, галерею фото, материалы, отзывы</goal>
+      <precondition>Товар существует и in_stock</precondition>
+      <acceptance>Страница товара содержит JSON-LD Product, breadcrumbs, отзывы (если включены)</acceptance>
+      <flow>DF-PRODUCT</flow>
+    </UC-PRODUCT-VIEW>
+
+    <UC-ARTICLES ACTOR="Visitor" PRIORITY="high">
+      <action>Просматривает раздел статей по темам бисероплетения</action>
+      <goal>Прочитать полезные и интересные статьи о бисере</goal>
+      <precondition>HTML-файлы статей существуют в content/articles/</precondition>
+      <acceptance>Список тем → список статей в теме → полный текст статьи с SEO-разметкой</acceptance>
+      <flow>DF-ARTICLES</flow>
+    </UC-ARTICLES>
+
+    <UC-CONTACT ACTOR="Visitor" PRIORITY="high">
+      <action>Отправляет заявку через форму «Контакты»</action>
+      <goal>Связаться с мастером</goal>
+      <precondition>Форма доступна, CSRF-токен валиден</precondition>
+      <acceptance>Заявка сохранена в БД со статусом new; посетитель видит подтверждение</acceptance>
+      <flow>DF-CONTACT</flow>
+    </UC-CONTACT>
+
+    <UC-FAQ ACTOR="Visitor" PRIORITY="medium">
+      <action>Просматривает часто задаваемые вопросы</action>
+      <goal>Получить ответы на типовые вопросы</goal>
+      <precondition>В БД есть записи faqs</precondition>
+      <acceptance>Вопросы отображаются сгруппированно с breadcrumbs</acceptance>
+    </UC-FAQ>
+
+    <UC-ABOUT ACTOR="Visitor" PRIORITY="medium">
+      <action>Просматривает страницу «О мастере»</action>
+      <goal>Узнать о мастере и его работах</goal>
+      <acceptance>Страница отображает текст из CMS-ключей</acceptance>
+    </UC-ABOUT>
+
+    <UC-ADMIN-AUTH ACTOR="Admin" PRIORITY="critical">
+      <action>Входит и выходит из панели администрирования</action>
+      <goal>Получить доступ к управлению сайтом</goal>
+      <precondition>Учётная запись admin существует в таблице users</precondition>
+      <acceptance>После входа — сессия admin=true; после выхода — сессия уничтожена</acceptance>
+      <flow>DF-AUTH</flow>
+    </UC-ADMIN-AUTH>
+
+    <UC-ADMIN-PRODUCTS ACTOR="Admin" PRIORITY="high">
+      <action>Создаёт, редактирует и удаляет товары</action>
+      <goal>Управлять каталогом товаров</goal>
+      <precondition>Авторизован как admin</precondition>
+      <acceptance>CRUD товаров работает; загрузка фото сохраняет файлы в public/images/products/</acceptance>
+      <flow>DF-ADMIN-CRUD</flow>
+    </UC-ADMIN-PRODUCTS>
+
+    <UC-ADMIN-CATEGORIES ACTOR="Admin" PRIORITY="high">
+      <action>Создаёт, редактирует и удаляет категории</action>
+      <goal>Управлять структурой каталога</goal>
+      <precondition>Авторизован как admin</precondition>
+      <acceptance>CRUD категорий работает</acceptance>
+    </UC-ADMIN-CATEGORIES>
+
+    <UC-ADMIN-CONTENT ACTOR="Admin" PRIORITY="high">
+      <action>Редактирует тексты и изображения сайта через CMS</action>
+      <goal>Менять контент без правки кода</goal>
+      <precondition>Авторизован; ключи определены в SiteContentDefaults</precondition>
+      <acceptance>Изменения сохраняются в site_content и сразу видны на сайте</acceptance>
+    </UC-ADMIN-CONTENT>
+
+    <UC-ADMIN-MESSAGES ACTOR="Admin" PRIORITY="medium">
+      <action>Просматривает заявки с сайта, меняет статус, удаляет</action>
+      <goal>Обрабатывать обращения посетителей</goal>
+      <acceptance>Список заявок с фильтром по статусу; смена статуса new→done→archived</acceptance>
+    </UC-ADMIN-MESSAGES>
+
+    <UC-ADMIN-REVIEWS ACTOR="Admin" PRIORITY="medium">
+      <action>Создаёт, редактирует и удаляет отзывы</action>
+      <goal>Управлять отзывами на сайте</goal>
+      <acceptance>CRUD отзывов с привязкой к товарам</acceptance>
+    </UC-ADMIN-REVIEWS>
+
+    <UC-ADMIN-FAQS ACTOR="Admin" PRIORITY="medium">
+      <action>Создаёт, редактирует и удаляет FAQ</action>
+      <goal>Управлять разделом вопросов-ответов</goal>
+      <acceptance>CRUD FAQ работает</acceptance>
+    </UC-ADMIN-FAQS>
+
+    <UC-ADMIN-LOGS ACTOR="Admin" PRIORITY="low">
+      <action>Просматривает журнал HTTP-событий</action>
+      <goal>Отслеживать активность на сайте</goal>
+      <acceptance>Таблица audit_log отображается с пагинацией</acceptance>
+    </UC-ADMIN-LOGS>
+
+    <UC-ADMIN-DB ACTOR="Admin" PRIORITY="low">
+      <action>Просматривает таблицы БД и экспортирует в Excel</action>
+      <goal>Диагностика и выгрузка данных</goal>
+      <acceptance>Список таблиц; просмотр строк; выгрузка SpreadsheetML .xls</acceptance>
+    </UC-ADMIN-DB>
+
+    <UC-SEO ACTOR="SearchEngine" PRIORITY="high">
+      <action>Индексирует сайт по sitemap.xml и robots.txt</action>
+      <goal>Корректная индексация всех публичных страниц</goal>
+      <acceptance>sitemap.xml содержит все URL; robots.txt разрешает индексацию; JSON-LD Organization, WebSite, Product, BreadcrumbList, BlogPosting</acceptance>
+      <flow>DF-SEO</flow>
+    </UC-SEO>
+  </UseCases>
+
+  <OutOfScope>
+    <rule-1>Нет онлайн-оплаты и корзины — сайт-визитка.</rule-1>
+    <rule-2>Нет регистрации пользователей — только один admin.</rule-2>
+    <rule-3>Статьи не редактируются через админку — статические HTML-файлы.</rule-3>
+    <rule-4>Нет API для мобильных приложений.</rule-4>
+  </OutOfScope>
+
+  <Constraints>
+    <constraint-1>Один SQLite-файл как единственная база данных (data/marketbw.db).</constraint-1>
+    <constraint-2>Деплой через Docker (Nginx + PHP-FPM).</constraint-2>
+    <constraint-3>Фронтенд: только CSS без сборки (public/css/app.css), без JavaScript-фреймворков.</constraint-3>
+    <constraint-4>PUBLIC_SITE_URL по умолчанию https://marketbw.ru.</constraint-4>
+    <constraint-5>BASE_PATH поддерживает размещение в подкаталоге.</constraint-5>
+  </Constraints>
+
+  <Assumptions>
+    <assumption-1>Один админ обслуживает сайт; параллельный доступ к админке не критичен.</assumption-1>
+    <assumption-2>Контент статей обновляется редко — допустимо хранить в файлах.</assumption-2>
+    <assumption-3>Трафик невысокий — SQLite справляется с нагрузкой.</assumption-3>
+  </Assumptions>
+
+  <OpenQuestions>
+    <question-1>Нужен ли поиск по статьям (полнотекстовый)?</question-1>
+    <question-2>Нужна ли мультиязычность (EN/RU)?</question-2>
+  </OpenQuestions>
+</Requirements>

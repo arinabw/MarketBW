@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<VerificationPlan>
+  <GlobalPolicy>
+    <log-format>[Module][function][BLOCK_NAME] message</log-format>
+    <structured-logging>true</structured-logging>
+    <module-level>Быстрые проверки: php -l (синтаксис), smoke HTTP-запросы к ключевым маршрутам.</module-level>
+    <wave-level>Проверка только затронутых поверхностей: формы, CRUD-операции, CMS-ключи.</wave-level>
+    <phase-level>Полный smoke-тест через Docker: все публичные страницы + sitemap + JSON-LD валидация.</phase-level>
+    <redaction>Никогда не логировать пароли, CSRF-токены, session ID, содержимое файлов загрузки.</redaction>
+  </GlobalPolicy>
+
+  <CriticalFlows>
+    <CF-CATALOG NAME="Каталог товаров" PRIORITY="high">
+      <scenario>Посетитель открывает /catalog, фильтрует по категории, открывает товар.</scenario>
+      <success-evidence>HTTP 200 на /catalog, /catalog/{cat}, /product/{id}; JSON-LD Product в head.</success-evidence>
+      <required-markers>
+        <marker-1>[Routes][catalog][BLOCK_FETCH_PRODUCTS]</marker-1>
+        <marker-2>[Routes][product][BLOCK_FETCH_PRODUCT]</marker-2>
+        <marker-3>[SeoHelper][buildProductJsonLd][BLOCK_BUILD_JSONLD]</marker-3>
+      </required-markers>
+      <trace-order>BLOCK_FETCH_PRODUCTS → BLOCK_RENDER_CATALOG или BLOCK_FETCH_PRODUCT → BLOCK_BUILD_JSONLD → BLOCK_RENDER_PRODUCT</trace-order>
+    </CF-CATALOG>
+
+    <CF-ARTICLES NAME="Просмотр статей" PRIORITY="high">
+      <scenario>Посетитель открывает /articles, выбирает тему, открывает статью.</scenario>
+      <success-evidence>HTTP 200; body_html из файла content/articles/{topic}/{slug}.html; JSON-LD BlogPosting.</success-evidence>
+      <required-markers>
+        <marker-1>[Routes][articles-index][BLOCK_TOPIC_LIST]</marker-1>
+        <marker-2>[ArticleContent][article][BLOCK_READ_HTML]</marker-2>
+        <marker-3>[SeoHelper][buildBlogPostingJsonLd][BLOCK_BUILD_BLOGPOSTING]</marker-3>
+      </required-markers>
+    </CF-ARTICLES>
+
+    <CF-AUTH NAME="Аутентификация" PRIORITY="critical">
+      <scenario>Admin входит POST /admin/login; guard проверяет сессию на /admin/*; logout уничтожает сессию.</scenario>
+      <success-evidence>Redirect 302 после логина; $_SESSION['admin']=true; guard блокирует неавторизованных.</success-evidence>
+      <required-markers>
+        <marker-1>[Routes][login][BLOCK_AUTHENTICATE]</marker-1>
+        <marker-2>[Routes][adminGuard][BLOCK_CHECK_SESSION]</marker-2>
+      </required-markers>
+      <failure-evidence>BLOCK_AUTHENTICATE не должен пропускать неверный пароль.</failure-evidence>
+    </CF-AUTH>
+
+    <CF-CONTACT NAME="Форма контактов" PRIORITY="high">
+      <scenario>Visitor заполняет форму /contact и отправляет POST.</scenario>
+      <success-evidence>Запись в contact_messages status=new; redirect /contact?sent=1.</success-evidence>
+      <required-markers>
+        <marker-1>[Routes][contact-post][BLOCK_CSRF_CHECK]</marker-1>
+        <marker-2>[Routes][contact-post][BLOCK_SAVE_MESSAGE]</marker-2>
+      </required-markers>
+    </CF-CONTACT>
+
+    <CF-CMS NAME="CMS-контент" PRIORITY="high">
+      <scenario>Middleware на каждом запросе загружает контент из БД и подмешивает в Twig.</scenario>
+      <success-evidence>t('ключ') возвращает переопределённое значение из site_content или дефолт.</success-evidence>
+      <required-markers>
+        <marker-1>[Bootstrap][contentMiddleware][BLOCK_MERGE_CONTENT]</marker-1>
+      </required-markers>
+    </CF-CMS>
+  </CriticalFlows>
+
+  <ModuleVerification>
+    <V-M-SETTINGS MODULE="M-SETTINGS" PRIORITY="low">
+      <module-checks>
+        <check-1>php -l config/settings.php</check-1>
+      </module-checks>
+      <scenarios>
+        <scenario-1 kind="success">Настройки загружаются с дефолтами при отсутствии env.</scenario-1>
+        <scenario-2 kind="success">BASE_PATH и PUBLIC_SITE_URL переопределяются через env.</scenario-2>
+      </scenarios>
+    </V-M-SETTINGS>
+
+    <V-M-CONTENT-DEFAULTS MODULE="M-CONTENT-DEFAULTS" PRIORITY="medium">
+      <module-checks>
+        <check-1>php -l app/SiteContentDefaults.php</check-1>
+      </module-checks>
+      <scenarios>
+        <scenario-1 kind="success">defaults() возвращает непустой массив.</scenario-1>
+        <scenario-2 kind="success">adminGroups() содержит все ключи из defaults().</scenario-2>
+        <scenario-3 kind="success">imageKeys() — подмножество ключей defaults().</scenario-3>
+      </scenarios>
+    </V-M-CONTENT-DEFAULTS>
+
+    <V-M-DATABASE MODULE="M-DATABASE" PRIORITY="critical">
+      <module-checks>
+        <check-1>php -l app/Database.php</check-1>
+      </module-checks>
+      <scenarios>
+        <scenario-1 kind="success">init() создаёт все таблицы в пустом SQLite-файле.</scenario-1>
+        <scenario-2 kind="success">init() повторный вызов не ломает существующие данные (IF NOT EXISTS).</scenario-2>
+        <scenario-3 kind="success">authenticate() возвращает true для admin/admin123 на свежей БД.</scenario-3>
+        <scenario-4 kind="failure">authenticate() возвращает false для неверного пароля.</scenario-4>
+        <scenario-5 kind="success">CRUD products: create → read → update → delete.</scenario-5>
+        <scenario-6 kind="success">getMergedSiteContent() сливает дефолты и переопределения.</scenario-6>
+      </scenarios>
+      <required-log-markers>
+        <marker-1>[Database][init][BLOCK_INIT_SCHEMA]</marker-1>
+        <marker-2>[Database][init][BLOCK_SEED]</marker-2>
+      </required-log-markers>
+    </V-M-DATABASE>
+
+    <V-M-SEED MODULE="M-SEED" PRIORITY="low">
+      <module-checks>
+        <check-1>php -l app/Seed.php</check-1>
+      </module-checks>
+      <scenarios>
+        <scenario-1 kind="success">ifEmpty() вставляет демо-данные в пустые таблицы.</scenario-1>
+        <scenario-2 kind="success">ifEmpty() не дублирует данные при повторном вызове.</scenario-2>
+      </scenarios>
+    </V-M-SEED>
+
+    <V-M-ARTICLE-CONTENT MODULE="M-ARTICLE-CONTENT" PRIORITY="high">
+      <module-checks>
+        <check-1>php -l app/ArticleContent.php</check-1>
+      </module-checks>
+      <scenarios>
+        <scenario-1 kind="success">topicList() возвращает 8 тем, отсортированных по sort.</scenario-1>
+        <scenario-2 kind="success">article('materials', '1-1-kak-vybrat-biser') возвращает body_html.</scenario-2>
+        <scenario-3 kind="failure">article('nonexistent', 'x') возвращает null.</scenario-3>
+        <scenario-4 kind="success">allPublishedSlugs() возвращает 39 пар (topic_slug, slug).</scenario-4>
+      </scenarios>
+      <required-log-markers>
+        <marker-1>[ArticleContent][article][BLOCK_READ_HTML]</marker-1>
+      </required-log-markers>
+      <notes>Файлы HTML проверяются на существование is_file(); несуществующий файл → статья не показывается.</notes>
+    </V-M-ARTICLE-CONTENT>
+
+    <V-M-SEO MODULE="M-SEO" PRIORITY="high">
+      <module-checks>
+        <check-1>php -l app/SeoHelper.php</check-1>
+      </module-checks>
+      <scenarios>
+        <scenario-1 kind="success">buildProductJsonLd() генерирует валидный JSON с @type Product.</scenario-1>
+        <scenario-2 kind="success">buildBlogPostingJsonLd() генерирует JSON с @type BlogPosting.</scenario-2>
+        <scenario-3 kind="success">buildBreadcrumbJsonLd() генерирует BreadcrumbList с правильным порядком.</scenario-3>
+        <scenario-4 kind="success">resolvePublicBase() учитывает PUBLIC_SITE_URL из settings.</scenario-4>
+      </scenarios>
+    </V-M-SEO>
+
+    <V-M-PRODUCT-IMAGES MODULE="M-PRODUCT-IMAGES" PRIORITY="medium">
+      <module-checks>
+        <check-1>php -l app/ProductImages.php</check-1>
+      </module-checks>
+      <scenarios>
+        <scenario-1 kind="success">normalize() возвращает массив чистых путей.</scenario-1>
+        <scenario-2 kind="success">data-URL конвертируется в файл на диске.</scenario-2>
+      </scenarios>
+    </V-M-PRODUCT-IMAGES>
+
+    <V-M-SITE-UPLOAD MODULE="M-SITE-UPLOAD" PRIORITY="medium">
+      <module-checks>
+        <check-1>php -l app/SiteUpload.php</check-1>
+      </module-checks>
+      <scenarios>
+        <scenario-1 kind="success">Загруженный файл сохраняется в public/images/site/.</scenario-1>
+        <scenario-2 kind="failure">Невалидный MIME-тип отклоняется.</scenario-2>
+      </scenarios>
+    </V-M-SITE-UPLOAD>
+
+    <V-M-BOOTSTRAP MODULE="M-BOOTSTRAP" PRIORITY="critical">
+      <module-checks>
+        <check-1>php -l app/bootstrap.php</check-1>
+      </module-checks>
+      <scenarios>
+        <scenario-1 kind="success">Приложение запускается без ошибок; Database::init() вызван.</scenario-1>
+        <scenario-2 kind="success">Middleware выставляет Twig глобалы (content, site_name, seo_*).</scenario-2>
+        <scenario-3 kind="success">CSRF-токен генерируется в сессии.</scenario-3>
+      </scenarios>
+      <required-log-markers>
+        <marker-1>[Bootstrap][contentMiddleware][BLOCK_MERGE_CONTENT]</marker-1>
+      </required-log-markers>
+    </V-M-BOOTSTRAP>
+
+    <V-M-ROUTES MODULE="M-ROUTES" PRIORITY="critical">
+      <module-checks>
+        <check-1>php -l app/routes.php</check-1>
+      </module-checks>
+      <scenarios>
+        <scenario-1 kind="success">GET / возвращает HTTP 200.</scenario-1>
+        <scenario-2 kind="success">GET /catalog возвращает HTTP 200.</scenario-2>
+        <scenario-3 kind="success">GET /articles возвращает HTTP 200.</scenario-3>
+        <scenario-4 kind="success">GET /sitemap.xml возвращает валидный XML.</scenario-4>
+        <scenario-5 kind="success">GET /admin без сессии → redirect /admin/login.</scenario-5>
+        <scenario-6 kind="success">POST /admin/login с верным паролем → redirect /admin.</scenario-6>
+        <scenario-7 kind="failure">POST /contact без CSRF → HTTP 403.</scenario-7>
+        <scenario-8 kind="success">GET /articles/materials/1-1-kak-vybrat-biser → HTTP 200 с body_html.</scenario-8>
+      </scenarios>
+    </V-M-ROUTES>
+  </ModuleVerification>
+
+  <PhaseGates>
+    <Gate-Phase-0 NAME="Фундамент">
+      <criteria>Все таблицы создаются; демо-данные вставляются; php -l проходит.</criteria>
+      <command>php -l config/settings.php &amp;&amp; php -l app/Database.php &amp;&amp; php -l app/Seed.php</command>
+    </Gate-Phase-0>
+
+    <Gate-Phase-1 NAME="Ядро приложения">
+      <criteria>Приложение запускается в Docker; GET / → HTTP 200.</criteria>
+      <command>docker compose up -d &amp;&amp; curl -s -o /dev/null -w "%{http_code}" http://localhost/</command>
+    </Gate-Phase-1>
+
+    <Gate-Phase-2 NAME="Публичный контент">
+      <criteria>Все публичные маршруты возвращают 200; sitemap валиден; статьи читаются.</criteria>
+      <command>curl -s http://localhost/sitemap.xml | head -5</command>
+    </Gate-Phase-2>
+
+    <Gate-Phase-3 NAME="Админка">
+      <criteria>Логин работает; CRUD операции выполняются; guard блокирует неавторизованных.</criteria>
+    </Gate-Phase-3>
+  </PhaseGates>
+
+  <FailurePacketTemplate>
+    <fields>scenario, expected-evidence, observed-evidence, first-divergent-block, next-action</fields>
+  </FailurePacketTemplate>
+</VerificationPlan>

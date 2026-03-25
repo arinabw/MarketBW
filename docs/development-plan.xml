@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DevelopmentPlan>
+  <Principles>
+    <optimize-for>Минимальный стек без сборки; быстрая навигация для AI-агентов; читаемые контракты модулей.</optimize-for>
+    <avoid>Раздувание diff; дублирование логики; JavaScript-фреймворки; хранение статей в БД.</avoid>
+    <risk>SQLite блокировка при параллельной записи из нескольких процессов.</risk>
+  </Principles>
+
+  <Modules>
+    <!-- LAYER 0: Конфигурация (нет зависимостей) -->
+
+    <M-SETTINGS NAME="Settings" TYPE="UTILITY" LAYER="0" ORDER="1">
+      <contract>
+        <purpose>Конфигурация приложения из env-переменных и дефолтов</purpose>
+        <inputs>
+          <param name="env" type="$_ENV" description="Переменные окружения" />
+        </inputs>
+        <outputs>
+          <param name="settings" type="array" description="Массив настроек: site_name, contacts, social, paths, base_path, public_site_url" />
+        </outputs>
+        <errors>
+          <error code="MISSING_DIR" description="DATA_DIR или IMAGES_DIR не существует" />
+        </errors>
+      </contract>
+      <interface>
+        <export-settings PURPOSE="Возвращает массив настроек приложения" />
+      </interface>
+      <depends>none</depends>
+      <source-path>config/settings.php</source-path>
+      <verification-ref>V-M-SETTINGS</verification-ref>
+    </M-SETTINGS>
+
+    <M-CONTENT-DEFAULTS NAME="SiteContentDefaults" TYPE="UTILITY" LAYER="0" ORDER="2">
+      <contract>
+        <purpose>Ключи и дефолтные значения CMS-текстов; группы для админки; список image/boolean ключей</purpose>
+        <inputs>none</inputs>
+        <outputs>
+          <param name="defaults" type="array" description="key => default_value" />
+          <param name="adminGroups" type="array" description="Группы ключей для формы в админке" />
+          <param name="imageKeys" type="array" description="Ключи, содержащие пути к картинкам" />
+          <param name="layoutBooleanKeys" type="array" description="Чекбоксы видимости элементов" />
+        </outputs>
+      </contract>
+      <interface>
+        <fn-defaults PURPOSE="Массив key => default_value" />
+        <fn-adminGroups PURPOSE="Группы ключей для админки" />
+        <fn-imageKeys PURPOSE="Список ключей-картинок" />
+        <fn-layoutBooleanKeys PURPOSE="Список булевых layout-ключей" />
+        <fn-fieldLabel PURPOSE="Человекочитаемая метка по ключу" />
+        <fn-inheritLegacyLayoutToggles PURPOSE="Наследование устаревших ключей layout" />
+      </interface>
+      <depends>none</depends>
+      <source-path>app/SiteContentDefaults.php</source-path>
+      <verification-ref>V-M-CONTENT-DEFAULTS</verification-ref>
+    </M-CONTENT-DEFAULTS>
+
+    <!-- LAYER 1: Инфраструктура данных -->
+
+    <M-DATABASE NAME="Database" TYPE="DATA_LAYER" LAYER="1" ORDER="1">
+      <contract>
+        <purpose>PDO SQLite: инициализация схемы, CRUD для всех сущностей (products, categories, reviews, faqs, users, site_content, contact_messages, audit_log)</purpose>
+        <inputs>
+          <param name="dbPath" type="string" description="Путь к файлу SQLite" />
+        </inputs>
+        <outputs>
+          <param name="self" type="Database" description="Объект с методами доступа к данным" />
+        </outputs>
+        <errors>
+          <error code="PDO_ERROR" description="Ошибка SQLite при запросах" />
+        </errors>
+      </contract>
+      <interface>
+        <fn-init PURPOSE="CREATE TABLE IF NOT EXISTS для всех таблиц; вставка admin-пользователя; вызов Seed" />
+        <fn-categories PURPOSE="Все категории" />
+        <fn-products PURPOSE="Товары с фильтрами" />
+        <fn-productById PURPOSE="Один товар по ID" />
+        <fn-faqs PURPOSE="Все FAQ" />
+        <fn-reviews PURPOSE="Все отзывы" />
+        <fn-authenticate PURPOSE="Проверка логина/пароля" />
+        <fn-getMergedSiteContent PURPOSE="Слияние SiteContentDefaults + site_content" />
+        <fn-saveSiteContent PURPOSE="Сохранение CMS-ключей" />
+        <fn-createProduct PURPOSE="Создание товара" />
+        <fn-updateProduct PURPOSE="Обновление товара" />
+        <fn-deleteProduct PURPOSE="Удаление товара" />
+        <fn-contactMessages PURPOSE="Список заявок" />
+        <fn-appendAuditLog PURPOSE="Запись в audit_log" />
+        <fn-changePassword PURPOSE="Смена пароля админа" />
+      </interface>
+      <depends>M-SETTINGS</depends>
+      <source-path>app/Database.php</source-path>
+      <test-path>tests/DatabaseTest.php</test-path>
+      <observability>
+        <log-prefix>[Database]</log-prefix>
+        <key-blocks>BLOCK_INIT_SCHEMA, BLOCK_SEED, BLOCK_QUERY</key-blocks>
+      </observability>
+      <verification-ref>V-M-DATABASE</verification-ref>
+    </M-DATABASE>
+
+    <M-SEED NAME="Seed" TYPE="DATA_LAYER" LAYER="1" ORDER="2">
+      <contract>
+        <purpose>Вставка демо-данных (категории, товары, отзывы, FAQ) при пустых таблицах</purpose>
+      </contract>
+      <interface>
+        <fn-ifEmpty PURPOSE="Проверяет COUNT(*) и вставляет демо-данные" />
+      </interface>
+      <depends>M-DATABASE</depends>
+      <source-path>app/Seed.php</source-path>
+      <verification-ref>V-M-SEED</verification-ref>
+    </M-SEED>
+
+    <M-ARTICLE-CONTENT NAME="ArticleContent" TYPE="DATA_LAYER" LAYER="1" ORDER="3">
+      <contract>
+        <purpose>Чтение статических статей из content/articles/ (конфиг + HTML-файлы, без БД)</purpose>
+        <inputs>
+          <param name="contentDir" type="?string" description="Путь к директории content/articles (по умолчанию — относительно корня)" />
+        </inputs>
+        <outputs>
+          <param name="topics" type="array" description="Список тем с метаданными" />
+          <param name="articles" type="array" description="Список статей в теме" />
+          <param name="article" type="array|null" description="Полная статья (slug, title, excerpt, body_html)" />
+        </outputs>
+      </contract>
+      <interface>
+        <fn-topics PURPOSE="Загрузка конфига _topics.php" />
+        <fn-topicList PURPOSE="Список тем для index-страницы" />
+        <fn-topicBySlug PURPOSE="Одна тема по slug" />
+        <fn-articlesInTopic PURPOSE="Статьи в теме (только если HTML-файл существует)" />
+        <fn-article PURPOSE="Полная статья: метаданные + body_html из файла" />
+        <fn-allPublishedSlugs PURPOSE="Все slug для sitemap" />
+      </interface>
+      <depends>none</depends>
+      <source-path>app/ArticleContent.php</source-path>
+      <data-path>content/articles/_topics.php</data-path>
+      <verification-ref>V-M-ARTICLE-CONTENT</verification-ref>
+    </M-ARTICLE-CONTENT>
+
+    <!-- LAYER 1: Утилиты -->
+
+    <M-SEO NAME="SeoHelper" TYPE="UTILITY" LAYER="1" ORDER="4">
+      <contract>
+        <purpose>SEO-утилиты: absolute URL, JSON-LD (Organization, WebSite, Product, BreadcrumbList, BlogPosting)</purpose>
+      </contract>
+      <interface>
+        <fn-resolvePublicBase PURPOSE="Вычисляет абсолютный origin сайта из settings/env" />
+        <fn-buildOrganizationJsonLd PURPOSE="JSON-LD Organization" />
+        <fn-buildWebSiteJsonLd PURPOSE="JSON-LD WebSite" />
+        <fn-buildProductJsonLd PURPOSE="JSON-LD Product" />
+        <fn-buildBreadcrumbJsonLd PURPOSE="JSON-LD BreadcrumbList" />
+        <fn-buildBlogPostingJsonLd PURPOSE="JSON-LD BlogPosting для статей" />
+      </interface>
+      <depends>M-SETTINGS</depends>
+      <source-path>app/SeoHelper.php</source-path>
+      <verification-ref>V-M-SEO</verification-ref>
+    </M-SEO>
+
+    <M-PRODUCT-IMAGES NAME="ProductImages" TYPE="UTILITY" LAYER="1" ORDER="5">
+      <contract>
+        <purpose>Нормализация путей к фото товаров; конвертация data-URL в файлы</purpose>
+      </contract>
+      <interface>
+        <fn-normalize PURPOSE="Нормализация массива путей к изображениям" />
+        <fn-saveDataUrl PURPOSE="Сохранение base64 data-URL как файла" />
+      </interface>
+      <depends>M-SETTINGS</depends>
+      <source-path>app/ProductImages.php</source-path>
+      <verification-ref>V-M-PRODUCT-IMAGES</verification-ref>
+    </M-PRODUCT-IMAGES>
+
+    <M-SITE-UPLOAD NAME="SiteUpload" TYPE="UTILITY" LAYER="1" ORDER="6">
+      <contract>
+        <purpose>Загрузка картинок CMS-контента в public/images/site/</purpose>
+      </contract>
+      <interface>
+        <fn-handleUpload PURPOSE="Обработка загрузки файла для CMS-ключа" />
+      </interface>
+      <depends>M-SETTINGS</depends>
+      <source-path>app/SiteUpload.php</source-path>
+      <verification-ref>V-M-SITE-UPLOAD</verification-ref>
+    </M-SITE-UPLOAD>
+
+    <!-- LAYER 2: Оркестрация -->
+
+    <M-BOOTSTRAP NAME="Bootstrap" TYPE="ENTRY_POINT" LAYER="2" ORDER="1">
+      <contract>
+        <purpose>Инициализация DI-контейнера, Twig, middleware (сессия, CSRF, контент из БД), Database::init(), подключение routes.php</purpose>
+      </contract>
+      <interface>
+        <fn-createApp PURPOSE="Создание Slim App с DI, Twig, middleware" />
+        <export-app PURPOSE="Настроенный экземпляр Slim\App" />
+      </interface>
+      <depends>M-SETTINGS, M-DATABASE, M-CONTENT-DEFAULTS, M-SEO</depends>
+      <source-path>app/bootstrap.php</source-path>
+      <verification-ref>V-M-BOOTSTRAP</verification-ref>
+    </M-BOOTSTRAP>
+
+    <M-ROUTES NAME="Routes" TYPE="ENTRY_POINT" LAYER="2" ORDER="2">
+      <contract>
+        <purpose>Все HTTP-маршруты: публичные страницы + группа /admin с guard; хелперы загрузки изображений</purpose>
+      </contract>
+      <interface>
+        <route-home PURPOSE="GET / — главная страница" />
+        <route-catalog PURPOSE="GET /catalog, /catalog/{cat} — каталог" />
+        <route-product PURPOSE="GET /product/{id} — страница товара" />
+        <route-about PURPOSE="GET /about — о мастере" />
+        <route-contact PURPOSE="GET|POST /contact — контакты и форма" />
+        <route-faq PURPOSE="GET /faq — FAQ" />
+        <route-articles PURPOSE="GET /articles, /articles/{topicSlug}, /articles/{topicSlug}/{articleSlug}" />
+        <route-sitemap PURPOSE="GET /sitemap.xml" />
+        <route-robots PURPOSE="GET /robots.txt" />
+        <route-admin PURPOSE="Группа /admin/* — CRUD товары, категории, FAQ, отзывы, контент, заявки, логи, БД, пароль" />
+      </interface>
+      <depends>M-BOOTSTRAP, M-DATABASE, M-SEO, M-ARTICLE-CONTENT, M-PRODUCT-IMAGES, M-SITE-UPLOAD, M-CONTENT-DEFAULTS</depends>
+      <source-path>app/routes.php</source-path>
+      <verification-ref>V-M-ROUTES</verification-ref>
+    </M-ROUTES>
+
+    <M-ENTRY NAME="IndexPhp" TYPE="ENTRY_POINT" LAYER="3" ORDER="1">
+      <contract>
+        <purpose>Единственная точка входа HTTP: подключает bootstrap.php и вызывает $app->run()</purpose>
+      </contract>
+      <depends>M-BOOTSTRAP</depends>
+      <source-path>public/index.php</source-path>
+    </M-ENTRY>
+
+    <!-- UI: Шаблоны -->
+
+    <M-TWIG-BASE NAME="BaseTemplate" TYPE="UI_COMPONENT" LAYER="2" ORDER="3">
+      <contract>
+        <purpose>Базовый HTML-шаблон: head (SEO, OG, JSON-LD), header, nav, footer, блоки для расширения</purpose>
+      </contract>
+      <depends>M-CONTENT-DEFAULTS, M-SEO</depends>
+      <source-path>templates/base.twig</source-path>
+    </M-TWIG-BASE>
+
+    <M-TWIG-ADMIN NAME="AdminLayout" TYPE="UI_COMPONENT" LAYER="2" ORDER="4">
+      <contract>
+        <purpose>Layout админки: боковая навигация, обёртка контента, кнопка «Выйти»</purpose>
+      </contract>
+      <depends>M-TWIG-BASE</depends>
+      <source-path>templates/admin/layout.twig</source-path>
+    </M-TWIG-ADMIN>
+
+    <M-TWIG-ARTICLES NAME="ArticleTemplates" TYPE="UI_COMPONENT" LAYER="2" ORDER="5">
+      <contract>
+        <purpose>Шаблоны раздела статей: index (темы), topic (список статей), article (полный текст)</purpose>
+      </contract>
+      <depends>M-TWIG-BASE, M-ARTICLE-CONTENT</depends>
+      <source-path>templates/articles/index.twig, templates/articles/topic.twig, templates/articles/article.twig</source-path>
+    </M-TWIG-ARTICLES>
+
+    <M-CSS NAME="Styles" TYPE="UI_COMPONENT" LAYER="0" ORDER="1">
+      <contract>
+        <purpose>Все стили сайта: CSS без сборки, адаптивный дизайн</purpose>
+      </contract>
+      <depends>none</depends>
+      <source-path>public/css/app.css</source-path>
+    </M-CSS>
+  </Modules>
+
+  <DataFlows>
+    <DF-CATALOG NAME="Просмотр каталога">
+      <step-1>Visitor → GET /catalog → M-ROUTES</step-1>
+      <step-2>M-ROUTES → M-DATABASE.categories() + M-DATABASE.products()</step-2>
+      <step-3>M-DATABASE → SQLite SELECT</step-3>
+      <step-4>M-ROUTES → Twig render catalog.twig</step-4>
+      <verification>HTTP 200; товары отображаются; категории кликабельны</verification>
+    </DF-CATALOG>
+
+    <DF-PRODUCT NAME="Страница товара">
+      <step-1>Visitor → GET /product/{id} → M-ROUTES</step-1>
+      <step-2>M-ROUTES → M-DATABASE.productById(id)</step-2>
+      <step-3>M-ROUTES → M-SEO.buildProductJsonLd() + buildBreadcrumbJsonLd()</step-3>
+      <step-4>M-ROUTES → Twig render product.twig</step-4>
+      <verification>HTTP 200; JSON-LD Product в head; фото галерея; breadcrumbs</verification>
+    </DF-PRODUCT>
+
+    <DF-ARTICLES NAME="Просмотр статей">
+      <step-1>Visitor → GET /articles → M-ROUTES</step-1>
+      <step-2>M-ROUTES → M-ARTICLE-CONTENT.topicList()</step-2>
+      <step-3>Visitor → GET /articles/{topicSlug}/{articleSlug}</step-3>
+      <step-4>M-ROUTES → M-ARTICLE-CONTENT.article(topicSlug, articleSlug)</step-4>
+      <step-5>M-ROUTES → M-SEO.buildBlogPostingJsonLd()</step-5>
+      <step-6>M-ROUTES → Twig render articles/article.twig</step-6>
+      <verification>HTTP 200; body_html из файла; JSON-LD BlogPosting; breadcrumbs</verification>
+    </DF-ARTICLES>
+
+    <DF-CONTACT NAME="Отправка заявки">
+      <step-1>Visitor → POST /contact (name, email, message, csrf)</step-1>
+      <step-2>M-ROUTES → CSRF check → validate fields</step-2>
+      <step-3>M-ROUTES → M-DATABASE.createContactMessage()</step-3>
+      <step-4>Redirect → GET /contact?sent=1</step-4>
+      <verification>Запись в contact_messages со status=new; redirect 302</verification>
+    </DF-CONTACT>
+
+    <DF-AUTH NAME="Аутентификация админа">
+      <step-1>Admin → POST /admin/login (username, password)</step-1>
+      <step-2>M-ROUTES → M-DATABASE.authenticate()</step-2>
+      <step-3>session_regenerate_id(); $_SESSION['admin'] = true</step-3>
+      <step-4>Redirect → /admin</step-4>
+      <verification>Сессия admin=true; redirect 302; guard пропускает к /admin/*</verification>
+    </DF-AUTH>
+
+    <DF-ADMIN-CRUD NAME="CRUD операции в админке">
+      <step-1>Admin → POST /admin/{entity}/new или /admin/{entity}/{id}/edit</step-1>
+      <step-2>CSRF check → validate fields</step-2>
+      <step-3>M-DATABASE.create*() или M-DATABASE.update*()</step-3>
+      <step-4>Redirect → /admin/{entity}</step-4>
+      <verification>Запись в БД; redirect 302; данные видны в списке</verification>
+    </DF-ADMIN-CRUD>
+
+    <DF-SEO NAME="Индексация поисковиками">
+      <step-1>SearchEngine → GET /robots.txt</step-1>
+      <step-2>SearchEngine → GET /sitemap.xml</step-2>
+      <step-3>M-ROUTES → M-DATABASE (products, categories) + M-ARTICLE-CONTENT.allPublishedSlugs()</step-3>
+      <step-4>XML sitemap со всеми публичными URL</step-4>
+      <verification>Валидный XML sitemap; robots.txt ссылается на sitemap; canonical URLs корректны</verification>
+    </DF-SEO>
+
+    <DF-CMS NAME="CMS-контент на каждом запросе">
+      <step-1>Любой HTTP-запрос → M-BOOTSTRAP middleware</step-1>
+      <step-2>M-DATABASE.getMergedSiteContent()</step-2>
+      <step-3>Слияние SiteContentDefaults + site_content → Twig глобал content</step-3>
+      <step-4>Шаблоны используют t('ключ') для текстов</step-4>
+      <verification>Переопределённые ключи из БД отображаются; дефолтные ключи работают</verification>
+    </DF-CMS>
+  </DataFlows>
+
+  <Phases>
+    <Phase-0 NAME="Фундамент" STATUS="implemented">
+      <description>Конфигурация, БД, сидирование, базовый Twig</description>
+      <step-1 STATUS="done">M-SETTINGS — конфигурация</step-1>
+      <step-2 STATUS="done">M-DATABASE — схема и CRUD</step-2>
+      <step-3 STATUS="done">M-SEED — демо-данные</step-3>
+      <step-4 STATUS="done">M-CONTENT-DEFAULTS — CMS-ключи</step-4>
+    </Phase-0>
+
+    <Phase-1 NAME="Ядро приложения" STATUS="implemented">
+      <description>Bootstrap, маршрутизация, шаблоны</description>
+      <step-1 STATUS="done">M-BOOTSTRAP — DI, middleware, Twig</step-1>
+      <step-2 STATUS="done">M-ROUTES — все маршруты</step-2>
+      <step-3 STATUS="done">M-TWIG-BASE, M-TWIG-ADMIN — шаблоны</step-3>
+      <step-4 STATUS="done">M-CSS — стили</step-4>
+    </Phase-1>
+
+    <Phase-2 NAME="Публичный контент" STATUS="implemented">
+      <description>Каталог, товары, SEO, контакты, FAQ, статьи</description>
+      <step-1 STATUS="done">Каталог и страница товара (UC-CATALOG, UC-PRODUCT-VIEW)</step-1>
+      <step-2 STATUS="done">SEO: sitemap, robots, JSON-LD (UC-SEO)</step-2>
+      <step-3 STATUS="done">Контакты и FAQ (UC-CONTACT, UC-FAQ)</step-3>
+      <step-4 STATUS="done">Раздел статей (UC-ARTICLES, M-ARTICLE-CONTENT)</step-4>
+    </Phase-2>
+
+    <Phase-3 NAME="Админка" STATUS="implemented">
+      <description>Полная админ-панель</description>
+      <step-1 STATUS="done">Аутентификация (UC-ADMIN-AUTH)</step-1>
+      <step-2 STATUS="done">CRUD: товары, категории, FAQ, отзывы</step-2>
+      <step-3 STATUS="done">CMS-контент, заявки, логи, экспорт БД, пароль</step-3>
+    </Phase-3>
+
+    <Phase-4 NAME="GRACE-разметка" STATUS="in-progress">
+      <description>Семантическая разметка, контракты модулей, граф знаний</description>
+      <step-1 STATUS="in-progress">Создание GRACE-артефактов (docs/*.xml)</step-1>
+      <step-2 STATUS="pending">Добавление MODULE_CONTRACT и START_BLOCK в PHP-файлы</step-2>
+    </Phase-4>
+  </Phases>
+
+  <ExecutionPolicy>
+    <controller-profile>balanced</controller-profile>
+    <shared-artifacts>docs/development-plan.xml, docs/knowledge-graph.xml, docs/verification-plan.xml</shared-artifacts>
+    <write-scope>Только файлы модулей в одобренном scope.</write-scope>
+  </ExecutionPolicy>
+</DevelopmentPlan>

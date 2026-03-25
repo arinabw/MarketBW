@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Technology>
+  <runtime>PHP 8.2+</runtime>
+  <language>PHP 8.2 (strict_types=1)</language>
+  <framework>Slim 4.13</framework>
+
+  <Dependencies>
+    <dep-slim NAME="slim/slim" VERSION="^4.13" PURPOSE="HTTP-микрофреймворк: маршрутизация, middleware, PSR-7/15" />
+    <dep-slim-psr7 NAME="slim/psr7" VERSION="^1.7" PURPOSE="PSR-7 реализация (Request/Response)" />
+    <dep-slim-twig NAME="slim/twig-view" VERSION="^3.4" PURPOSE="Интеграция Slim с Twig-шаблонами" />
+    <dep-twig NAME="twig/twig" VERSION="^3.x" PURPOSE="Шаблонизатор Twig 3" />
+    <dep-phpdi NAME="php-di/slim-bridge" VERSION="^3.x" PURPOSE="DI-контейнер PHP-DI для Slim" />
+  </Dependencies>
+
+  <DevDependencies>
+    <!-- Нет dev-зависимостей в composer.json — тестирование и линтинг внешние -->
+  </DevDependencies>
+
+  <Database>
+    <engine>SQLite 3</engine>
+    <driver>PDO (ext-pdo_sqlite)</driver>
+    <file>data/marketbw.db</file>
+    <schema-init>Database::init() — DDL в PHP-коде при первом запуске</schema-init>
+    <seeding>Seed::ifEmpty() — демо-данные при пустых таблицах</seeding>
+  </Database>
+
+  <Testing>
+    <module-level>
+      <command>php -l app/*.php</command>
+      <description>Синтаксическая проверка PHP-файлов (lint)</description>
+    </module-level>
+    <wave-level>
+      <command>curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/</command>
+      <description>Smoke-тест: HTTP 200 на главную страницу</description>
+    </wave-level>
+    <phase-level>
+      <command>docker compose -f docker/docker-compose.yml up -d &amp;&amp; curl http://localhost/sitemap.xml</command>
+      <description>Интеграционный тест: Docker-окружение и sitemap</description>
+    </phase-level>
+    <strategy>Тестирование через IDE ReadLints (PHP Intelephense), ручной smoke-тест через Docker. Автоматизированные тесты пока не внедрены (потенциал для PHPUnit).</strategy>
+  </Testing>
+
+  <Observability>
+    <logger>AuditLogMiddleware → таблица audit_log (SQLite)</logger>
+    <log-format>[Module][function][BLOCK_NAME] message</log-format>
+    <structured-fields>channel, method, path, status_code, duration_ms, ip, user_agent, admin_username</structured-fields>
+    <redaction>Пароли, CSRF-токены, сессионные данные никогда не логируются.</redaction>
+  </Observability>
+
+  <Deployment>
+    <method>Docker: Nginx (reverse proxy) + PHP-FPM (alpine)</method>
+    <dockerfile>docker/Dockerfile</dockerfile>
+    <compose>docker/docker-compose.yml</compose>
+    <deploy-script>docker/deploy.sh</deploy-script>
+    <env-example>docker/env.example</env-example>
+    <volumes>data/ — SQLite и загрузки</volumes>
+  </Deployment>
+
+  <Architecture>
+    <pattern>Монолит: один процесс PHP-FPM, одна база SQLite, один Docker-контейнер</pattern>
+    <entry-point>public/index.php → app/bootstrap.php → Slim::run()</entry-point>
+    <routing>app/routes.php — все маршруты (public + /admin group)</routing>
+    <templating>Twig 3 — templates/ (base.twig, pages, admin/*, partials/*)</templating>
+    <static-content>Статьи: content/articles/ — HTML-файлы, конфиг _topics.php</static-content>
+    <cms>SiteContentDefaults (ключи) + site_content (SQLite) → Twig глобал content</cms>
+  </Architecture>
+</Technology>

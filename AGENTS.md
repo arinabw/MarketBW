@@ -2,6 +2,8 @@
 
 Документ для **ИИ-агентов и разработчиков**: где что лежит, как течёт запрос, где менять поведение.
 
+> **GRACE-артефакты** (Graph-RAG Anchored Code Engineering): `docs/requirements.xml`, `docs/technology.xml`, `docs/development-plan.xml`, `docs/verification-plan.xml`, `docs/knowledge-graph.xml`. Они — каноническая карта модулей, контрактов, потоков данных и плана верификации.
+
 ## Назначение проекта
 
 Визитка мастера (украшения из бисера): каталог товаров, **раздел статей**, страницы «О мастере», контакты, FAQ. Админка: товары, категории, **контент сайта** (тексты/картинки из БД), FAQ, отзывы, пароль.
@@ -29,6 +31,7 @@
 | `content/articles/` | Статические HTML-файлы статей по темам + конфиг `_topics.php` |
 | `data/` | `marketbw.db` (на проде часто volume) |
 | `templates/` | Twig: `base.twig`, страницы, `admin/*`, `partials/*` |
+| `docs/` | GRACE-артефакты: requirements, technology, development-plan, verification-plan, knowledge-graph (XML) |
 | `docker/` | Dockerfile, nginx, compose, `deploy.sh`, `env.example` |
 
 ---

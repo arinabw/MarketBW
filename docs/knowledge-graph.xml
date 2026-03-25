@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<KnowledgeGraph>
+  <Project NAME="MarketBW" VERSION="3.9.0">
+    <keywords>бисер, украшения, handmade, каталог, статьи, CMS, PHP, Slim, Twig, SQLite</keywords>
+    <annotation>Визитка мастера украшений из бисера: каталог, статьи, CMS-контент, админка. Slim 4 + Twig 3 + SQLite.</annotation>
+
+    <!-- ═══════════════════════════════════════════
+         LAYER 0: Конфигурация и статика
+         ═══════════════════════════════════════════ -->
+
+    <M-SETTINGS NAME="Settings" TYPE="UTILITY" STATUS="implemented">
+      <purpose>Конфигурация приложения из env-переменных и дефолтов</purpose>
+      <path>config/settings.php</path>
+      <depends>none</depends>
+      <verification-ref>V-M-SETTINGS</verification-ref>
+      <annotations>
+        <fn-settings PURPOSE="Возвращает массив настроек (site_name, contacts, social, paths, base_path, public_site_url)" />
+        <const-DATA_DIR PURPOSE="Путь к data/ по умолчанию" />
+        <const-IMAGES_DIR PURPOSE="Путь к public/images/ по умолчанию" />
+      </annotations>
+    </M-SETTINGS>
+
+    <M-CONTENT-DEFAULTS NAME="SiteContentDefaults" TYPE="UTILITY" STATUS="implemented">
+      <purpose>Ключи и дефолты CMS-текстов; группы для админки; image/boolean ключи</purpose>
+      <path>app/SiteContentDefaults.php</path>
+      <depends>none</depends>
+      <verification-ref>V-M-CONTENT-DEFAULTS</verification-ref>
+      <annotations>
+        <fn-defaults PURPOSE="Массив key => default_value" />
+        <fn-adminGroups PURPOSE="Группы ключей для формы в админке" />
+        <fn-imageKeys PURPOSE="Список ключей с путями к картинкам" />
+        <fn-layoutBooleanKeys PURPOSE="Чекбоксы видимости элементов" />
+        <fn-fieldLabel PURPOSE="Человекочитаемая метка по ключу" />
+        <fn-inheritLegacyLayoutToggles PURPOSE="Миграция устаревших layout-ключей" />
+      </annotations>
+    </M-CONTENT-DEFAULTS>
+
+    <M-CSS NAME="Styles" TYPE="UI_COMPONENT" STATUS="implemented">
+      <purpose>Все стили сайта: CSS без сборки, адаптивный дизайн</purpose>
+      <path>public/css/app.css</path>
+      <depends>none</depends>
+      <annotations>
+        <export-catalog-styles PURPOSE="Стили каталога (.catalog-grid, .product-card)" />
+        <export-article-styles PURPOSE="Стили статей (.article-topic-grid, .article-list, .article-body)" />
+        <export-admin-styles PURPOSE="Стили админки (.admin-wrap, .admin-nav)" />
+        <export-layout-styles PURPOSE="Стили layout (header, footer, hero, breadcrumb)" />
+      </annotations>
+    </M-CSS>
+
+    <!-- ═══════════════════════════════════════════
+         LAYER 1: Данные и утилиты
+         ═══════════════════════════════════════════ -->
+
+    <M-DATABASE NAME="Database" TYPE="DATA_LAYER" STATUS="implemented">
+      <purpose>PDO SQLite: схема, CRUD для products, categories, reviews, faqs, users, site_content, contact_messages, audit_log</purpose>
+      <path>app/Database.php</path>
+      <depends>M-SETTINGS</depends>
+      <verification-ref>V-M-DATABASE</verification-ref>
+      <annotations>
+        <fn-init PURPOSE="CREATE TABLE IF NOT EXISTS; вставка admin; вызов Seed" />
+        <fn-categories PURPOSE="SELECT * FROM categories" />
+        <fn-products PURPOSE="Товары с фильтрами (категория, featured, in_stock)" />
+        <fn-productById PURPOSE="Один товар по ID" />
+        <fn-createProduct PURPOSE="INSERT INTO products" />
+        <fn-updateProduct PURPOSE="UPDATE products" />
+        <fn-deleteProduct PURPOSE="DELETE FROM products" />
+        <fn-faqs PURPOSE="Все FAQ" />
+        <fn-reviews PURPOSE="Все отзывы" />
+        <fn-authenticate PURPOSE="password_verify для логина" />
+        <fn-getMergedSiteContent PURPOSE="Слияние дефолтов + site_content" />
+        <fn-saveSiteContent PURPOSE="UPSERT в site_content" />
+        <fn-contactMessages PURPOSE="Список заявок с фильтром" />
+        <fn-appendAuditLog PURPOSE="INSERT INTO audit_log" />
+        <fn-changePassword PURPOSE="UPDATE users SET password_hash" />
+      </annotations>
+      <CrossLink from="M-DATABASE" to="M-SETTINGS" relation="reads-db-path" />
+      <CrossLink from="M-DATABASE" to="M-SEED" relation="calls-seed" />
+    </M-DATABASE>
+
+    <M-SEED NAME="Seed" TYPE="DATA_LAYER" STATUS="implemented">
+      <purpose>Демо-данные (категории, товары, отзывы, FAQ) при пустых таблицах</purpose>
+      <path>app/Seed.php</path>
+      <depends>M-DATABASE</depends>
+      <verification-ref>V-M-SEED</verification-ref>
+      <annotations>
+        <fn-ifEmpty PURPOSE="Проверяет COUNT(*) → вставляет демо-данные" />
+        <const-DEMO_CATEGORIES PURPOSE="3 категории: браслеты, колье, серьги" />
+        <const-DEMO_REVIEWS PURPOSE="3 отзыва" />
+        <const-DEMO_FAQS PURPOSE="8 FAQ" />
+      </annotations>
+    </M-SEED>
+
+    <M-ARTICLE-CONTENT NAME="ArticleContent" TYPE="DATA_LAYER" STATUS="implemented">
+      <purpose>Чтение статических статей из content/articles/ (PHP-конфиг + HTML-файлы, без БД)</purpose>
+      <path>app/ArticleContent.php</path>
+      <depends>none</depends>
+      <verification-ref>V-M-ARTICLE-CONTENT</verification-ref>
+      <annotations>
+        <fn-topics PURPOSE="Загрузка конфига _topics.php (8 тем, 39 статей)" />
+        <fn-topicList PURPOSE="Список тем для index-страницы (sorted)" />
+        <fn-topicBySlug PURPOSE="Одна тема по slug" />
+        <fn-articlesInTopic PURPOSE="Статьи в теме (только если HTML существует)" />
+        <fn-article PURPOSE="Полная статья: title + excerpt + body_html из файла" />
+        <fn-allPublishedSlugs PURPOSE="Все пары (topic_slug, slug) для sitemap" />
+      </annotations>
+    </M-ARTICLE-CONTENT>
+
+    <M-SEO NAME="SeoHelper" TYPE="UTILITY" STATUS="implemented">
+      <purpose>SEO-утилиты: canonical URL, JSON-LD (Organization, WebSite, Product, BreadcrumbList, BlogPosting)</purpose>
+      <path>app/SeoHelper.php</path>
+      <depends>M-SETTINGS</depends>
+      <verification-ref>V-M-SEO</verification-ref>
+      <annotations>
+        <fn-resolvePublicBase PURPOSE="Абсолютный origin из settings или env" />
+        <fn-buildOrganizationJsonLd PURPOSE="JSON-LD @type Organization" />
+        <fn-buildWebSiteJsonLd PURPOSE="JSON-LD @type WebSite" />
+        <fn-buildProductJsonLd PURPOSE="JSON-LD @type Product" />
+        <fn-buildBreadcrumbJsonLd PURPOSE="JSON-LD @type BreadcrumbList" />
+        <fn-buildBlogPostingJsonLd PURPOSE="JSON-LD @type BlogPosting для статей" />
+      </annotations>
+      <CrossLink from="M-SEO" to="M-SETTINGS" relation="reads-public-site-url" />
+    </M-SEO>
+
+    <M-PRODUCT-IMAGES NAME="ProductImages" TYPE="UTILITY" STATUS="implemented">
+      <purpose>Нормализация путей к фото товаров; конвертация data-URL в файлы</purpose>
+      <path>app/ProductImages.php</path>
+      <depends>M-SETTINGS</depends>
+      <verification-ref>V-M-PRODUCT-IMAGES</verification-ref>
+      <annotations>
+        <fn-normalize PURPOSE="Нормализация массива путей к изображениям" />
+        <fn-saveDataUrl PURPOSE="base64 data-URL → файл на диске" />
+      </annotations>
+      <CrossLink from="M-PRODUCT-IMAGES" to="M-SETTINGS" relation="reads-images-dir" />
+    </M-PRODUCT-IMAGES>
+
+    <M-SITE-UPLOAD NAME="SiteUpload" TYPE="UTILITY" STATUS="implemented">
+      <purpose>Загрузка картинок CMS-контента в public/images/site/</purpose>
+      <path>app/SiteUpload.php</path>
+      <depends>M-SETTINGS</depends>
+      <verification-ref>V-M-SITE-UPLOAD</verification-ref>
+      <annotations>
+        <fn-handleUpload PURPOSE="Обработка загрузки файла для CMS-ключа" />
+      </annotations>
+      <CrossLink from="M-SITE-UPLOAD" to="M-SETTINGS" relation="reads-images-dir" />
+    </M-SITE-UPLOAD>
+
+    <!-- ═══════════════════════════════════════════
+         LAYER 2: Оркестрация и UI
+         ═══════════════════════════════════════════ -->
+
+    <M-BOOTSTRAP NAME="Bootstrap" TYPE="ENTRY_POINT" STATUS="implemented">
+      <purpose>DI-контейнер, Twig, middleware (сессия, CSRF, CMS-контент), Database::init(), routes.php</purpose>
+      <path>app/bootstrap.php</path>
+      <depends>M-SETTINGS, M-DATABASE, M-CONTENT-DEFAULTS, M-SEO</depends>
+      <verification-ref>V-M-BOOTSTRAP</verification-ref>
+      <annotations>
+        <fn-createApp PURPOSE="Создание и конфигурация Slim\App" />
+        <export-app PURPOSE="Готовый экземпляр Slim\App" />
+        <fn-contentMiddleware PURPOSE="Middleware: слияние CMS + Twig глобалы" />
+        <fn-csrfHelper PURPOSE="Генерация и проверка CSRF-токена" />
+      </annotations>
+      <CrossLink from="M-BOOTSTRAP" to="M-DATABASE" relation="calls-init" />
+      <CrossLink from="M-BOOTSTRAP" to="M-SETTINGS" relation="reads-config" />
+      <CrossLink from="M-BOOTSTRAP" to="M-CONTENT-DEFAULTS" relation="reads-defaults" />
+      <CrossLink from="M-BOOTSTRAP" to="M-SEO" relation="sets-seo-globals" />
+      <CrossLink from="M-BOOTSTRAP" to="M-ROUTES" relation="includes-routes" />
+    </M-BOOTSTRAP>
+
+    <M-ROUTES NAME="Routes" TYPE="ENTRY_POINT" STATUS="implemented">
+      <purpose>Все HTTP-маршруты: публичные (/, /catalog, /product, /about, /contact, /faq, /articles, /sitemap.xml, /robots.txt) + группа /admin/*</purpose>
+      <path>app/routes.php</path>
+      <depends>M-BOOTSTRAP, M-DATABASE, M-SEO, M-ARTICLE-CONTENT, M-PRODUCT-IMAGES, M-SITE-UPLOAD, M-CONTENT-DEFAULTS</depends>
+      <verification-ref>V-M-ROUTES</verification-ref>
+      <annotations>
+        <route-home PURPOSE="GET / — главная страница" />
+        <route-catalog PURPOSE="GET /catalog, /catalog/{cat}" />
+        <route-product PURPOSE="GET /product/{id}" />
+        <route-about PURPOSE="GET /about" />
+        <route-contact-get PURPOSE="GET /contact" />
+        <route-contact-post PURPOSE="POST /contact (CSRF, save message)" />
+        <route-faq PURPOSE="GET /faq" />
+        <route-articles-index PURPOSE="GET /articles (список тем)" />
+        <route-articles-topic PURPOSE="GET /articles/{topicSlug}" />
+        <route-articles-article PURPOSE="GET /articles/{topicSlug}/{articleSlug}" />
+        <route-sitemap PURPOSE="GET /sitemap.xml" />
+        <route-robots PURPOSE="GET /robots.txt" />
+        <fn-adminGuard PURPOSE="Middleware: проверка $_SESSION[admin]" />
+        <route-admin-login PURPOSE="GET|POST /admin/login" />
+        <route-admin-logout PURPOSE="POST /admin/logout" />
+        <route-admin-dashboard PURPOSE="GET /admin" />
+        <route-admin-content PURPOSE="GET|POST /admin/content" />
+        <route-admin-products PURPOSE="CRUD /admin/products" />
+        <route-admin-categories PURPOSE="CRUD /admin/categories" />
+        <route-admin-faqs PURPOSE="CRUD /admin/faqs" />
+        <route-admin-reviews PURPOSE="CRUD /admin/reviews" />
+        <route-admin-messages PURPOSE="GET|POST /admin/contact-messages" />
+        <route-admin-logs PURPOSE="GET /admin/logs" />
+        <route-admin-database PURPOSE="GET|POST /admin/database" />
+        <route-admin-password PURPOSE="GET|POST /admin/password" />
+        <fn-handle_image_uploads PURPOSE="Хелпер загрузки изображений товаров" />
+        <fn-handle_category_upload PURPOSE="Хелпер загрузки картинки категории" />
+      </annotations>
+      <CrossLink from="M-ROUTES" to="M-DATABASE" relation="queries-all-entities" />
+      <CrossLink from="M-ROUTES" to="M-ARTICLE-CONTENT" relation="reads-static-articles" />
+      <CrossLink from="M-ROUTES" to="M-SEO" relation="builds-jsonld" />
+      <CrossLink from="M-ROUTES" to="M-PRODUCT-IMAGES" relation="handles-image-uploads" />
+      <CrossLink from="M-ROUTES" to="M-SITE-UPLOAD" relation="handles-cms-uploads" />
+    </M-ROUTES>
+
+    <M-ENTRY NAME="IndexPhp" TYPE="ENTRY_POINT" STATUS="implemented">
+      <purpose>Единственная точка входа HTTP: require bootstrap.php → $app->run()</purpose>
+      <path>public/index.php</path>
+      <depends>M-BOOTSTRAP</depends>
+      <annotations>
+        <fn-main PURPOSE="Точка входа: подключает bootstrap и вызывает run()" />
+      </annotations>
+      <CrossLink from="M-ENTRY" to="M-BOOTSTRAP" relation="requires-bootstrap" />
+    </M-ENTRY>
+
+    <!-- Шаблоны Twig -->
+
+    <M-TWIG-BASE NAME="BaseTemplate" TYPE="UI_COMPONENT" STATUS="implemented">
+      <purpose>Базовый HTML: head (SEO, OG, JSON-LD), header, nav, footer</purpose>
+      <path>templates/base.twig</path>
+      <depends>M-CONTENT-DEFAULTS, M-SEO</depends>
+      <annotations>
+        <export-head PURPOSE="Блоки title, meta, OG, canonical, JSON-LD" />
+        <export-body PURPOSE="Блоки header, nav, content, footer" />
+        <fn-t PURPOSE="Twig-функция t('key') — текст из CMS" />
+        <fn-path PURPOSE="Twig-функция path('/url') — с учётом BASE_PATH" />
+      </annotations>
+    </M-TWIG-BASE>
+
+    <M-TWIG-ADMIN NAME="AdminLayout" TYPE="UI_COMPONENT" STATUS="implemented">
+      <purpose>Layout админки: боковое меню, обёртка контента</purpose>
+      <path>templates/admin/layout.twig</path>
+      <depends>M-TWIG-BASE</depends>
+      <annotations>
+        <export-admin-nav PURPOSE="Навигация: Обзор, Контент, Товары, Категории, FAQ, Отзывы, Заявки, Журнал, БД, Пароль" />
+      </annotations>
+    </M-TWIG-ADMIN>
+
+    <M-TWIG-ARTICLES NAME="ArticleTemplates" TYPE="UI_COMPONENT" STATUS="implemented">
+      <purpose>Шаблоны статей: index (темы), topic (список), article (полный текст)</purpose>
+      <path>templates/articles/index.twig, templates/articles/topic.twig, templates/articles/article.twig</path>
+      <depends>M-TWIG-BASE, M-ARTICLE-CONTENT</depends>
+      <annotations>
+        <export-index PURPOSE="Сетка тем с описаниями" />
+        <export-topic PURPOSE="Список статей в теме с breadcrumbs" />
+        <export-article PURPOSE="Полный текст статьи с SEO (BlogPosting, breadcrumbs)" />
+      </annotations>
+    </M-TWIG-ARTICLES>
+
+    <!-- ═══════════════════════════════════════════
+         Статический контент (не PHP-модуль)
+         ═══════════════════════════════════════════ -->
+
+    <M-ARTICLE-FILES NAME="ArticleHTMLFiles" TYPE="DATA_LAYER" STATUS="implemented">
+      <purpose>39 HTML-файлов статей по 8 темам (content/articles/{topic}/{slug}.html)</purpose>
+      <path>content/articles/</path>
+      <depends>none</depends>
+      <annotations>
+        <export-topics-config PURPOSE="content/articles/_topics.php — конфиг тем и статей" />
+        <export-materials PURPOSE="5 статей: материалы и инструменты" />
+        <export-techniques PURPOSE="5 статей: техники бисероплетения" />
+        <export-jewelry PURPOSE="5 статей: украшения" />
+        <export-flowers PURPOSE="5 статей: цветы и композиции" />
+        <export-figures PURPOSE="5 статей: фигурки и сувениры" />
+        <export-combination PURPOSE="5 статей: комбинирование" />
+        <export-history PURPOSE="5 статей: история и культура" />
+        <export-trends PURPOSE="4 статьи: современные тенденции" />
+      </annotations>
+    </M-ARTICLE-FILES>
+
+  </Project>
+</KnowledgeGraph>
