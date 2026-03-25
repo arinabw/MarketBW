@@ -43,11 +43,6 @@ final class SiteContentDefaults
             'brand.master_name' => (string) ($settings['master_name'] ?? 'Мастер'),
             'brand.tagline' => (string) ($settings['master_tagline'] ?? 'Украшения из бисера ручной работы'),
             'contact.email' => (string) ($settings['contact_email'] ?? ''),
-            'contact.phone' => (string) ($settings['contact_phone'] ?? ''),
-            'contact.whatsapp' => (string) ($settings['contact_whatsapp'] ?? ''),
-            'social.instagram' => (string) ($settings['social_instagram'] ?? '#'),
-            'social.telegram' => (string) ($settings['social_telegram'] ?? '#'),
-            'social.vk' => (string) ($settings['social_vk'] ?? '#'),
 
             'meta.description' => '%SITE% — %TAGLINE% Авторские украшения и бижутерия из бисера: колье, браслеты, серьги, броши. Оригинальные подарки ручной работы, бисероплетение на заказ.',
             'meta.keywords' => 'украшения из бисера, бисер, бисероплетение, бижутерия, бижутерия ручной работы, оригинальные подарки, подарки ручной работы, рукоделие, авторские украшения, изделия из бисера, колье из бисера, браслеты из бисера, серьги из бисера, броши из бисера, купить украшение из бисера, бисер купить, бисерные украшения, handmade, %SITE%',
@@ -77,8 +72,6 @@ final class SiteContentDefaults
             'layout.show_product_order_title' => '1',
             'layout.show_product_order_steps' => '1',
             'layout.show_product_btn_order' => '1',
-            'layout.show_product_btn_telegram' => '1',
-            'layout.show_product_btn_whatsapp' => '1',
             'layout.show_product_reviews_title' => '1',
             'layout.show_product_review_items' => '1',
 
@@ -127,18 +120,14 @@ final class SiteContentDefaults
             'contact.page_sub' => 'Расскажите о вашей идее — вместе создадим украшение из бисера.',
             'contact.box_contacts_title' => 'Контакты',
             'contact.box_message_title' => 'Написать сообщение',
-            'contact.label_phone' => 'Телефон:',
             'contact.label_email' => 'Email:',
-            'contact.label_social' => 'Соцсети:',
-            'contact.btn_whatsapp' => 'Написать в WhatsApp',
-            'contact.btn_telegram' => 'Открыть Telegram',
             'contact.form_name' => 'Имя',
             'contact.form_email' => 'Email',
             'contact.form_message' => 'Сообщение',
             'contact.form_submit' => 'Отправить',
             'contact.form_success' => 'Спасибо! Сообщение сохранено — мастер увидит его в админке и ответит. Обычно в течение суток: проверьте почту или мессенджер.',
             'contact.form_error' => 'Укажите имя и текст сообщения.',
-            'contact.form_hint' => 'Заявка попадает в личный кабинет мастера (раздел «Заявки»). Также можно написать на почту или в мессенджер.',
+            'contact.form_hint' => 'Заявка попадает в личный кабинет мастера (раздел «Заявки»). Также можно написать на почту.',
 
             'catalog.page_title' => 'Каталог',
             'catalog.page_sub' => 'Каталог бижутерии и украшений из бисера ручной работы: колье, браслеты, серьги, броши. Оригинальные подарки, бисероплетение на заказ.',
@@ -163,7 +152,7 @@ final class SiteContentDefaults
             'product.meta_stock_no' => 'под заказ',
             'product.materials_label' => 'Материалы',
             'product.order_title' => 'Как заказать',
-            'product.order_step_1' => 'Напишите в <a href="/contact">контакты</a> или в мессенджер — укажите изделие или идею.',
+            'product.order_step_1' => 'Напишите через <a href="/contact">форму</a> или на email — укажите изделие или идею.',
             'product.order_step_2' => 'Согласуем детали, срок и стоимость.',
             'product.order_step_3' => 'После подтверждения — изготовление и отправка.',
             'product.btn_order' => 'Заказать или задать вопрос',
@@ -226,8 +215,6 @@ final class SiteContentDefaults
                 'layout.show_product_order_title',
                 'layout.show_product_order_steps',
                 'layout.show_product_btn_order',
-                'layout.show_product_btn_telegram',
-                'layout.show_product_btn_whatsapp',
                 'layout.show_product_reviews_title',
                 'layout.show_product_review_items',
             ],
@@ -309,9 +296,8 @@ final class SiteContentDefaults
     public static function adminGroups(): array
     {
         return array_merge(self::visibilityAdminGroups(), [
-            'Бренд, контакты и соцсети' => [
-                'brand.master_name', 'brand.tagline', 'contact.email', 'contact.phone', 'contact.whatsapp',
-                'social.instagram', 'social.telegram', 'social.vk',
+            'Бренд и контакты' => [
+                'brand.master_name', 'brand.tagline', 'contact.email',
             ],
             'SEO' => ['meta.description', 'meta.keywords'],
             'Шапка и меню' => [
@@ -330,8 +316,7 @@ final class SiteContentDefaults
             ],
             'Контакты (страница)' => [
                 'contact.page_title', 'contact.page_sub', 'contact.box_contacts_title', 'contact.box_message_title',
-                'contact.label_phone', 'contact.label_email', 'contact.label_social',
-                'contact.btn_whatsapp', 'contact.btn_telegram',
+                'contact.label_email',
                 'contact.form_name', 'contact.form_email', 'contact.form_message', 'contact.form_submit',
                 'contact.form_success', 'contact.form_error', 'contact.form_hint',
             ],

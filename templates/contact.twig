@@ -21,19 +21,7 @@
   <div class="container contact-grid">
     <div class="box contact-card">
       <h2 class="box__title">{{ t('contact.box_contacts_title') }}</h2>
-      <p><strong>{{ t('contact.label_phone') }}</strong> <a href="tel:{{ contact_phone|replace({' ': '', '(': '', ')': '', '-': ''}) }}">{{ contact_phone }}</a></p>
       <p><strong>{{ t('contact.label_email') }}</strong> <a href="mailto:{{ contact_email }}?subject={{ 'Заказ с сайта '|url_encode }}{{ site_name|url_encode }}">{{ contact_email }}</a></p>
-      <p class="contact-card__social">{{ t('contact.label_social') }}
-        <a href="{{ social_instagram }}">Instagram</a> ·
-        <a href="{{ social_telegram }}">Telegram</a> ·
-        <a href="{{ social_vk }}">ВКонтакте</a>
-      </p>
-      {% if contact_whatsapp != '' %}
-      <p><a class="btn btn--wa" href="{{ whatsapp_url() }}" target="_blank" rel="noopener">{{ t('contact.btn_whatsapp') }}</a></p>
-      {% endif %}
-      {% if social_telegram != '#' %}
-      <p><a class="btn btn--tg" href="{{ social_telegram }}" target="_blank" rel="noopener">{{ t('contact.btn_telegram') }}</a></p>
-      {% endif %}
     </div>
     <div class="box contact-card">
       <h2 class="box__title">{{ t('contact.box_message_title') }}</h2>

@@ -23,15 +23,10 @@ services:
       SESSION_COOKIE_DOMAIN: ${SESSION_COOKIE_DOMAIN:-}
       SITE_NAME: ${SITE_NAME:-Bead Wonder}
       CONTACT_EMAIL: ${CONTACT_EMAIL:-your-email@example.com}
-      CONTACT_PHONE: ${CONTACT_PHONE:-+7 (999) 123-45-67}
-      SOCIAL_INSTAGRAM: ${SOCIAL_INSTAGRAM:-#}
-      SOCIAL_TELEGRAM: ${SOCIAL_TELEGRAM:-#}
-      SOCIAL_VK: ${SOCIAL_VK:-#}
       PUBLIC_SITE_URL: ${PUBLIC_SITE_URL:-}
       BASE_PATH: ${BASE_PATH:-}
       MASTER_NAME: ${MASTER_NAME:-}
       MASTER_TAGLINE: ${MASTER_TAGLINE:-}
-      CONTACT_WHATSAPP: ${CONTACT_WHATSAPP:-}
     volumes:
       - ../data:/var/www/data
       - ../public/images:/var/www/images

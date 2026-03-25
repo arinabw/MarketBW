@@ -106,17 +106,9 @@
       </div>
       {% endif %}
 
-      {% if layout_visible('layout.show_product_btn_order') or (layout_visible('layout.show_product_btn_telegram') and social_telegram != '#') or (layout_visible('layout.show_product_btn_whatsapp') and contact_whatsapp != '') %}
+      {% if layout_visible('layout.show_product_btn_order') %}
       <div class="btn-row product-actions">
-        {% if layout_visible('layout.show_product_btn_order') %}
         <a class="btn btn--primary" href="{{ path('/contact') }}?product={{ product.id|url_encode }}">{{ t('product.btn_order') }}</a>
-        {% endif %}
-        {% if layout_visible('layout.show_product_btn_telegram') and social_telegram != '#' %}
-        <a class="btn btn--tg" href="{{ social_telegram }}" target="_blank" rel="noopener">Telegram</a>
-        {% endif %}
-        {% if layout_visible('layout.show_product_btn_whatsapp') and contact_whatsapp != '' %}
-        <a class="btn btn--wa" href="{{ whatsapp_url() }}" target="_blank" rel="noopener">WhatsApp</a>
-        {% endif %}
       </div>
       {% endif %}
     </div>

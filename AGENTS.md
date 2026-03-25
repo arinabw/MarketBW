@@ -25,7 +25,7 @@
 | `app/SiteContentDefaults.php` | Ключи и дефолты текстов CMS, группы для админки `adminGroups()`, `imageKeys()` |
 | `app/ProductImages.php` | Нормализация путей к фото товаров, data-URL → файлы |
 | `app/SiteUpload.php` | Загрузка картинок для раздела «Контент» → `public/images/site/` |
-| `config/settings.php` | Env: `SITE_NAME`, контакты, соцсети, пути `DATA_DIR`, `IMAGES_DIR`, опционально **`BASE_PATH`**, **`PUBLIC_SITE_URL`** (канонический URL для SEO) |
+| `config/settings.php` | Env: `SITE_NAME`, `CONTACT_EMAIL`, пути `DATA_DIR`, `IMAGES_DIR`, опционально **`BASE_PATH`**, **`PUBLIC_SITE_URL`** (канонический URL для SEO) |
 | `app/ArticleContent.php` | Чтение статических статей из `content/articles/` (без БД) |
 | `app/SeoHelper.php` | Абсолютный origin сайта, JSON-LD Organization / WebSite / Product / BreadcrumbList / BlogPosting |
 | `content/articles/` | Статические HTML-файлы статей по темам + конфиг `_topics.php` |
@@ -39,7 +39,7 @@
 ## Поток запроса (обязательно понимать порядок)
 
 1. `public/index.php` вызывает `app/bootstrap.php` и `->run()`.
-2. Регистрируются middleware (Slim): в конце файла добавлен слой, который на **каждый запрос** подмешивает в Twig глобал `content` (слияние `SiteContentDefaults` + таблица `site_content`) и перезаписывает глобалы `master_*`, `contact_*`, `social_*`.
+2. Регистрируются middleware (Slim): в конце файла добавлен слой, который на **каждый запрос** подмешивает в Twig глобал `content` (слияние `SiteContentDefaults` + таблица `site_content`) и перезаписывает глобалы `master_*`, `contact_email`.
 3. Маршруты из `app/routes.php`: публичные URL и группа `/admin` с guard (кроме логина).
 4. Рендер: Twig-шаблоны; тексты с сайта — **`t('ключ')`** (ключи из `SiteContentDefaults`).
 

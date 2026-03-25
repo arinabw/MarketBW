@@ -101,12 +101,6 @@ $containerBuilder->addDefinitions([
         $env->addFunction(new \Twig\TwigFunction('content_label', function (string $key): string {
             return SiteContentDefaults::fieldLabel($key);
         }));
-        $env->addFunction(new \Twig\TwigFunction('whatsapp_url', function () use ($env): string {
-            $g = $env->getGlobals();
-            $d = preg_replace('/\D+/', '', (string) ($g['contact_whatsapp'] ?? ''));
-
-            return $d !== '' ? 'https://wa.me/' . $d : '#';
-        }));
         $env->addFilter(new \Twig\TwigFilter('stars', function ($rating): string {
             $r = max(0, min(5, (int) $rating));
             return str_repeat('★', $r) . str_repeat('☆', 5 - $r);
@@ -231,11 +225,6 @@ $app->add(function ($request, $handler) use ($container, $app) {
     $env->addGlobal('master_name', $merged['brand.master_name'] ?? $settings['master_name']);
     $env->addGlobal('master_tagline', $merged['brand.tagline'] ?? $settings['master_tagline']);
     $env->addGlobal('contact_email', $merged['contact.email'] ?? $settings['contact_email']);
-    $env->addGlobal('contact_phone', $merged['contact.phone'] ?? $settings['contact_phone']);
-    $env->addGlobal('contact_whatsapp', $merged['contact.whatsapp'] ?? $settings['contact_whatsapp']);
-    $env->addGlobal('social_instagram', $merged['social.instagram'] ?? $settings['social_instagram']);
-    $env->addGlobal('social_telegram', $merged['social.telegram'] ?? $settings['social_telegram']);
-    $env->addGlobal('social_vk', $merged['social.vk'] ?? $settings['social_vk']);
 
     $base = SeoHelper::resolvePublicBase($request, $settings, $app->getBasePath());
     $path = $request->getUri()->getPath();
@@ -250,11 +239,6 @@ $app->add(function ($request, $handler) use ($container, $app) {
     $homeUrl = $base !== '' ? rtrim($base, '/') . '/' : '';
     $orgName = (string) ($merged['brand.master_name'] ?? $settings['site_name']);
     $orgDesc = (string) ($merged['meta.description'] ?? '');
-    $sameAs = array_values(array_filter([
-        (string) ($merged['social.instagram'] ?? ''),
-        (string) ($merged['social.telegram'] ?? ''),
-        (string) ($merged['social.vk'] ?? ''),
-    ], static fn (string $u): bool => $u !== '' && $u !== '#'));
     $kwMeta = trim((string) ($merged['meta.keywords'] ?? ''));
     $env->addGlobal(
         'seo_organization_json_ld',
@@ -263,9 +247,9 @@ $app->add(function ($request, $handler) use ($container, $app) {
                 $orgName,
                 $orgDesc,
                 $homeUrl,
-                (string) ($merged['contact.phone'] ?? $settings['contact_phone']),
+                '',
                 (string) ($merged['contact.email'] ?? $settings['contact_email']),
-                $sameAs,
+                [],
                 SeoHelper::thematicKnowsAbout(),
                 $kwMeta !== '' ? $kwMeta : null,
                 $base !== '' ? rtrim($base, '/') . '/favicon.svg' : '',

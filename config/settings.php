@@ -4,7 +4,7 @@
 // VERSION: 3.12.4
 // START_MODULE_CONTRACT
 //   PURPOSE: Конфигурация приложения из env-переменных и дефолтов
-//   SCOPE: site_name, contacts, social, paths, base_path, public_site_url, session, debug
+//   SCOPE: site_name, contact_email, paths, base_path, public_site_url, session, debug
 //   DEPENDS: none
 //   LINKS: M-SETTINGS
 // END_MODULE_CONTRACT
@@ -52,12 +52,6 @@ return [
     'data_dir' => $envStr('DATA_DIR', $root . '/data'),
     'images_dir' => $envStr('IMAGES_DIR', $root . '/public/images'),
     'contact_email' => $envStr('CONTACT_EMAIL', 'your-email@example.com'),
-    'contact_phone' => $envStr('CONTACT_PHONE', '+7 (999) 123-45-67'),
-    'social_instagram' => $envStr('SOCIAL_INSTAGRAM', '#'),
-    'social_telegram' => $envStr('SOCIAL_TELEGRAM', '#'),
-    'social_vk' => $envStr('SOCIAL_VK', '#'),
-    /** Только цифры, например 79991234567 — для wa.me */
-    'contact_whatsapp' => $envStr('CONTACT_WHATSAPP', ''),
     'master_name' => $envStr('MASTER_NAME', 'Мастер'),
     'master_tagline' => $envStr('MASTER_TAGLINE', 'Украшения из бисера ручной работы'),
 ];

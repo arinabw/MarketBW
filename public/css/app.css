@@ -99,33 +99,6 @@ img {
   }
 }
 
-.social-icons {
-  display: flex;
-  gap: 0.35rem;
-  align-items: center;
-}
-
-.social-icons__link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 2rem;
-  height: 2rem;
-  padding: 0 0.4rem;
-  border-radius: 8px;
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.social-icons__link:hover {
-  color: var(--primary-dark);
-  border-color: var(--primary);
-  text-decoration: none;
-}
 
 .logo {
   font-family: var(--display);
@@ -1038,25 +1011,6 @@ tr:last-child td {
   resize: vertical;
 }
 
-.btn--wa {
-  background: #25d366;
-  border-color: #1fb256;
-  color: #fff;
-}
-
-.btn--wa:hover {
-  filter: brightness(0.96);
-}
-
-.btn--tg {
-  background: #229ed9;
-  border-color: #1b8bc2;
-  color: #fff;
-}
-
-.btn--tg:hover {
-  filter: brightness(0.96);
-}
 
 .stars-rating {
   color: #c9a227;

@@ -71,7 +71,7 @@
           </div>
         </details>
         <div class="site-header__social">
-          {% include 'partials/social-icons.twig' %}
+          <a href="mailto:{{ contact_email }}" title="Email">✉</a>
         </div>
       </div>
     </div>
@@ -85,8 +85,6 @@
         <div>© {{ "now"|date("Y") }} {{ site_name }}. {{ master_tagline }}</div>
         <div class="footer-contacts">
           <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
-          <span class="footer-sep">·</span>
-          <a href="tel:{{ contact_phone|replace({' ': '', '(': '', ')': '', '-': ''}) }}">{{ contact_phone }}</a>
         </div>
       </div>
       <nav class="footer-nav" aria-label="Дополнительно">
