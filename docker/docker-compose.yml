@@ -27,6 +27,11 @@ services:
       SOCIAL_INSTAGRAM: ${SOCIAL_INSTAGRAM:-#}
       SOCIAL_TELEGRAM: ${SOCIAL_TELEGRAM:-#}
       SOCIAL_VK: ${SOCIAL_VK:-#}
+      PUBLIC_SITE_URL: ${PUBLIC_SITE_URL:-}
+      BASE_PATH: ${BASE_PATH:-}
+      MASTER_NAME: ${MASTER_NAME:-}
+      MASTER_TAGLINE: ${MASTER_TAGLINE:-}
+      CONTACT_WHATSAPP: ${CONTACT_WHATSAPP:-}
     volumes:
       - ../data:/var/www/data
       - ../public/images:/var/www/images
