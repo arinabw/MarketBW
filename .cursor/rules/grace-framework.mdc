@@ -1,0 +1,55 @@
+---
+description: GRACE framework — читать артефакты при старте, следовать контрактам, синхронизировать граф знаний и план верификации при каждой доработке
+alwaysApply: true
+---
+
+# GRACE (Graph-RAG Anchored Code Engineering)
+
+## При старте сессии
+
+Перед любыми изменениями прочитай GRACE-артефакты:
+1. `docs/knowledge-graph.xml` — карта модулей, зависимостей, экспортов
+2. `docs/development-plan.xml` — контракты модулей, фазы, потоки данных
+3. `docs/verification-plan.xml` — сценарии проверки, лог-маркеры, критические потоки
+4. `docs/requirements.xml` — юзкейсы и ограничения (при добавлении фичи)
+5. `docs/technology.xml` — стек и соглашения (при вопросах по технологиям)
+
+## При каждой доработке
+
+### Контракт-first
+- НЕ пиши код без контракта. Перед изменением модуля прочитай его `MODULE_CONTRACT` и секцию в `development-plan.xml`.
+- Если контракт устарел — обнови его ДО написания кода.
+
+### Синхронизация артефактов
+После изменения кода **обязательно** обнови затронутые артефакты:
+
+| Что изменилось | Что обновить |
+|---|---|
+| Новый модуль/класс | `knowledge-graph.xml` (добавить M-xxx), `development-plan.xml` (модуль + контракт) |
+| Новая функция/экспорт | `knowledge-graph.xml` (fn-xxx в annotations модуля) |
+| Новая зависимость между модулями | `knowledge-graph.xml` (CrossLink), `development-plan.xml` (depends) |
+| Новый маршрут | `knowledge-graph.xml` (route-xxx в M-ROUTES), `development-plan.xml` |
+| Удалён модуль/функция | Убрать из `knowledge-graph.xml`, `development-plan.xml`, `verification-plan.xml` |
+| Изменена логика проверки | `verification-plan.xml` (сценарии, лог-маркеры) |
+| Новый юзкейс | `requirements.xml` (UC-xxx), `development-plan.xml` (DataFlow), `verification-plan.xml` (CriticalFlow если важный) |
+| Версия проекта | `knowledge-graph.xml` → `Project VERSION` |
+
+### Уникальные теги (не нарушать!)
+В XML используются **уникальные ID как имена тегов** (не `<Module ID="...">`, а `<M-DATABASE ...>`). Это облегчает навигацию LLM. Соблюдай конвенцию:
+- Модули: `M-XXX`
+- Фазы: `Phase-N`
+- Потоки: `DF-XXX`
+- Юзкейсы: `UC-XXX`
+- Верификация: `V-M-XXX`
+- Критические потоки: `CF-XXX`
+
+### Верификация
+- Каждый новый модуль должен иметь запись `V-M-xxx` в `verification-plan.xml`.
+- Указывай сценарии (success/failure) и лог-маркеры формата `[Module][function][BLOCK_NAME]`.
+
+## Принципы
+
+1. **Граф всегда актуален** — knowledge-graph.xml не отстаёт от кода.
+2. **Top-Down** — Requirements → Plan → Verification → Contract → Code.
+3. **Governed Autonomy (PCAM)** — контракт определяет ЧТО, ты выбираешь КАК.
+4. **Верификация = архитектура** — если модуль нельзя проверить, он не готов.
