@@ -59,28 +59,7 @@ SQL;
             }
         }
 
-        $n = (int) $pdo->query('SELECT COUNT(*) FROM article_topics')->fetchColumn();
-        if ($n === 0) {
-            $st = $pdo->prepare(
-                'INSERT INTO article_topics (id, name, slug, description, sort_order) VALUES (?, ?, ?, ?, ?)'
-            );
-            foreach (self::ARTICLE_TOPICS as $t) {
-                $st->execute($t);
-            }
-        }
     }
-
-    /** @var list<array{0:string,1:string,2:string,3:string,4:int}> */
-    private const ARTICLE_TOPICS = [
-        ['materials', 'Материалы и инструменты', 'materials', 'Бисер, нити, инструменты, фурнитура, организация рабочего места.', 10],
-        ['techniques', 'Техники', 'techniques', 'Пейот, кирпичный стежок, жгут, станок и другие приёмы.', 20],
-        ['jewelry', 'Украшения', 'jewelry', 'Браслеты, серьги, колье, кольца, броши.', 30],
-        ['flowers', 'Цветы и композиции', 'flowers', 'Цветы, листья, деревья, букеты и панно.', 40],
-        ['figures', 'Фигурки и сувениры', 'figures', 'Фигурки, брелоки, тематические поделки.', 50],
-        ['combination', 'Комбинирование', 'combination', 'Сочетание бисера с камнями, сутажем, лентами, основами.', 60],
-        ['history', 'История и культура', 'history', 'История бисера, традиции, узоры, костюмы, дизайн.', 70],
-        ['trends', 'Современные тенденции', 'trends', 'Актуальные направления, стили и идеи для вдохновения.', 80],
-    ];
 
     /** @return list<array<int, mixed>> */
     private static function demoProducts(): array

@@ -4,7 +4,7 @@
 
 ## Назначение проекта
 
-Визитка мастера (украшения из бисера): каталог товаров, страницы «О мастере», контакты, FAQ. Админка: товары, категории, **контент сайта** (тексты/картинки из БД), FAQ, отзывы, пароль.
+Визитка мастера (украшения из бисера): каталог товаров, **раздел статей**, страницы «О мастере», контакты, FAQ. Админка: товары, категории, **контент сайта** (тексты/картинки из БД), FAQ, отзывы, пароль.
 
 **Стек:** PHP 8.2+, Slim 4, Twig 3, SQLite, Docker (Nginx + PHP-FPM). Фронт — CSS без сборки (`public/css/app.css`).
 
@@ -24,7 +24,9 @@
 | `app/ProductImages.php` | Нормализация путей к фото товаров, data-URL → файлы |
 | `app/SiteUpload.php` | Загрузка картинок для раздела «Контент» → `public/images/site/` |
 | `config/settings.php` | Env: `SITE_NAME`, контакты, соцсети, пути `DATA_DIR`, `IMAGES_DIR`, опционально **`BASE_PATH`**, **`PUBLIC_SITE_URL`** (канонический URL для SEO) |
-| `app/SeoHelper.php` | Абсолютный origin сайта, JSON-LD Organization / WebSite / Product / BreadcrumbList |
+| `app/ArticleContent.php` | Чтение статических статей из `content/articles/` (без БД) |
+| `app/SeoHelper.php` | Абсолютный origin сайта, JSON-LD Organization / WebSite / Product / BreadcrumbList / BlogPosting |
+| `content/articles/` | Статические HTML-файлы статей по темам + конфиг `_topics.php` |
 | `data/` | `marketbw.db` (на проде часто volume) |
 | `templates/` | Twig: `base.twig`, страницы, `admin/*`, `partials/*` |
 | `docker/` | Dockerfile, nginx, compose, `deploy.sh`, `env.example` |
@@ -92,6 +94,19 @@
 
 ---
 
+## Статьи (статика, без БД)
+
+Раздел «Статьи» (`/articles`) реализован **полностью статически** — без хранения в БД.
+
+- **Конфиг тем и статей:** `content/articles/_topics.php` — PHP-массив: ключ = slug темы → `name`, `description`, `articles[]` (slug, title, excerpt).
+- **HTML-файлы:** `content/articles/{topic_slug}/{article_slug}.html` — тело статьи в чистом HTML (без обёрток/шаблонов).
+- **PHP-класс:** `app/ArticleContent.php` — читает конфиг и файлы; используется маршрутами в `routes.php`.
+- **Twig-шаблоны:** `templates/articles/index.twig`, `topic.twig`, `article.twig`.
+- **Маршруты:** `GET /articles`, `GET /articles/{topicSlug}`, `GET /articles/{topicSlug}/{articleSlug}`.
+- **SEO:** BreadcrumbList + BlogPosting JSON-LD, canonical URL, sitemap.
+
+---
+
 ## Соглашения по коду
 
 - PHP: `declare(strict_types=1);`, namespace `App\` для классов в `app/`.
@@ -106,6 +121,7 @@
 | Задача | Место |
 |--------|--------|
 | Новая публичная страница | `app/routes.php` + `templates/*.twig`, при необходимости ключи в `SiteContentDefaults` |
+| Новая статья | HTML в `content/articles/{topic}/`, запись в `content/articles/_topics.php` |
 | Текст на существующей странице | Ключ в `SiteContentDefaults`, шаблон — `t('ключ')`, при необходимости поле в `adminGroups()` |
 | Стили сайта | `public/css/app.css` |
 | Env-переменные | `config/settings.php`, `docker/env.example` |
