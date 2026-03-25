@@ -1353,3 +1353,15 @@ textarea.mono {
   font-family: ui-monospace, Consolas, monospace;
   font-size: 0.9rem;
 }
+
+.article-extra {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.article-extra h2 {
+  font-family: var(--display);
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+}

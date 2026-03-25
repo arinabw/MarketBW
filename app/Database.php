@@ -154,6 +154,14 @@ SQL;
         }
 
         Seed::ifEmpty($this->pdo);
+
+        $countArticles = (int) $this->pdo->query('SELECT COUNT(*) FROM articles')->fetchColumn();
+        if ($countArticles === 0) {
+            $extracted = dirname(__DIR__) . '/temp/_extracted';
+            if (is_dir($extracted)) {
+                ArticleImport::importFromTxtDirectory($this, $extracted);
+            }
+        }
     }
 
     /** @return list<array<string, mixed>> */
