@@ -1,7 +1,7 @@
 <?php
 
 // FILE: app/SiteContentDefaults.php
-// VERSION: 3.12.2
+// VERSION: 3.12.4
 // START_MODULE_CONTRACT
 //   PURPOSE: Ключи и дефолтные значения CMS-текстов; группы для админки; image/boolean ключи
 //   SCOPE: defaults, adminGroups, imageKeys, layoutBooleanKeys, fieldLabel, inheritLegacyLayoutToggles

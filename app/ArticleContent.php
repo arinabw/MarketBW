@@ -1,7 +1,7 @@
 <?php
 
 // FILE: app/ArticleContent.php
-// VERSION: 3.12.2
+// VERSION: 3.12.4
 // START_MODULE_CONTRACT
 //   PURPOSE: Чтение статических статей из content/articles/ (PHP-конфиг + HTML-файлы, без БД)
 //   SCOPE: topics, topicList, topicBySlug, articlesInTopic, article, allPublishedSlugs

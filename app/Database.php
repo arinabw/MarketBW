@@ -8,7 +8,7 @@ use PDO;
 use PDOException;
 
 // FILE: app/Database.php
-// VERSION: 3.12.2
+// VERSION: 3.12.4
 // START_MODULE_CONTRACT
 //   PURPOSE: PDO SQLite: инициализация схемы, CRUD для products, categories, reviews, faqs, users, site_content, contact_messages, audit_log
 //   SCOPE: init, categories, products, productById, createProduct, updateProduct, deleteProduct, faqs, authenticate, getMergedSiteContent, saveSiteContent, contactMessages, appendAuditLog, updatePassword

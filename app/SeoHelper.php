@@ -1,7 +1,7 @@
 <?php
 
 // FILE: app/SeoHelper.php
-// VERSION: 3.12.0
+// VERSION: 3.12.4
 // START_MODULE_CONTRACT
 //   PURPOSE: SEO-утилиты: canonical URL, JSON-LD (Organization, WebSite, Product, BreadcrumbList, BlogPosting, FAQPage, ItemList, CollectionPage)
 //   SCOPE: resolvePublicBase, buildOrganizationJsonLd, buildWebSiteJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd, buildBlogPostingJsonLd, buildFaqPageJsonLd, buildItemListJsonLd, buildCollectionPageJsonLd

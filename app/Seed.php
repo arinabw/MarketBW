@@ -1,7 +1,7 @@
 <?php
 
 // FILE: app/Seed.php
-// VERSION: 3.12.2
+// VERSION: 3.12.4
 // START_MODULE_CONTRACT
 //   PURPOSE: Вставка демо-данных (категории, товары, отзывы, FAQ) при пустых таблицах
 //   SCOPE: ifEmpty() — проверка COUNT(*) и INSERT демо-записей

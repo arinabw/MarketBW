@@ -1,7 +1,7 @@
 <?php
 
 // FILE: app/ProductImages.php
-// VERSION: 3.12.2
+// VERSION: 3.12.4
 // START_MODULE_CONTRACT
 //   PURPOSE: Нормализация путей к фото товаров; конвертация data-URL в файлы на диске
 //   SCOPE: normalizeFromForm, migrateStoredDataUrls, saveDataUrlToFile

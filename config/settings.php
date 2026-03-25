@@ -1,7 +1,7 @@
 <?php
 
 // FILE: config/settings.php
-// VERSION: 3.12.2
+// VERSION: 3.12.4
 // START_MODULE_CONTRACT
 //   PURPOSE: Конфигурация приложения из env-переменных и дефолтов
 //   SCOPE: site_name, contacts, social, paths, base_path, public_site_url, session, debug

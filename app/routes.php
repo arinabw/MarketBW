@@ -1,7 +1,7 @@
 <?php
 
 // FILE: app/routes.php
-// VERSION: 3.12.2
+// VERSION: 3.12.4
 // START_MODULE_CONTRACT
 //   PURPOSE: Все HTTP-маршруты: публичные страницы + группа /admin с guard; хелперы загрузки изображений
 //   SCOPE: GET /, /catalog, /product, /about, /contact, /faq, /articles, /sitemap.xml, /robots.txt; POST /contact; /admin/* CRUD
