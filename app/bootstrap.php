@@ -51,11 +51,6 @@ $containerBuilder->addDefinitions([
         $env->addGlobal('site_name', $settings['site_name']);
         $env->addGlobal('app_version', $settings['app_version'] ?? '0.0.0');
         $env->addGlobal('contact_email', $settings['contact_email']);
-        $env->addGlobal('contact_phone', $settings['contact_phone']);
-        $env->addGlobal('social_instagram', $settings['social_instagram']);
-        $env->addGlobal('social_telegram', $settings['social_telegram']);
-        $env->addGlobal('social_vk', $settings['social_vk']);
-        $env->addGlobal('contact_whatsapp', $settings['contact_whatsapp']);
         $env->addGlobal('master_name', $settings['master_name']);
         $env->addGlobal('master_tagline', $settings['master_tagline']);
         $env->addFunction(new \Twig\TwigFunction('csrf_token', function (): string {
