@@ -1,0 +1,5 @@
+{% set _tag = price_tag|default('div') %}
+<{{ _tag }} class="{{ extra_classes }} price-with-note">
+  <span class="price-with-note__value">{{ price|price_rub }}<span class="price-with-note__star" aria-hidden="true">*</span></span>
+  <span class="price-with-note__hint">{{ t('catalog.price_approx_note') }}</span>
+</{{ _tag }}>

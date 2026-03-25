@@ -1,7 +1,7 @@
 <?php
 
 // FILE: app/SiteContentDefaults.php
-// VERSION: 3.13.1
+// VERSION: 3.13.2
 // START_MODULE_CONTRACT
 //   PURPOSE: Ключи и дефолтные значения CMS-текстов; группы для админки; image/boolean ключи
 //   SCOPE: defaults, adminGroups, imageKeys, layoutBooleanKeys, fieldLabel, inheritLegacyLayoutToggles
@@ -138,6 +138,7 @@ final class SiteContentDefaults
             'catalog.btn_apply' => 'Применить',
             'catalog.chip_all' => 'Все',
             'catalog.card_open' => 'Открыть',
+            'catalog.price_approx_note' => 'цена ориентировочная и подлежит уточнению при заказе',
             'catalog.empty_hint' => 'Ничего не найдено. <a href="/catalog">Сбросить фильтры</a> или измените запрос.',
 
             'faq.page_title' => 'Вопросы и ответы',
@@ -323,7 +324,7 @@ final class SiteContentDefaults
             'Каталог' => [
                 'catalog.page_title', 'catalog.page_sub', 'catalog.search_placeholder',
                 'catalog.sort_new', 'catalog.sort_price_asc', 'catalog.sort_price_desc', 'catalog.btn_apply',
-                'catalog.chip_all', 'catalog.card_open', 'catalog.empty_hint',
+                'catalog.chip_all', 'catalog.card_open', 'catalog.price_approx_note', 'catalog.empty_hint',
             ],
             'FAQ (заголовки страницы)' => ['faq.page_title', 'faq.page_sub'],
             'Статьи (заголовки раздела)' => [
@@ -385,6 +386,7 @@ final class SiteContentDefaults
             'nav.contact' => 'Меню: Контакты',
             'nav.faq' => 'Меню: FAQ',
             'nav.articles' => 'Меню: Статьи',
+            'catalog.price_approx_note' => 'Каталог и карточка товара: приписка к цене (рядом со звёздочкой)',
             'articles.page_title' => 'Статьи: заголовок H1 на списке тем',
             'articles.page_sub' => 'Статьи: подзаголовок под H1',
             'articles.topic_empty' => 'Статьи: текст, если в теме нет опубликованных статей',

@@ -29,7 +29,7 @@ COPY content ./content
 COPY composer.json ./
 COPY VERSION /var/www/VERSION
 
-LABEL org.opencontainers.image.version="3.13.1"
+LABEL org.opencontainers.image.version="3.13.2"
 
 # Демо-картинки в образе; на сервере можно смонтировать том поверх /var/www/images
 COPY public/images /var/www/images

@@ -70,7 +70,7 @@
       <h1 class="product-info__title">{{ product.name }}</h1>
       {% endif %}
       {% if layout_visible('layout.show_product_price') %}
-      <p class="product-info__price">{{ product.price|price_rub }}</p>
+      {% include 'partials/price_with_note.twig' with { price: product.price, price_tag: 'p', extra_classes: 'product-info__price' } %}
       {% endif %}
       {% if layout_visible('layout.show_product_description') %}
       <p class="muted product-info__desc">{{ product.description }}</p>

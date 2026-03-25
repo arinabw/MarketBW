@@ -88,7 +88,7 @@
         </a>
         <div class="card__body">
           <h3 class="card__title"><a href="{{ path('/product/' ~ p.id) }}">{{ p.name }}</a></h3>
-          <div class="card__meta">{{ p.price|price_rub }}</div>
+          {% include 'partials/price_with_note.twig' with { price: p.price, price_tag: 'div', extra_classes: 'card__meta' } %}
           <p class="card__text">{{ p.description|slice(0, 120) }}{% if p.description|length > 120 %}…{% endif %}</p>
           <a class="card__link" href="{{ path('/product/' ~ p.id) }}">{{ t('home.card_more') }}</a>
         </div>

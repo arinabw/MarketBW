@@ -428,6 +428,49 @@ img {
   margin-bottom: 0.5rem;
 }
 
+.price-with-note {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.price-with-note__value {
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.card__meta.price-with-note {
+  font-weight: 400;
+  color: inherit;
+}
+
+.card__meta.price-with-note .price-with-note__value {
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.price-with-note__star {
+  margin-left: 0.12em;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.price-with-note__hint {
+  font-size: 0.78rem;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+.product-info__price.price-with-note {
+  margin: 0 0 0.75rem;
+  font-size: 1.35rem;
+}
+
+.product-info__price.price-with-note .price-with-note__hint {
+  font-size: 0.82rem;
+}
+
 .card__text {
   color: var(--text-muted);
   font-size: 0.92rem;
