@@ -1,5 +1,6 @@
 {% extends "base.twig" %}
 
+{% block title %}{{ site_name }} — украшения из бисера ручной работы | бижутерия, подарки, бисероплетение{% endblock %}
 {% block meta_description %}{{ t('meta.description') }}{% endblock %}
 
 {% block body %}
@@ -52,7 +53,7 @@
       {% for c in categories %}
       <a class="card card--link" href="{{ catalog_url(c.id, null, null) }}">
         <div class="card__img">
-          <img src="{{ c.image }}" alt="{{ c.name }}" loading="lazy" width="400" height="400">
+          <img src="{{ c.image }}" alt="{{ c.name }} — категория украшений из бисера" loading="lazy" width="400" height="400">
         </div>
         <div class="card__body">
           <h3 class="card__title">{{ c.name }}</h3>
@@ -83,7 +84,7 @@
       <article class="card">
         <a href="{{ path('/product/' ~ p.id) }}" class="card__img">
           {% set img = p.images[0] ?? '/images/placeholder.svg' %}
-          <img src="{{ img }}" alt="{{ p.name }}" loading="lazy" width="400" height="400">
+          <img src="{{ img }}" alt="{{ p.name }} — бисерное украшение ручной работы" loading="lazy" width="400" height="400">
         </a>
         <div class="card__body">
           <h3 class="card__title"><a href="{{ path('/product/' ~ p.id) }}">{{ p.name }}</a></h3>

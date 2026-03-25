@@ -1,7 +1,8 @@
 {% extends "base.twig" %}
 
-{% block title %}{{ product.name }} — {{ site_name }}{% endblock %}
-{% block meta_description %}{% set _desc = product.description|striptags|replace({"\n": ' ', "\r": ' '})|trim %}{{ _desc|slice(0, 158) }}{% if _desc|length > 158 %}…{% endif %}{% endblock %}
+{% block title %}{{ product.name }}{% if category_name is defined and category_name %} — {{ category_name }}{% endif %} | купить украшение из бисера | {{ site_name }}{% endblock %}
+{% block meta_description %}{{ product.name }}{% if category_name is defined and category_name %} ({{ category_name }}){% endif %} — {% set _desc = product.description|striptags|replace({"\n": ' ', "\r": ' '})|trim %}{{ _desc|slice(0, 120) }}{% if _desc|length > 120 %}…{% endif %} Купить бижутерию ручной работы.{% endblock %}
+{% block meta_keywords %}{{ product.name }}, {% if category_name is defined and category_name %}{{ category_name }}, {% endif %}украшение из бисера, бижутерия ручной работы, купить подарок, {{ site_name }}{% endblock %}
 {% block og_type %}product{% endblock %}
 {% block social_image %}
 {% if product.images[0] is defined and product.images[0] %}

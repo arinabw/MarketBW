@@ -75,10 +75,17 @@ final class SeoHelper
     {
         return [
             'Бисероплетение',
-            'Украшения ручной работы',
+            'Украшения из бисера',
+            'Бижутерия ручной работы',
             'Рукоделие',
             'Подарки ручной работы',
+            'Оригинальные подарки',
             'Изделия из бисера',
+            'Авторские украшения',
+            'Колье из бисера',
+            'Браслеты из бисера',
+            'Серьги из бисера',
+            'Броши из бисера',
         ];
     }
 
@@ -254,6 +261,94 @@ final class SeoHelper
         ];
         if ($description !== '') {
             $data['description'] = $description;
+        }
+
+        return self::encodeJsonLd($data);
+    }
+
+    /**
+     * @param list<array{question: string, answer: string}> $faqs
+     */
+    public static function buildFaqPageJsonLd(array $faqs): string
+    {
+        if ($faqs === []) {
+            return '';
+        }
+        $entities = [];
+        foreach ($faqs as $faq) {
+            $entities[] = [
+                '@type' => 'Question',
+                'name' => (string) ($faq['question'] ?? ''),
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text' => (string) ($faq['answer'] ?? ''),
+                ],
+            ];
+        }
+
+        return self::encodeJsonLd([
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            'mainEntity' => $entities,
+        ]);
+    }
+
+    /**
+     * @param list<array{url: string, name: string, image?: string, position?: int}> $items
+     */
+    public static function buildItemListJsonLd(array $items, string $listName = ''): string
+    {
+        if ($items === []) {
+            return '';
+        }
+        $elements = [];
+        $pos = 1;
+        foreach ($items as $it) {
+            $el = [
+                '@type' => 'ListItem',
+                'position' => $it['position'] ?? $pos,
+                'url' => $it['url'],
+                'name' => $it['name'],
+            ];
+            if (!empty($it['image'])) {
+                $el['image'] = $it['image'];
+            }
+            $elements[] = $el;
+            $pos++;
+        }
+        $data = [
+            '@context' => 'https://schema.org',
+            '@type' => 'ItemList',
+            'itemListElement' => $elements,
+        ];
+        if ($listName !== '') {
+            $data['name'] = $listName;
+        }
+
+        return self::encodeJsonLd($data);
+    }
+
+    public static function buildCollectionPageJsonLd(
+        string $name,
+        string $url,
+        string $description = '',
+        int $numberOfItems = 0,
+    ): string {
+        $data = [
+            '@context' => 'https://schema.org',
+            '@type' => 'CollectionPage',
+            'name' => $name,
+            'url' => $url,
+            'inLanguage' => 'ru-RU',
+        ];
+        if ($description !== '') {
+            $data['description'] = $description;
+        }
+        if ($numberOfItems > 0) {
+            $data['mainEntity' ] = [
+                '@type' => 'ItemList',
+                'numberOfItems' => $numberOfItems,
+            ];
         }
 
         return self::encodeJsonLd($data);

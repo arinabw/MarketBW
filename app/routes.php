@@ -62,11 +62,18 @@ return function (App $app, ContainerInterface $container): void {
         $bp = trim($app->getBasePath(), '/');
         $adminPrefix = ($bp !== '' ? '/' . $bp : '') . '/admin';
         $sitemapUrl = $base !== '' ? (rtrim($base, '/') . $withBase('/sitemap.xml')) : $withBase('/sitemap.xml');
+        $catalogPrefix = ($bp !== '' ? '/' . $bp : '') . '/catalog';
+        $articlesPrefix = ($bp !== '' ? '/' . $bp : '') . '/articles';
         $lines = [
             'User-agent: *',
             'Allow: /',
+            'Allow: ' . $catalogPrefix,
+            'Allow: ' . $articlesPrefix,
             '',
             'Disallow: ' . $adminPrefix,
+            'Disallow: /*?sort=',
+            '',
+            'Host: ' . ($base !== '' ? rtrim($base, '/') : 'marketbw.ru'),
             '',
             'Sitemap: ' . $sitemapUrl,
         ];
@@ -83,29 +90,31 @@ return function (App $app, ContainerInterface $container): void {
 
             return $response->withHeader('Content-Type', 'application/xml; charset=UTF-8');
         }
+        $today = date('Y-m-d');
         $urls = [];
-        $add = static function (string $path, string $changefreq = 'weekly', string $priority = '0.8') use (&$urls, $base, $withBase): void {
+        $add = static function (string $path, string $changefreq = 'weekly', string $priority = '0.8', ?string $lastmod = null) use (&$urls, $base, $withBase, $today): void {
             $loc = htmlspecialchars(rtrim($base, '/') . $withBase($path), ENT_XML1 | ENT_QUOTES, 'UTF-8');
-            $urls[] = '<url><loc>' . $loc . '</loc><changefreq>' . $changefreq . '</changefreq><priority>' . $priority . '</priority></url>';
+            $lm = $lastmod ?? $today;
+            $urls[] = '<url><loc>' . $loc . '</loc><lastmod>' . $lm . '</lastmod><changefreq>' . $changefreq . '</changefreq><priority>' . $priority . '</priority></url>';
         };
         $add('/', 'daily', '1.0');
-        $add('/catalog', 'daily', '0.9');
+        $add('/catalog', 'daily', '0.95');
         $add('/about', 'monthly', '0.7');
-        $add('/contact', 'monthly', '0.8');
+        $add('/contact', 'monthly', '0.6');
         $add('/faq', 'weekly', '0.7');
-        $add('/articles', 'weekly', '0.75');
+        $add('/articles', 'weekly', '0.8');
         $ac = new ArticleContent();
         foreach ($ac->topicList() as $t) {
-            $add('/articles/' . rawurlencode($t['slug']), 'weekly', '0.72');
+            $add('/articles/' . rawurlencode($t['slug']), 'weekly', '0.75');
         }
         foreach ($ac->allPublishedSlugs() as $row) {
-            $add('/articles/' . rawurlencode($row['topic_slug']) . '/' . rawurlencode($row['slug']), 'monthly', '0.68');
+            $add('/articles/' . rawurlencode($row['topic_slug']) . '/' . rawurlencode($row['slug']), 'monthly', '0.7');
         }
         foreach ($db()->categories() as $c) {
             if (!isset($c['id'])) {
                 continue;
             }
-            $add('/catalog?' . http_build_query(['category' => (string) $c['id']]), 'weekly', '0.8');
+            $add('/catalog?' . http_build_query(['category' => (string) $c['id']]), 'weekly', '0.85');
         }
         foreach ($db()->allProductIds() as $pid) {
             $add('/product/' . rawurlencode($pid), 'weekly', '0.9');
@@ -158,13 +167,28 @@ return function (App $app, ContainerInterface $container): void {
             }
         }
 
+        $products = $database->products($cat, $search, $sort);
+        $itemListItems = [];
+        if ($pub !== '') {
+            $pos = 1;
+            foreach ($products as $p) {
+                $pUrl = rtrim($pub, '/') . $withBase('/product/' . rawurlencode((string) $p['id']));
+                $img = '';
+                if (!empty($p['images'][0]) && is_string($p['images'][0])) {
+                    $img = str_starts_with($p['images'][0], 'http') ? $p['images'][0] : rtrim($pub, '/') . '/' . ltrim($p['images'][0], '/');
+                }
+                $itemListItems[] = ['url' => $pUrl, 'name' => (string) $p['name'], 'image' => $img, 'position' => $pos++];
+            }
+        }
+
         return $view()->render($response, 'catalog.twig', [
-            'products' => $database->products($cat, $search, $sort),
+            'products' => $products,
             'categories' => $database->categories(),
             'active_category' => $cat,
             'search_q' => $search ?? '',
             'sort' => $sort,
             'breadcrumb_json_ld' => $pub !== '' ? SeoHelper::buildBreadcrumbJsonLd($bcItems) : '',
+            'itemlist_json_ld' => SeoHelper::buildItemListJsonLd($itemListItems, 'Каталог украшений из бисера'),
         ]);
     });
 
@@ -302,9 +326,11 @@ return function (App $app, ContainerInterface $container): void {
 
     $app->get('/faq', function (Request $request, Response $response) use ($db, $view, $settings, $app, $withBase): Response {
         $pub = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
+        $faqs = $db()->faqs();
 
         return $view()->render($response, 'faq.twig', [
-            'faqs' => $db()->faqs(),
+            'faqs' => $faqs,
+            'faq_json_ld' => SeoHelper::buildFaqPageJsonLd($faqs),
             'breadcrumb_json_ld' => $pub !== '' ? SeoHelper::buildBreadcrumbJsonLd([
                 ['name' => 'Главная', 'url' => rtrim($pub, '/') . '/'],
                 ['name' => 'Вопросы и ответы', 'url' => rtrim($pub, '/') . $withBase('/faq')],
@@ -384,12 +410,22 @@ return function (App $app, ContainerInterface $container): void {
 
     $app->get('/articles', function (Request $request, Response $response) use ($articles, $view, $settings, $app, $withBase): Response {
         $pub = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
+        $ac = $articles();
+        $topicList = $ac->topicList();
+        $totalArticles = count($ac->allPublishedSlugs());
+        $articlesUrl = $pub !== '' ? rtrim($pub, '/') . $withBase('/articles') : '';
 
         return $view()->render($response, 'articles/index.twig', [
-            'topics' => $articles()->topicList(),
+            'topics' => $topicList,
+            'collection_json_ld' => $articlesUrl !== '' ? SeoHelper::buildCollectionPageJsonLd(
+                'Статьи о бисере и бисероплетении',
+                $articlesUrl,
+                'Материалы, техники плетения, идеи украшений из бисера, история рукоделия и тренды бижутерии.',
+                $totalArticles,
+            ) : '',
             'breadcrumb_json_ld' => $pub !== '' ? SeoHelper::buildBreadcrumbJsonLd([
                 ['name' => 'Главная', 'url' => rtrim($pub, '/') . '/'],
-                ['name' => 'Статьи', 'url' => rtrim($pub, '/') . $withBase('/articles')],
+                ['name' => 'Статьи', 'url' => $articlesUrl],
             ]) : '',
         ]);
     });

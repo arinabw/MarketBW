@@ -7,9 +7,9 @@
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
   {% endblock %}
   <meta name="description" content="{% block meta_description %}{{ t('meta.description') }}{% endblock %}">
-  {% set _kw = t('meta.keywords')|trim %}
-  {% if _kw != '' %}
-  <meta name="keywords" content="{{ _kw }}">
+  {% set _kw %}{% block meta_keywords %}{{ t('meta.keywords') }}{% endblock %}{% endset %}
+  {% if _kw|trim != '' %}
+  <meta name="keywords" content="{{ _kw|trim }}">
   {% endif %}
   <title>{% block title %}{{ site_name }}{% endblock %}</title>
   {% if seo_canonical_url != '' %}

@@ -1,7 +1,7 @@
 {% extends "base.twig" %}
 
-{% block title %}{{ topic.name }} — {{ t('articles.page_title') }} — {{ site_name }}{% endblock %}
-{% block meta_description %}{{ topic.description|default('')|slice(0, 160) }}{% endblock %}
+{% block title %}{{ topic.name }} — статьи о бисере и бисероплетении | {{ site_name }}{% endblock %}
+{% block meta_description %}{{ topic.description|default('') }} Статьи и советы по бисероплетению и рукоделию. {{ site_name }}.{% endblock %}
 
 {% block head_structured_extra %}
 {% if breadcrumb_json_ld is defined and breadcrumb_json_ld != '' %}

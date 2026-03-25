@@ -1,11 +1,15 @@
 {% extends "base.twig" %}
 
-{% block title %}{{ t('catalog.page_title') }} — {{ site_name }}{% endblock %}
-{% block meta_description %}{{ t('catalog.page_title') }} — {{ t('catalog.page_sub') }} {{ site_name }}.{% endblock %}
+{% block title %}{{ t('catalog.page_title') }} украшений из бисера — бижутерия ручной работы | {{ site_name }}{% endblock %}
+{% block meta_description %}{{ t('catalog.page_sub') }}{% endblock %}
+{% block meta_keywords %}каталог украшений из бисера, купить бижутерию, бисерные украшения, колье из бисера, браслеты из бисера, серьги из бисера, броши ручной работы, оригинальные подарки, {{ site_name }}{% endblock %}
 
 {% block head_structured_extra %}
 {% if breadcrumb_json_ld is defined and breadcrumb_json_ld != '' %}
 <script type="application/ld+json">{{ breadcrumb_json_ld|raw }}</script>
+{% endif %}
+{% if itemlist_json_ld is defined and itemlist_json_ld != '' %}
+<script type="application/ld+json">{{ itemlist_json_ld|raw }}</script>
 {% endif %}
 {% endblock %}
 
@@ -50,7 +54,7 @@
       <article class="card">
         <a href="{{ path('/product/' ~ p.id) }}" class="card__img">
           {% set img = p.images[0] ?? '/images/placeholder.svg' %}
-          <img src="{{ img }}" alt="{{ p.name }}" loading="lazy" width="400" height="400">
+          <img src="{{ img }}" alt="{{ p.name }} — украшение из бисера ручной работы" loading="lazy" width="400" height="400">
         </a>
         <div class="card__body">
           <h2 class="card__title"><a href="{{ path('/product/' ~ p.id) }}">{{ p.name }}</a></h2>

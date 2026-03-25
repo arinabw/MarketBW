@@ -660,8 +660,8 @@ textarea {
 }
 
 .faq-item {
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
+  margin-bottom: 0;
+  padding: 1rem 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -669,14 +669,44 @@ textarea {
   border-bottom: 0;
 }
 
+.faq-item[open] .faq-q {
+  margin-bottom: 0.5rem;
+}
+
 .faq-q {
   font-weight: 700;
-  margin: 0 0 0.35rem;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.faq-q::-webkit-details-marker {
+  display: none;
+}
+
+.faq-q::after {
+  content: '+';
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--primary);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.faq-item[open] .faq-q::after {
+  content: '−';
 }
 
 .faq-a {
   margin: 0;
   color: var(--text-muted);
+}
+
+.faq-a p {
+  margin: 0;
 }
 
 .page-hero {

@@ -1,11 +1,14 @@
 {% extends "base.twig" %}
 
-{% block title %}{{ t('faq.page_title') }} — {{ site_name }}{% endblock %}
-{% block meta_description %}{{ t('faq.page_title') }} — вопросы и ответы. {{ site_name }}, {{ master_tagline|slice(0, 80) }}.{% endblock %}
+{% block title %}{{ t('faq.page_title') }} — украшения из бисера, заказ и доставка | {{ site_name }}{% endblock %}
+{% block meta_description %}{{ t('faq.page_sub') }}{% endblock %}
 
 {% block head_structured_extra %}
 {% if breadcrumb_json_ld is defined and breadcrumb_json_ld != '' %}
 <script type="application/ld+json">{{ breadcrumb_json_ld|raw }}</script>
+{% endif %}
+{% if faq_json_ld is defined and faq_json_ld != '' %}
+<script type="application/ld+json">{{ faq_json_ld|raw }}</script>
 {% endif %}
 {% endblock %}
 
@@ -17,13 +20,15 @@
   </div>
 </section>
 
-<section class="section section--white">
+<section class="section section--white" itemscope itemtype="https://schema.org/FAQPage">
   <div class="container" style="max-width:720px;margin:0 auto">
     {% for f in faqs %}
-    <div class="faq-item">
-      <p class="faq-q">{{ f.question }}</p>
-      <p class="faq-a">{{ f.answer }}</p>
-    </div>
+    <details class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+      <summary class="faq-q" itemprop="name">{{ f.question }}</summary>
+      <div class="faq-a" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+        <p itemprop="text">{{ f.answer }}</p>
+      </div>
+    </details>
     {% endfor %}
   </div>
 </section>
