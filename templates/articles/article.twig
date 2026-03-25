@@ -1,7 +1,7 @@
 {% extends "base.twig" %}
 
 {% block title %}{{ article.title }} — бисероплетение | {{ site_name }}{% endblock %}
-{% block meta_description %}{{ article_meta_description|default('') }} {{ site_name }} — статьи о бисере и рукоделии.{% endblock %}
+{% block meta_description %}{{ article_meta_description|default('')|slice(0, 140) }} | {{ site_name }}{% endblock %}
 {% block meta_keywords %}{{ article.title }}, {{ article.topic_name }}, бисероплетение, бисер, рукоделие, украшения из бисера, {{ site_name }}{% endblock %}
 {% block og_type %}article{% endblock %}
 

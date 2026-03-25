@@ -107,8 +107,11 @@ return function (App $app, ContainerInterface $container): void {
         foreach ($ac->topicList() as $t) {
             $add('/articles/' . rawurlencode($t['slug']), 'weekly', '0.75');
         }
+        $articleDir = dirname(__DIR__) . '/content/articles';
         foreach ($ac->allPublishedSlugs() as $row) {
-            $add('/articles/' . rawurlencode($row['topic_slug']) . '/' . rawurlencode($row['slug']), 'monthly', '0.7');
+            $htmlPath = $articleDir . '/' . $row['topic_slug'] . '/' . $row['slug'] . '.html';
+            $articleLastmod = is_file($htmlPath) ? date('Y-m-d', filemtime($htmlPath)) : $today;
+            $add('/articles/' . rawurlencode($row['topic_slug']) . '/' . rawurlencode($row['slug']), 'monthly', '0.7', $articleLastmod);
         }
         foreach ($db()->categories() as $c) {
             if (!isset($c['id'])) {
@@ -155,16 +158,23 @@ return function (App $app, ContainerInterface $container): void {
             ['name' => 'Главная', 'url' => rtrim($pub, '/') . '/'],
             ['name' => 'Каталог', 'url' => rtrim($pub, '/') . $withBase('/catalog')],
         ];
+        $catalogCategoryName = '';
         if ($cat !== null && $cat !== '') {
             foreach ($database->categories() as $c) {
                 if ($c['id'] === $cat) {
+                    $catalogCategoryName = (string) $c['name'];
                     $bcItems[] = [
-                        'name' => (string) $c['name'],
+                        'name' => $catalogCategoryName,
                         'url' => rtrim($pub, '/') . $withBase('/catalog?' . http_build_query(['category' => $cat])),
                     ];
                     break;
                 }
             }
+        }
+
+        $catalogCanonical = rtrim($pub, '/') . $withBase('/catalog');
+        if ($catalogCategoryName !== '' && $search === null && $sort === 'date_desc') {
+            $catalogCanonical = rtrim($pub, '/') . $withBase('/catalog?' . http_build_query(['category' => $cat]));
         }
 
         $products = $database->products($cat, $search, $sort);
@@ -185,8 +195,10 @@ return function (App $app, ContainerInterface $container): void {
             'products' => $products,
             'categories' => $database->categories(),
             'active_category' => $cat,
+            'catalog_category_name' => $catalogCategoryName,
             'search_q' => $search ?? '',
             'sort' => $sort,
+            'catalog_canonical' => $catalogCanonical,
             'breadcrumb_json_ld' => $pub !== '' ? SeoHelper::buildBreadcrumbJsonLd($bcItems) : '',
             'itemlist_json_ld' => SeoHelper::buildItemListJsonLd($itemListItems, 'Каталог украшений из бисера'),
         ]);
@@ -219,6 +231,7 @@ return function (App $app, ContainerInterface $container): void {
         $pub = SeoHelper::resolvePublicBase($request, $settings(), $app->getBasePath());
         $pageUrl = $pub !== '' ? rtrim($pub, '/') . $withBase('/product/' . $args['id']) : '';
         $siteName = (string) ($settings()['site_name'] ?? '');
+        $reviews = $database->reviews((string) $args['id']);
         $productJsonLd = ($pageUrl !== '' && $pub !== '')
             ? SeoHelper::buildProductJsonLd(
                 $product,
@@ -226,6 +239,7 @@ return function (App $app, ContainerInterface $container): void {
                 $pub,
                 $categoryName !== null ? (string) $categoryName : null,
                 $siteName,
+                $reviews,
             )
             : '';
 
@@ -249,7 +263,7 @@ return function (App $app, ContainerInterface $container): void {
             'product' => $product,
             'category_name' => $categoryName,
             'categories' => $database->categories(),
-            'reviews' => $database->reviews((string) $args['id']),
+            'reviews' => $reviews,
             'product_json_ld' => $productJsonLd,
             'breadcrumb_json_ld' => $breadcrumbJsonLd,
         ]);
@@ -365,10 +379,26 @@ return function (App $app, ContainerInterface $container): void {
         $articleUrl = $pub !== '' ? rtrim($pub, '/') . $withBase('/articles/' . rawurlencode($topicSlug) . '/' . rawurlencode($articleSlug)) : '';
         $desc = (string) ($row['excerpt'] ?? '');
 
+        $articleDir = dirname(__DIR__) . '/content/articles';
+        $htmlPath = $articleDir . '/' . $topicSlug . '/' . $articleSlug . '.html';
+        $fileMtime = is_file($htmlPath) ? date('Y-m-d', filemtime($htmlPath)) : date('Y-m-d');
+        $masterName = (string) ($settings()['master_name'] ?? '');
+        $siteName = (string) ($settings()['site_name'] ?? '');
+        $publisherLogoUrl = $pub !== '' ? rtrim($pub, '/') . $withBase('/favicon.svg') : '';
+
         return $view()->render($response, 'articles/article.twig', [
             'article' => $row,
             'article_meta_description' => $desc,
-            'article_json_ld' => $articleUrl !== '' ? SeoHelper::buildBlogPostingJsonLd((string) $row['title'], $articleUrl, date('Y-m-d'), $desc) : '',
+            'article_json_ld' => $articleUrl !== '' ? SeoHelper::buildBlogPostingJsonLd(
+                (string) $row['title'],
+                $articleUrl,
+                $fileMtime,
+                $fileMtime,
+                $desc,
+                $masterName,
+                $siteName,
+                $publisherLogoUrl,
+            ) : '',
             'breadcrumb_json_ld' => $pub !== '' ? SeoHelper::buildBreadcrumbJsonLd([
                 ['name' => 'Главная', 'url' => rtrim($pub, '/') . '/'],
                 ['name' => 'Статьи', 'url' => rtrim($pub, '/') . $withBase('/articles')],

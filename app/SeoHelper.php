@@ -1,23 +1,26 @@
 <?php
 
 // FILE: app/SeoHelper.php
-// VERSION: 3.10.0
+// VERSION: 3.12.0
 // START_MODULE_CONTRACT
-//   PURPOSE: SEO-утилиты: canonical URL, JSON-LD (Organization, WebSite, Product, BreadcrumbList, BlogPosting)
-//   SCOPE: resolvePublicBase, buildOrganizationJsonLd, buildWebSiteJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd, buildBlogPostingJsonLd
+//   PURPOSE: SEO-утилиты: canonical URL, JSON-LD (Organization, WebSite, Product, BreadcrumbList, BlogPosting, FAQPage, ItemList, CollectionPage)
+//   SCOPE: resolvePublicBase, buildOrganizationJsonLd, buildWebSiteJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd, buildBlogPostingJsonLd, buildFaqPageJsonLd, buildItemListJsonLd, buildCollectionPageJsonLd
 //   DEPENDS: M-SETTINGS (public_site_url)
 //   LINKS: M-SEO
 // END_MODULE_CONTRACT
 //
 // START_MODULE_MAP
-//   resolvePublicBase        — абсолютный origin из settings или request
-//   inferFromRequest         — fallback: вычисление origin из HTTP-заголовков
-//   thematicKnowsAbout      — список тем для schema.org
-//   buildProductJsonLd       — JSON-LD @type Product
-//   buildOrganizationJsonLd  — JSON-LD @type Organization
-//   buildWebSiteJsonLd       — JSON-LD @type WebSite
-//   buildBreadcrumbJsonLd    — JSON-LD @type BreadcrumbList
-//   buildBlogPostingJsonLd   — JSON-LD @type BlogPosting
+//   resolvePublicBase          — абсолютный origin из settings или request
+//   inferFromRequest           — fallback: вычисление origin из HTTP-заголовков
+//   thematicKnowsAbout        — список тем для schema.org
+//   buildProductJsonLd         — JSON-LD @type Product (+ aggregateRating)
+//   buildOrganizationJsonLd    — JSON-LD @type Organization (+ logo, contactPoint)
+//   buildWebSiteJsonLd         — JSON-LD @type WebSite
+//   buildBreadcrumbJsonLd      — JSON-LD @type BreadcrumbList
+//   buildBlogPostingJsonLd     — JSON-LD @type BlogPosting (author, publisher, image)
+//   buildFaqPageJsonLd         — JSON-LD @type FAQPage
+//   buildItemListJsonLd        — JSON-LD @type ItemList
+//   buildCollectionPageJsonLd  — JSON-LD @type CollectionPage
 // END_MODULE_MAP
 
 declare(strict_types=1);
@@ -100,6 +103,7 @@ final class SeoHelper
         string $absoluteBase,
         ?string $categoryName = null,
         string $brandName = '',
+        array $reviews = [],
     ): string {
         $imgs = [];
         foreach ($product['images'] ?? [] as $img) {
@@ -150,6 +154,26 @@ final class SeoHelper
         if (is_array($materials) && $materials !== []) {
             $data['material'] = implode(', ', array_map(static fn ($m): string => (string) $m, $materials));
         }
+        if ($reviews !== []) {
+            $total = 0;
+            $count = 0;
+            foreach ($reviews as $rev) {
+                $rating = (int) ($rev['rating'] ?? 0);
+                if ($rating > 0) {
+                    $total += $rating;
+                    $count++;
+                }
+            }
+            if ($count > 0) {
+                $data['aggregateRating'] = [
+                    '@type' => 'AggregateRating',
+                    'ratingValue' => round($total / $count, 1),
+                    'reviewCount' => $count,
+                    'bestRating' => 5,
+                    'worstRating' => 1,
+                ];
+            }
+        }
 
         return self::encodeJsonLd($data);
     }
@@ -167,6 +191,7 @@ final class SeoHelper
         array $sameAs,
         array $knowsAbout = [],
         ?string $keywords = null,
+        string $logoUrl = '',
     ): string {
         $same = array_values(array_filter($sameAs, static fn (string $u): bool => $u !== '' && $u !== '#'));
         $data = [
@@ -176,11 +201,31 @@ final class SeoHelper
             'description' => $description,
             'url' => $siteUrl,
         ];
+        if ($logoUrl !== '') {
+            $data['logo'] = [
+                '@type' => 'ImageObject',
+                'url' => $logoUrl,
+            ];
+        }
         if ($phone !== '') {
             $data['telephone'] = $phone;
         }
         if ($email !== '') {
             $data['email'] = $email;
+        }
+        if ($phone !== '' || $email !== '') {
+            $cp = [
+                '@type' => 'ContactPoint',
+                'contactType' => 'customer service',
+                'availableLanguage' => 'Russian',
+            ];
+            if ($phone !== '') {
+                $cp['telephone'] = $phone;
+            }
+            if ($email !== '') {
+                $cp['email'] = $email;
+            }
+            $data['contactPoint'] = $cp;
         }
         if ($same !== []) {
             $data['sameAs'] = $same;
@@ -248,19 +293,56 @@ final class SeoHelper
     public static function buildBlogPostingJsonLd(
         string $headline,
         string $url,
-        string $dateModified,
+        string $datePublished = '',
+        string $dateModified = '',
         string $description = '',
+        string $authorName = '',
+        string $publisherName = '',
+        string $publisherLogoUrl = '',
+        string $imageUrl = '',
     ): string {
         $data = [
             '@context' => 'https://schema.org',
             '@type' => 'BlogPosting',
             'headline' => $headline,
             'url' => $url,
-            'dateModified' => $dateModified,
             'inLanguage' => 'ru-RU',
+            'mainEntityOfPage' => [
+                '@type' => 'WebPage',
+                '@id' => $url,
+            ],
         ];
+        if ($datePublished !== '') {
+            $data['datePublished'] = $datePublished;
+        }
+        if ($dateModified !== '') {
+            $data['dateModified'] = $dateModified;
+        }
         if ($description !== '') {
             $data['description'] = $description;
+        }
+        $resolvedAuthor = $authorName !== '' ? $authorName : $publisherName;
+        if ($resolvedAuthor !== '') {
+            $data['author'] = [
+                '@type' => 'Person',
+                'name' => $resolvedAuthor,
+            ];
+        }
+        if ($publisherName !== '') {
+            $pub = [
+                '@type' => 'Organization',
+                'name' => $publisherName,
+            ];
+            if ($publisherLogoUrl !== '') {
+                $pub['logo'] = [
+                    '@type' => 'ImageObject',
+                    'url' => $publisherLogoUrl,
+                ];
+            }
+            $data['publisher'] = $pub;
+        }
+        if ($imageUrl !== '') {
+            $data['image'] = $imageUrl;
         }
 
         return self::encodeJsonLd($data);

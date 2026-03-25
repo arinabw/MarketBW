@@ -1,7 +1,7 @@
 {% extends "base.twig" %}
 
-{% block title %}{{ t('catalog.page_title') }} украшений из бисера — бижутерия ручной работы | {{ site_name }}{% endblock %}
-{% block meta_description %}{{ t('catalog.page_sub') }}{% endblock %}
+{% block title %}{% if catalog_category_name is defined and catalog_category_name != '' %}{{ catalog_category_name }} — {% endif %}{{ t('catalog.page_title') }} украшений из бисера | {{ site_name }}{% endblock %}
+{% block meta_description %}{% if catalog_category_name is defined and catalog_category_name != '' %}{{ catalog_category_name }} — украшения из бисера ручной работы. {% endif %}{{ t('catalog.page_sub')|slice(0, 140) }}{% endblock %}
 {% block meta_keywords %}каталог украшений из бисера, купить бижутерию, бисерные украшения, колье из бисера, браслеты из бисера, серьги из бисера, броши ручной работы, оригинальные подарки, {{ site_name }}{% endblock %}
 
 {% block head_structured_extra %}

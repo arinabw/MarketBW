@@ -142,11 +142,11 @@
       </contract>
       <interface>
         <fn-resolvePublicBase PURPOSE="Вычисляет абсолютный origin сайта из settings/env" />
-        <fn-buildOrganizationJsonLd PURPOSE="JSON-LD Organization" />
+        <fn-buildOrganizationJsonLd PURPOSE="JSON-LD Organization (+ logo, contactPoint)" />
         <fn-buildWebSiteJsonLd PURPOSE="JSON-LD WebSite" />
-        <fn-buildProductJsonLd PURPOSE="JSON-LD Product" />
+        <fn-buildProductJsonLd PURPOSE="JSON-LD Product (+ aggregateRating)" />
         <fn-buildBreadcrumbJsonLd PURPOSE="JSON-LD BreadcrumbList" />
-        <fn-buildBlogPostingJsonLd PURPOSE="JSON-LD BlogPosting для статей" />
+        <fn-buildBlogPostingJsonLd PURPOSE="JSON-LD BlogPosting (author, publisher, image)" />
         <fn-buildFaqPageJsonLd PURPOSE="JSON-LD FAQPage для FAQ" />
         <fn-buildItemListJsonLd PURPOSE="JSON-LD ItemList для каталога" />
         <fn-buildCollectionPageJsonLd PURPOSE="JSON-LD CollectionPage для статей" />

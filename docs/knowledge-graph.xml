@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <KnowledgeGraph>
-  <Project NAME="MarketBW" VERSION="3.11.4">
+  <Project NAME="MarketBW" VERSION="3.12.1">
     <keywords>бисер, бисероплетение, украшения, бижутерия, handmade, оригинальные подарки, каталог, статьи, CMS, PHP, Slim, Twig, SQLite</keywords>
     <annotation>Визитка мастера украшений из бисера: каталог, статьи (статические HTML с таблицами), CMS-контент, админка, расширенное SEO. Slim 4 + Twig 3 + SQLite.</annotation>
 
@@ -114,11 +114,11 @@
       <verification-ref>V-M-SEO</verification-ref>
       <annotations>
         <fn-resolvePublicBase PURPOSE="Абсолютный origin из settings или env" />
-        <fn-buildOrganizationJsonLd PURPOSE="JSON-LD @type Organization" />
+        <fn-buildOrganizationJsonLd PURPOSE="JSON-LD @type Organization (+ logo, contactPoint)" />
         <fn-buildWebSiteJsonLd PURPOSE="JSON-LD @type WebSite" />
-        <fn-buildProductJsonLd PURPOSE="JSON-LD @type Product" />
+        <fn-buildProductJsonLd PURPOSE="JSON-LD @type Product (+ aggregateRating)" />
         <fn-buildBreadcrumbJsonLd PURPOSE="JSON-LD @type BreadcrumbList" />
-        <fn-buildBlogPostingJsonLd PURPOSE="JSON-LD @type BlogPosting для статей" />
+        <fn-buildBlogPostingJsonLd PURPOSE="JSON-LD @type BlogPosting (author, publisher, image)" />
         <fn-buildFaqPageJsonLd PURPOSE="JSON-LD @type FAQPage для FAQ-страницы" />
         <fn-buildItemListJsonLd PURPOSE="JSON-LD @type ItemList для каталога" />
         <fn-buildCollectionPageJsonLd PURPOSE="JSON-LD @type CollectionPage для раздела статей" />
