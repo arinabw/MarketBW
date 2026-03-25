@@ -9,7 +9,7 @@
     <dep-slim-psr7 NAME="slim/psr7" VERSION="^1.7" PURPOSE="PSR-7 реализация (Request/Response)" />
     <dep-slim-twig NAME="slim/twig-view" VERSION="^3.4" PURPOSE="Интеграция Slim с Twig-шаблонами" />
     <dep-twig NAME="twig/twig" VERSION="^3.x" PURPOSE="Шаблонизатор Twig 3" />
-    <dep-phpdi NAME="php-di/slim-bridge" VERSION="^3.x" PURPOSE="DI-контейнер PHP-DI для Slim" />
+    <dep-phpdi NAME="php-di/php-di" VERSION="^7.0" PURPOSE="DI-контейнер PHP-DI" />
   </Dependencies>
 
   <DevDependencies>

@@ -88,7 +88,7 @@
       </interface>
       <depends>M-SETTINGS</depends>
       <source-path>app/Database.php</source-path>
-      <test-path>tests/DatabaseTest.php</test-path>
+      <!-- test-path: тесты (PHPUnit) запланированы, но пока не реализованы -->
       <observability>
         <log-prefix>[Database]</log-prefix>
         <key-blocks>BLOCK_INIT_SCHEMA, BLOCK_SEED, BLOCK_QUERY</key-blocks>

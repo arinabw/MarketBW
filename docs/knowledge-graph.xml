@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <KnowledgeGraph>
-  <Project NAME="MarketBW" VERSION="3.12.3">
+  <Project NAME="MarketBW" VERSION="3.12.4">
     <keywords>бисер, бисероплетение, украшения, бижутерия, handmade, оригинальные подарки, каталог, статьи, CMS, PHP, Slim, Twig, SQLite</keywords>
     <annotation>Визитка мастера украшений из бисера: каталог, статьи (статические HTML с таблицами), CMS-контент, админка, расширенное SEO. Slim 4 + Twig 3 + SQLite.</annotation>
 
@@ -35,19 +35,6 @@
         <fn-applyMetaPlaceholders PURPOSE="Замена %SITE% и %TAGLINE% в meta description/keywords" />
       </annotations>
     </M-CONTENT-DEFAULTS>
-
-    <M-CSS NAME="Styles" TYPE="UI_COMPONENT" STATUS="implemented">
-      <purpose>Все стили сайта: CSS без сборки, адаптивный дизайн</purpose>
-      <path>public/css/app.css</path>
-      <depends>none</depends>
-      <annotations>
-        <export-catalog-styles PURPOSE="Стили каталога (.catalog-grid, .product-card)" />
-        <export-article-styles PURPOSE="Стили статей (.topic-grid, .topic-card, .article-card-list, .article-card, .article-body, .article-table)" />
-        <export-admin-styles PURPOSE="Стили админки (.admin-wrap, .admin-nav)" />
-        <export-layout-styles PURPOSE="Стили layout (header, footer, hero, breadcrumb)" />
-        <export-faq-styles PURPOSE="Стили FAQ (details/summary с microdata FAQPage)" />
-      </annotations>
-    </M-CSS>
 
     <!-- ═══════════════════════════════════════════
          LAYER 1: Данные и утилиты
@@ -304,6 +291,34 @@
         <export-trends PURPOSE="4 статьи: современные тенденции" />
       </annotations>
     </M-ARTICLE-FILES>
+
+    <M-HTTPS-DETECTOR NAME="HttpsDetector" TYPE="UTILITY" STATUS="implemented">
+      <purpose>Определение HTTPS за reverse-proxy (Traefik, Caddy, Cloudflare)</purpose>
+      <path>app/HttpsDetector.php</path>
+      <depends>none</depends>
+      <annotations>
+        <fn-fromServer PURPOSE="Проверка $_SERVER на HTTPS-прокси-заголовки" />
+      </annotations>
+    </M-HTTPS-DETECTOR>
+
+    <M-EXCEL-EXPORT NAME="DatabaseExcelExport" TYPE="UTILITY" STATUS="implemented">
+      <purpose>Экспорт таблиц SQLite в SpreadsheetML (.xls)</purpose>
+      <path>app/DatabaseExcelExport.php</path>
+      <depends>M-DATABASE</depends>
+      <annotations>
+        <fn-openSpreadsheetXmlStream PURPOSE="Генерация XML-потока SpreadsheetML из всех таблиц" />
+      </annotations>
+    </M-EXCEL-EXPORT>
+
+    <M-AUDIT-LOG NAME="AuditLogMiddleware" TYPE="MIDDLEWARE" STATUS="implemented">
+      <purpose>Middleware журналирования HTTP-запросов в audit_log</purpose>
+      <path>app/AuditLogMiddleware.php</path>
+      <depends>M-DATABASE, M-SETTINGS</depends>
+      <annotations>
+        <fn-process PURPOSE="Slim middleware: запись метода, URI, статуса, IP в audit_log" />
+      </annotations>
+      <CrossLink from="M-AUDIT-LOG" to="M-DATABASE" relation="writes-audit-log" />
+    </M-AUDIT-LOG>
 
   </Project>
 </KnowledgeGraph>
