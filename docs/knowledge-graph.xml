@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <KnowledgeGraph>
-  <Project NAME="MarketBW" VERSION="3.12.1">
+  <Project NAME="MarketBW" VERSION="3.12.2">
     <keywords>бисер, бисероплетение, украшения, бижутерия, handmade, оригинальные подарки, каталог, статьи, CMS, PHP, Slim, Twig, SQLite</keywords>
     <annotation>Визитка мастера украшений из бисера: каталог, статьи (статические HTML с таблицами), CMS-контент, админка, расширенное SEO. Slim 4 + Twig 3 + SQLite.</annotation>
 
@@ -179,7 +179,7 @@
       <verification-ref>V-M-ROUTES</verification-ref>
       <annotations>
         <route-home PURPOSE="GET / — главная страница" />
-        <route-catalog PURPOSE="GET /catalog, /catalog/{cat}" />
+        <route-catalog PURPOSE="GET /catalog — динамический title/description/canonical по категории" />
         <route-product PURPOSE="GET /product/{id}" />
         <route-about PURPOSE="GET /about" />
         <route-contact-get PURPOSE="GET /contact" />
@@ -188,7 +188,7 @@
         <route-articles-index PURPOSE="GET /articles (список тем)" />
         <route-articles-topic PURPOSE="GET /articles/{topicSlug}" />
         <route-articles-article PURPOSE="GET /articles/{topicSlug}/{articleSlug}" />
-        <route-sitemap PURPOSE="GET /sitemap.xml" />
+        <route-sitemap PURPOSE="GET /sitemap.xml — lastmod из mtime файлов статей и БД" />
         <route-robots PURPOSE="GET /robots.txt" />
         <fn-adminGuard PURPOSE="Middleware: проверка $_SESSION[admin]" />
         <route-admin-login PURPOSE="GET|POST /admin/login" />
@@ -260,6 +260,33 @@
     <!-- ═══════════════════════════════════════════
          Статический контент (не PHP-модуль)
          ═══════════════════════════════════════════ -->
+
+    <M-NGINX NAME="NginxConf" TYPE="INFRASTRUCTURE" STATUS="implemented">
+      <purpose>Конфигурация Nginx: gzip, security headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy), кэш статики, PHP-FPM</purpose>
+      <path>docker/nginx.conf</path>
+      <depends>none</depends>
+      <annotations>
+        <export-gzip PURPOSE="gzip on, типы: text/css, application/json, application/javascript, text/xml, image/svg+xml" />
+        <export-security PURPOSE="nosniff, SAMEORIGIN, strict-origin-when-cross-origin" />
+        <export-static-cache PURPOSE="7d для CSS/JS/SVG/fonts/images; 30d для /images/ (immutable)" />
+      </annotations>
+    </M-NGINX>
+
+    <M-CSS NAME="AppCSS" TYPE="UI_COMPONENT" STATUS="implemented">
+      <purpose>Основная таблица стилей: тема, компоненты, адаптив, @media print</purpose>
+      <path>public/css/app.css</path>
+      <depends>none</depends>
+      <annotations>
+        <export-print PURPOSE="@media print — скрытие навигации, чёрно-белая печать" />
+        <export-article-styles PURPOSE=".topic-grid, .topic-card, .article-table, .article-body" />
+      </annotations>
+    </M-CSS>
+
+    <M-MANIFEST NAME="WebManifest" TYPE="INFRASTRUCTURE" STATUS="implemented">
+      <purpose>Web App Manifest: PWA-сигналы, тема, иконка</purpose>
+      <path>public/site.webmanifest</path>
+      <depends>none</depends>
+    </M-MANIFEST>
 
     <M-ARTICLE-FILES NAME="ArticleHTMLFiles" TYPE="DATA_LAYER" STATUS="implemented">
       <purpose>39 HTML-файлов статей по 8 темам (content/articles/{topic}/{slug}.html); таблицы — HTML table; списки — ol/li</purpose>

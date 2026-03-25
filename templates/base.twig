@@ -14,11 +14,13 @@
   <meta name="keywords" content="{{ _kw|trim }}">
   {% endif %}
   <title>{% block title %}{{ site_name }}{% endblock %}</title>
+  {% block head_canonical %}
   {% if seo_canonical_url != '' %}
   <link rel="canonical" href="{{ seo_canonical_url }}">
   <link rel="alternate" hreflang="ru-RU" href="{{ seo_canonical_url }}">
   <link rel="alternate" hreflang="x-default" href="{{ seo_canonical_url }}">
   {% endif %}
+  {% endblock %}
   <meta name="theme-color" content="#fffafb">
   <meta property="og:type" content="{% block og_type %}website{% endblock %}">
   <meta property="og:site_name" content="{{ site_name }}">

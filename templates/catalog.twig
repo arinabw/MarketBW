@@ -4,6 +4,15 @@
 {% block meta_description %}{% if catalog_category_name is defined and catalog_category_name != '' %}{{ catalog_category_name }} — украшения из бисера ручной работы. {% endif %}{{ t('catalog.page_sub')|slice(0, 140) }}{% endblock %}
 {% block meta_keywords %}каталог украшений из бисера, купить бижутерию, бисерные украшения, колье из бисера, браслеты из бисера, серьги из бисера, броши ручной работы, оригинальные подарки, {{ site_name }}{% endblock %}
 
+{% block head_canonical %}
+{% if catalog_canonical is defined and catalog_canonical != '' %}
+  <link rel="canonical" href="{{ catalog_canonical }}">
+  <link rel="alternate" hreflang="ru-RU" href="{{ catalog_canonical }}">
+  <link rel="alternate" hreflang="x-default" href="{{ catalog_canonical }}">
+{% else %}
+  {{ parent() }}
+{% endif %}
+{% endblock %}
 {% block head_structured_extra %}
 {% if breadcrumb_json_ld is defined and breadcrumb_json_ld != '' %}
 <script type="application/ld+json">{{ breadcrumb_json_ld|raw }}</script>

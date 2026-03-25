@@ -376,6 +376,18 @@
       <step-5 STATUS="done">Восстановление 232 побитых таблиц в HTML-статьях → article-table</step-5>
       <step-6 STATUS="done">Иконки тем и счётчик статей в ArticleContent + _topics.php</step-6>
     </Phase-5>
+
+    <Phase-6 NAME="SEO-оптимизация v2" STATUS="done">
+      <description>Углублённая SEO-оптимизация: JSON-LD расширения, nginx-перформанс, print CSS, web manifest</description>
+      <step-1 STATUS="done">Organization JSON-LD: logo (ImageObject), contactPoint (ContactPoint)</step-1>
+      <step-2 STATUS="done">BlogPosting JSON-LD: author (Person), publisher (Organization), datePublished/dateModified из mtime, mainEntityOfPage</step-2>
+      <step-3 STATUS="done">Product JSON-LD: aggregateRating из отзывов в БД</step-3>
+      <step-4 STATUS="done">Sitemap: lastmod из filemtime() HTML-файлов статей</step-4>
+      <step-5 STATUS="done">Каталог: динамический title/description/canonical по категории</step-5>
+      <step-6 STATUS="done">Meta description: обрезка до 160 символов; оптимизация title главной</step-6>
+      <step-7 STATUS="done">Nginx: gzip сжатие, security headers (nosniff, SAMEORIGIN, Referrer-Policy), расширенный кэш</step-7>
+      <step-8 STATUS="done">@media print стили, site.webmanifest, hreflang x-default</step-8>
+    </Phase-6>
   </Phases>
 
   <ExecutionPolicy>

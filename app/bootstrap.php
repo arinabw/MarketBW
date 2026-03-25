@@ -268,6 +268,7 @@ $app->add(function ($request, $handler) use ($container, $app) {
                 $sameAs,
                 SeoHelper::thematicKnowsAbout(),
                 $kwMeta !== '' ? $kwMeta : null,
+                $base !== '' ? rtrim($base, '/') . '/favicon.svg' : '',
             )
             : ''
     );
