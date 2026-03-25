@@ -1,7 +1,7 @@
 <?php
 
 // FILE: app/SeoHelper.php
-// VERSION: 3.12.4
+// VERSION: 3.13.1
 // START_MODULE_CONTRACT
 //   PURPOSE: SEO-утилиты: canonical URL, JSON-LD (Organization, WebSite, Product, BreadcrumbList, BlogPosting, FAQPage, ItemList, CollectionPage)
 //   SCOPE: resolvePublicBase, buildOrganizationJsonLd, buildWebSiteJsonLd, buildProductJsonLd, buildBreadcrumbJsonLd, buildBlogPostingJsonLd, buildFaqPageJsonLd, buildItemListJsonLd, buildCollectionPageJsonLd
@@ -179,21 +179,17 @@ final class SeoHelper
     }
 
     /**
-     * @param list<string> $sameAs
      * @param list<string> $knowsAbout
      */
     public static function buildOrganizationJsonLd(
         string $name,
         string $description,
         string $siteUrl,
-        string $phone,
         string $email,
-        array $sameAs,
         array $knowsAbout = [],
         ?string $keywords = null,
         string $logoUrl = '',
     ): string {
-        $same = array_values(array_filter($sameAs, static fn (string $u): bool => $u !== '' && $u !== '#'));
         $data = [
             '@context' => 'https://schema.org',
             '@type' => ['LocalBusiness', 'JewelryStore'],
@@ -207,28 +203,14 @@ final class SeoHelper
                 'url' => $logoUrl,
             ];
         }
-        if ($phone !== '') {
-            $data['telephone'] = $phone;
-        }
         if ($email !== '') {
             $data['email'] = $email;
-        }
-        if ($phone !== '' || $email !== '') {
-            $cp = [
+            $data['contactPoint'] = [
                 '@type' => 'ContactPoint',
                 'contactType' => 'customer service',
                 'availableLanguage' => 'Russian',
+                'email' => $email,
             ];
-            if ($phone !== '') {
-                $cp['telephone'] = $phone;
-            }
-            if ($email !== '') {
-                $cp['email'] = $email;
-            }
-            $data['contactPoint'] = $cp;
-        }
-        if ($same !== []) {
-            $data['sameAs'] = $same;
         }
         if ($knowsAbout !== []) {
             $data['knowsAbout'] = $knowsAbout;

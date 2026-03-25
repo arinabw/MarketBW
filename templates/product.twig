@@ -41,7 +41,7 @@
 {% endif %}
 
 {% set _gallery_left = layout_visible('layout.show_product_gallery_main') or (layout_visible('layout.show_product_gallery_thumbs') and product.images|length > 1) %}
-{% set _info_keys = ['layout.show_product_title', 'layout.show_product_price', 'layout.show_product_description', 'layout.show_product_meta', 'layout.show_product_materials', 'layout.show_product_order_title', 'layout.show_product_order_steps', 'layout.show_product_btn_order', 'layout.show_product_btn_telegram', 'layout.show_product_btn_whatsapp'] %}
+{% set _info_keys = ['layout.show_product_title', 'layout.show_product_price', 'layout.show_product_description', 'layout.show_product_meta', 'layout.show_product_materials', 'layout.show_product_order_title', 'layout.show_product_order_steps', 'layout.show_product_btn_order'] %}
 {% if _gallery_left or layout_any_visible(_info_keys) %}
 <section class="section section--white">
   <div class="container product-layout">

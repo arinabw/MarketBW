@@ -1,7 +1,7 @@
 <?php
 
 // FILE: app/bootstrap.php
-// VERSION: 3.12.4
+// VERSION: 3.13.1
 // START_MODULE_CONTRACT
 //   PURPOSE: DI-контейнер, Twig, middleware (сессия, CSRF, CMS-контент), Database::init(), подключение routes.php
 //   SCOPE: создание Slim App, настройка контейнера, Twig-глобалы, CSRF, content middleware, SEO middleware
@@ -84,9 +84,6 @@ $containerBuilder->addDefinitions([
             }
 
             return str_starts_with($cur, $path);
-        }));
-        $env->addFunction(new \Twig\TwigFunction('phone_digits', function (string $phone): string {
-            return preg_replace('/\D+/', '', $phone) ?: '';
         }));
         $env->addFunction(new \Twig\TwigFunction('t', function (string $key) use ($env): string {
             $content = $env->getGlobals()['content'] ?? [];
@@ -242,9 +239,7 @@ $app->add(function ($request, $handler) use ($container, $app) {
                 $orgName,
                 $orgDesc,
                 $homeUrl,
-                '',
                 (string) ($merged['contact.email'] ?? $settings['contact_email']),
-                [],
                 SeoHelper::thematicKnowsAbout(),
                 $kwMeta !== '' ? $kwMeta : null,
                 $base !== '' ? rtrim($base, '/') . '/favicon.svg' : '',

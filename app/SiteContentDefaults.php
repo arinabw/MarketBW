@@ -1,7 +1,7 @@
 <?php
 
 // FILE: app/SiteContentDefaults.php
-// VERSION: 3.12.4
+// VERSION: 3.13.1
 // START_MODULE_CONTRACT
 //   PURPOSE: Ключи и дефолтные значения CMS-текстов; группы для админки; image/boolean ключи
 //   SCOPE: defaults, adminGroups, imageKeys, layoutBooleanKeys, fieldLabel, inheritLegacyLayoutToggles
@@ -349,11 +349,6 @@ final class SiteContentDefaults
             'brand.master_name' => 'Имя мастера',
             'brand.tagline' => 'Слоган бренда',
             'contact.email' => 'Email',
-            'contact.phone' => 'Телефон (как на сайте)',
-            'contact.whatsapp' => 'WhatsApp (только цифры)',
-            'social.instagram' => 'Instagram URL',
-            'social.telegram' => 'Telegram URL',
-            'social.vk' => 'ВКонтакте URL',
             'meta.description' => 'Meta description (подставьте %SITE% и %TAGLINE%; 150–160 символов желательно)',
             'meta.keywords' => 'Meta keywords (через запятую; для Яндекса; %SITE% и %TAGLINE%)',
             'layout.show_home_hero_badge' => 'Главная, герой: строка-бейдж над заголовком',
@@ -381,8 +376,6 @@ final class SiteContentDefaults
             'layout.show_product_order_title' => 'Товар: заголовок «Как заказать»',
             'layout.show_product_order_steps' => 'Товар: нумерованные шаги заказа',
             'layout.show_product_btn_order' => 'Товар: кнопка «Заказать / вопрос»',
-            'layout.show_product_btn_telegram' => 'Товар: кнопка Telegram',
-            'layout.show_product_btn_whatsapp' => 'Товар: кнопка WhatsApp',
             'layout.show_product_reviews_title' => 'Товар: заголовок блока отзывов',
             'layout.show_product_review_items' => 'Товар: сами отзывы',
             'header.logo_suffix' => 'Текст в логотипе после названия',
