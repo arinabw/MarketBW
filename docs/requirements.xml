@@ -3,7 +3,7 @@
   <ProjectInfo>
     <name>MarketBW</name>
     <annotation>Визитка мастера украшений из бисера: каталог товаров, раздел статей, контакты, FAQ. Админка для управления контентом.</annotation>
-    <keywords>бисер, украшения, handmade, каталог, статьи, CMS, PHP, Slim, Twig, SQLite</keywords>
+    <keywords>бисер, бисероплетение, украшения, бижутерия, handmade, оригинальные подарки, каталог, статьи, CMS, PHP, Slim, Twig, SQLite</keywords>
   </ProjectInfo>
 
   <Actors>
@@ -33,7 +33,7 @@
       <action>Просматривает раздел статей по темам бисероплетения</action>
       <goal>Прочитать полезные и интересные статьи о бисере</goal>
       <precondition>HTML-файлы статей существуют в content/articles/</precondition>
-      <acceptance>Список тем → список статей в теме → полный текст статьи с SEO-разметкой</acceptance>
+      <acceptance>Сетка тем (topic-grid с иконками/счётчиками) → карточки статей → полный текст с таблицами (article-table) и SEO-разметкой (BlogPosting, CollectionPage)</acceptance>
       <flow>DF-ARTICLES</flow>
     </UC-ARTICLES>
 
@@ -49,7 +49,7 @@
       <action>Просматривает часто задаваемые вопросы</action>
       <goal>Получить ответы на типовые вопросы</goal>
       <precondition>В БД есть записи faqs</precondition>
-      <acceptance>Вопросы отображаются сгруппированно с breadcrumbs</acceptance>
+      <acceptance>Вопросы в details/summary с FAQPage microdata и JSON-LD; breadcrumbs</acceptance>
     </UC-FAQ>
 
     <UC-ABOUT ACTOR="Visitor" PRIORITY="medium">
@@ -121,7 +121,7 @@
     <UC-SEO ACTOR="SearchEngine" PRIORITY="high">
       <action>Индексирует сайт по sitemap.xml и robots.txt</action>
       <goal>Корректная индексация всех публичных страниц</goal>
-      <acceptance>sitemap.xml содержит все URL; robots.txt разрешает индексацию; JSON-LD Organization, WebSite, Product, BreadcrumbList, BlogPosting</acceptance>
+      <acceptance>sitemap.xml содержит все URL с lastmod; robots.txt разрешает индексацию; JSON-LD Organization, WebSite, Product, BreadcrumbList, BlogPosting, FAQPage, ItemList, CollectionPage; keyword-rich meta на всех страницах; CSS cache-busting</acceptance>
       <flow>DF-SEO</flow>
     </UC-SEO>
   </UseCases>

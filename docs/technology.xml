@@ -54,6 +54,8 @@
     <deploy-script>docker/deploy.sh</deploy-script>
     <env-example>docker/env.example</env-example>
     <volumes>data/ — SQLite и загрузки</volumes>
+    <static-copy>COPY content ./content — статические статьи копируются в Docker-образ</static-copy>
+    <nginx-cache>Cache-Control для CSS/JS/SVG; cache-busting через ?v=app_version</nginx-cache>
   </Deployment>
 
   <Architecture>
@@ -61,7 +63,7 @@
     <entry-point>public/index.php → app/bootstrap.php → Slim::run()</entry-point>
     <routing>app/routes.php — все маршруты (public + /admin group)</routing>
     <templating>Twig 3 — templates/ (base.twig, pages, admin/*, partials/*)</templating>
-    <static-content>Статьи: content/articles/ — HTML-файлы, конфиг _topics.php</static-content>
+    <static-content>Статьи: content/articles/ — HTML-файлы (с article-table), конфиг _topics.php (с иконками тем)</static-content>
     <cms>SiteContentDefaults (ключи) + site_content (SQLite) → Twig глобал content</cms>
   </Architecture>
 </Technology>

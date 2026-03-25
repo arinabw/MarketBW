@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <KnowledgeGraph>
-  <Project NAME="MarketBW" VERSION="3.10.0">
-    <keywords>бисер, украшения, handmade, каталог, статьи, CMS, PHP, Slim, Twig, SQLite</keywords>
-    <annotation>Визитка мастера украшений из бисера: каталог, статьи, CMS-контент, админка. Slim 4 + Twig 3 + SQLite.</annotation>
+  <Project NAME="MarketBW" VERSION="3.11.2">
+    <keywords>бисер, бисероплетение, украшения, бижутерия, handmade, оригинальные подарки, каталог, статьи, CMS, PHP, Slim, Twig, SQLite</keywords>
+    <annotation>Визитка мастера украшений из бисера: каталог, статьи (статические HTML с таблицами), CMS-контент, админка, расширенное SEO. Slim 4 + Twig 3 + SQLite.</annotation>
 
     <!-- ═══════════════════════════════════════════
          LAYER 0: Конфигурация и статика
@@ -32,6 +32,7 @@
         <fn-layoutBooleanKeys PURPOSE="Чекбоксы видимости элементов" />
         <fn-fieldLabel PURPOSE="Человекочитаемая метка по ключу" />
         <fn-inheritLegacyLayoutToggles PURPOSE="Миграция устаревших layout-ключей" />
+        <fn-applyMetaPlaceholders PURPOSE="Замена %SITE% и %TAGLINE% в meta description/keywords" />
       </annotations>
     </M-CONTENT-DEFAULTS>
 
@@ -41,9 +42,10 @@
       <depends>none</depends>
       <annotations>
         <export-catalog-styles PURPOSE="Стили каталога (.catalog-grid, .product-card)" />
-        <export-article-styles PURPOSE="Стили статей (.article-topic-grid, .article-list, .article-body)" />
+        <export-article-styles PURPOSE="Стили статей (.topic-grid, .topic-card, .article-card-list, .article-card, .article-body, .article-table)" />
         <export-admin-styles PURPOSE="Стили админки (.admin-wrap, .admin-nav)" />
         <export-layout-styles PURPOSE="Стили layout (header, footer, hero, breadcrumb)" />
+        <export-faq-styles PURPOSE="Стили FAQ (details/summary с microdata FAQPage)" />
       </annotations>
     </M-CSS>
 
@@ -96,9 +98,9 @@
       <depends>none</depends>
       <verification-ref>V-M-ARTICLE-CONTENT</verification-ref>
       <annotations>
-        <fn-topics PURPOSE="Загрузка конфига _topics.php (8 тем, 39 статей)" />
-        <fn-topicList PURPOSE="Список тем для index-страницы (sorted)" />
-        <fn-topicBySlug PURPOSE="Одна тема по slug" />
+        <fn-topics PURPOSE="Загрузка конфига _topics.php (8 тем, 39 статей, иконки)" />
+        <fn-topicList PURPOSE="Список тем с icon, article_count (sorted)" />
+        <fn-topicBySlug PURPOSE="Одна тема по slug (включая icon)" />
         <fn-articlesInTopic PURPOSE="Статьи в теме (только если HTML существует)" />
         <fn-article PURPOSE="Полная статья: title + excerpt + body_html из файла" />
         <fn-allPublishedSlugs PURPOSE="Все пары (topic_slug, slug) для sitemap" />
@@ -106,7 +108,7 @@
     </M-ARTICLE-CONTENT>
 
     <M-SEO NAME="SeoHelper" TYPE="UTILITY" STATUS="implemented">
-      <purpose>SEO-утилиты: canonical URL, JSON-LD (Organization, WebSite, Product, BreadcrumbList, BlogPosting)</purpose>
+      <purpose>SEO-утилиты: canonical URL, JSON-LD (Organization, WebSite, Product, BreadcrumbList, BlogPosting, FAQPage, ItemList, CollectionPage), knowsAbout</purpose>
       <path>app/SeoHelper.php</path>
       <depends>M-SETTINGS</depends>
       <verification-ref>V-M-SEO</verification-ref>
@@ -117,6 +119,10 @@
         <fn-buildProductJsonLd PURPOSE="JSON-LD @type Product" />
         <fn-buildBreadcrumbJsonLd PURPOSE="JSON-LD @type BreadcrumbList" />
         <fn-buildBlogPostingJsonLd PURPOSE="JSON-LD @type BlogPosting для статей" />
+        <fn-buildFaqPageJsonLd PURPOSE="JSON-LD @type FAQPage для FAQ-страницы" />
+        <fn-buildItemListJsonLd PURPOSE="JSON-LD @type ItemList для каталога" />
+        <fn-buildCollectionPageJsonLd PURPOSE="JSON-LD @type CollectionPage для раздела статей" />
+        <fn-thematicKnowsAbout PURPOSE="Массив ключевых тем для Organization.knowsAbout" />
       </annotations>
       <CrossLink from="M-SEO" to="M-SETTINGS" relation="reads-public-site-url" />
     </M-SEO>
@@ -224,7 +230,7 @@
       <path>templates/base.twig</path>
       <depends>M-CONTENT-DEFAULTS, M-SEO</depends>
       <annotations>
-        <export-head PURPOSE="Блоки title, meta, OG, canonical, JSON-LD" />
+        <export-head PURPOSE="Блоки title, meta (keywords, description), OG, canonical, JSON-LD; CSS cache-busting ?v=app_version" />
         <export-body PURPOSE="Блоки header, nav, content, footer" />
         <fn-t PURPOSE="Twig-функция t('key') — текст из CMS" />
         <fn-path PURPOSE="Twig-функция path('/url') — с учётом BASE_PATH" />
@@ -245,9 +251,9 @@
       <path>templates/articles/index.twig, templates/articles/topic.twig, templates/articles/article.twig</path>
       <depends>M-TWIG-BASE, M-ARTICLE-CONTENT</depends>
       <annotations>
-        <export-index PURPOSE="Сетка тем с описаниями" />
-        <export-topic PURPOSE="Список статей в теме с breadcrumbs" />
-        <export-article PURPOSE="Полный текст статьи с SEO (BlogPosting, breadcrumbs)" />
+        <export-index PURPOSE="Сетка тем (topic-grid, topic-card с иконками и счётчиками); CollectionPage JSON-LD" />
+        <export-topic PURPOSE="Карточки статей (article-card-list) с номерами; topic-hero с иконкой; breadcrumbs" />
+        <export-article PURPOSE="Полный текст с article-table, article-body; BlogPosting JSON-LD; article-nav" />
       </annotations>
     </M-TWIG-ARTICLES>
 
@@ -256,7 +262,7 @@
          ═══════════════════════════════════════════ -->
 
     <M-ARTICLE-FILES NAME="ArticleHTMLFiles" TYPE="DATA_LAYER" STATUS="implemented">
-      <purpose>39 HTML-файлов статей по 8 темам (content/articles/{topic}/{slug}.html)</purpose>
+      <purpose>39 HTML-файлов статей по 8 темам (content/articles/{topic}/{slug}.html); таблицы — HTML table; списки — ol/li</purpose>
       <path>content/articles/</path>
       <depends>none</depends>
       <annotations>

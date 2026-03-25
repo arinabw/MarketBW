@@ -138,7 +138,7 @@
 
     <M-SEO NAME="SeoHelper" TYPE="UTILITY" LAYER="1" ORDER="4">
       <contract>
-        <purpose>SEO-утилиты: absolute URL, JSON-LD (Organization, WebSite, Product, BreadcrumbList, BlogPosting)</purpose>
+        <purpose>SEO-утилиты: absolute URL, JSON-LD (Organization, WebSite, Product, BreadcrumbList, BlogPosting, FAQPage, ItemList, CollectionPage), knowsAbout</purpose>
       </contract>
       <interface>
         <fn-resolvePublicBase PURPOSE="Вычисляет абсолютный origin сайта из settings/env" />
@@ -147,6 +147,10 @@
         <fn-buildProductJsonLd PURPOSE="JSON-LD Product" />
         <fn-buildBreadcrumbJsonLd PURPOSE="JSON-LD BreadcrumbList" />
         <fn-buildBlogPostingJsonLd PURPOSE="JSON-LD BlogPosting для статей" />
+        <fn-buildFaqPageJsonLd PURPOSE="JSON-LD FAQPage для FAQ" />
+        <fn-buildItemListJsonLd PURPOSE="JSON-LD ItemList для каталога" />
+        <fn-buildCollectionPageJsonLd PURPOSE="JSON-LD CollectionPage для статей" />
+        <fn-thematicKnowsAbout PURPOSE="Ключевые темы для Organization.knowsAbout" />
       </interface>
       <depends>M-SETTINGS</depends>
       <source-path>app/SeoHelper.php</source-path>
@@ -362,6 +366,16 @@
       <step-1 STATUS="done">Создание GRACE-артефактов (docs/*.xml)</step-1>
       <step-2 STATUS="done">Добавление MODULE_CONTRACT и START_BLOCK в PHP-файлы</step-2>
     </Phase-4>
+
+    <Phase-5 NAME="SEO и UI-полировка" STATUS="done">
+      <description>Расширенное SEO (FAQPage, ItemList, CollectionPage JSON-LD, ключевые слова, meta), редизайн статей, кэш-бастинг, восстановление таблиц</description>
+      <step-1 STATUS="done">Новые JSON-LD типы: FAQPage, ItemList, CollectionPage в SeoHelper</step-1>
+      <step-2 STATUS="done">Keyword-rich meta description/keywords на всех страницах</step-2>
+      <step-3 STATUS="done">Редизайн UI статей: topic-grid, topic-card, article-card, article-nav</step-3>
+      <step-4 STATUS="done">CSS cache-busting (?v=app_version), Nginx Cache-Control</step-4>
+      <step-5 STATUS="done">Восстановление 232 побитых таблиц в HTML-статьях → article-table</step-5>
+      <step-6 STATUS="done">Иконки тем и счётчик статей в ArticleContent + _topics.php</step-6>
+    </Phase-5>
   </Phases>
 
   <ExecutionPolicy>
