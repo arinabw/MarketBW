@@ -1,0 +1,16 @@
+{
+  "name": "MarketBW — украшения из бисера",
+  "short_name": "MarketBW",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#fffafb",
+  "theme_color": "#783038",
+  "lang": "ru",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

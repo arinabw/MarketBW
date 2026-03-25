@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <KnowledgeGraph>
-  <Project NAME="MarketBW" VERSION="3.11.3">
+  <Project NAME="MarketBW" VERSION="3.11.4">
     <keywords>бисер, бисероплетение, украшения, бижутерия, handmade, оригинальные подарки, каталог, статьи, CMS, PHP, Slim, Twig, SQLite</keywords>
     <annotation>Визитка мастера украшений из бисера: каталог, статьи (статические HTML с таблицами), CMS-контент, админка, расширенное SEO. Slim 4 + Twig 3 + SQLite.</annotation>
 
@@ -230,7 +230,7 @@
       <path>templates/base.twig</path>
       <depends>M-CONTENT-DEFAULTS, M-SEO</depends>
       <annotations>
-        <export-head PURPOSE="Блоки title, meta (keywords, description), OG, canonical, JSON-LD; CSS cache-busting ?v=app_version" />
+        <export-head PURPOSE="Блоки title, meta (keywords, description), OG, canonical, JSON-LD; favicon, apple-touch-icon, manifest (site.webmanifest); CSS cache-busting ?v=app_version" />
         <export-body PURPOSE="Блоки header, nav, content, footer" />
         <fn-t PURPOSE="Twig-функция t('key') — текст из CMS" />
         <fn-path PURPOSE="Twig-функция path('/url') — с учётом BASE_PATH" />
