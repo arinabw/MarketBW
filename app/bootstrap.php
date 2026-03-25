@@ -1,7 +1,7 @@
 <?php
 
 // FILE: app/bootstrap.php
-// VERSION: 3.10.0
+// VERSION: 3.12.2
 // START_MODULE_CONTRACT
 //   PURPOSE: DI-контейнер, Twig, middleware (сессия, CSRF, CMS-контент), Database::init(), подключение routes.php
 //   SCOPE: создание Slim App, настройка контейнера, Twig-глобалы, CSRF, content middleware, SEO middleware

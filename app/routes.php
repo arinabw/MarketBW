@@ -1,7 +1,7 @@
 <?php
 
 // FILE: app/routes.php
-// VERSION: 3.10.0
+// VERSION: 3.12.2
 // START_MODULE_CONTRACT
 //   PURPOSE: Все HTTP-маршруты: публичные страницы + группа /admin с guard; хелперы загрузки изображений
 //   SCOPE: GET /, /catalog, /product, /about, /contact, /faq, /articles, /sitemap.xml, /robots.txt; POST /contact; /admin/* CRUD
@@ -497,7 +497,6 @@ return function (App $app, ContainerInterface $container): void {
     });
 
     $app->post('/admin/logout', function (Request $request, Response $response) use ($withBase): Response {
-        $_SESSION['admin'] = false;
         unset($_SESSION['admin'], $_SESSION['admin_username']);
         return $response->withHeader('Location', $withBase('/admin/login'))->withStatus(302);
     })->add($adminGuard);

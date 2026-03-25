@@ -8,10 +8,10 @@ use PDO;
 use PDOException;
 
 // FILE: app/Database.php
-// VERSION: 3.10.0
+// VERSION: 3.12.2
 // START_MODULE_CONTRACT
 //   PURPOSE: PDO SQLite: инициализация схемы, CRUD для products, categories, reviews, faqs, users, site_content, contact_messages, audit_log
-//   SCOPE: init, categories, products, productById, createProduct, updateProduct, deleteProduct, faqs, authenticate, getMergedSiteContent, saveSiteContent, contactMessages, appendAuditLog, changePassword
+//   SCOPE: init, categories, products, productById, createProduct, updateProduct, deleteProduct, faqs, authenticate, getMergedSiteContent, saveSiteContent, contactMessages, appendAuditLog, updatePassword
 //   DEPENDS: M-SETTINGS (data_dir)
 //   LINKS: M-DATABASE
 // END_MODULE_CONTRACT
@@ -31,7 +31,7 @@ use PDOException;
 //   saveSiteContent      — UPSERT в site_content
 //   contactMessages      — список заявок с фильтром
 //   appendAuditLog       — INSERT INTO audit_log
-//   changePassword       — UPDATE users SET password_hash
+//   updatePassword       — UPDATE users SET password_hash
 // END_MODULE_MAP
 final class Database
 {
@@ -202,7 +202,6 @@ SQL;
         $this->pdo->prepare('UPDATE users SET password_hash = ? WHERE username = ?')->execute([$hash, $username]);
     }
 
-    /** @return list<array<string, mixed>> */
     /**
      * @return list<string>
      */

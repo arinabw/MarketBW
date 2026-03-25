@@ -237,7 +237,7 @@ final class SeoHelper
             $data['keywords'] = $keywords;
         }
 
-        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+        return self::encodeJsonLd($data);
     }
 
     public static function buildWebSiteJsonLd(string $name, string $url, string $description, ?string $searchUrlTemplate = null): string
@@ -427,7 +427,7 @@ final class SeoHelper
             $data['description'] = $description;
         }
         if ($numberOfItems > 0) {
-            $data['mainEntity' ] = [
+            $data['mainEntity'] = [
                 '@type' => 'ItemList',
                 'numberOfItems' => $numberOfItems,
             ];

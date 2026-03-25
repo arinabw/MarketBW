@@ -114,7 +114,7 @@ final class DatabaseExcelExport
         return htmlspecialchars($s, ENT_NOQUOTES | ENT_XML1, 'UTF-8');
     }
 
-    public static function excelSheetTitle(string $name): string
+    private static function excelSheetTitle(string $name): string
     {
         $s = preg_replace('/[:\\\\\\/\\?\\*\\[\\]]/u', '-', $name) ?? $name;
         if (function_exists('mb_substr')) {

@@ -1,7 +1,7 @@
 <?php
 
 // FILE: app/SiteUpload.php
-// VERSION: 3.10.0
+// VERSION: 3.12.2
 // START_MODULE_CONTRACT
 //   PURPOSE: Загрузка картинок CMS-контента в public/images/site/
 //   SCOPE: saveImage — валидация расширения, перемещение файла

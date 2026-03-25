@@ -16,7 +16,7 @@ final class HttpsDetector
     {
         if (!empty($server['HTTPS'])) {
             $v = strtolower((string) $server['HTTPS']);
-            if ($v !== 'off' && $v !== '0' && $v !== '') {
+            if ($v !== 'off' && $v !== '0') {
                 return true;
             }
         }
