@@ -363,7 +363,7 @@
 
     <Phase-4 NAME="GRACE-разметка" STATUS="done">
       <description>Семантическая разметка, контракты модулей, граф знаний</description>
-      <step-1 STATUS="done">Создание GRACE-артефактов (docs/*.xml)</step-1>
+      <step-1 STATUS="done">Создание GRACE-артефактов под grace/** (XML по этапам ЖЦ)</step-1>
       <step-2 STATUS="done">Добавление MODULE_CONTRACT и START_BLOCK в PHP-файлы</step-2>
     </Phase-4>
 
@@ -392,7 +392,7 @@
 
   <ExecutionPolicy>
     <controller-profile>balanced</controller-profile>
-    <shared-artifacts>docs/development-plan.xml, docs/knowledge-graph.xml, docs/verification-plan.xml</shared-artifacts>
+    <shared-artifacts>grace/plan/development-plan.xml, grace/knowledge-graph/knowledge-graph.xml, grace/verification/verification-plan.xml</shared-artifacts>
     <write-scope>Только файлы модулей в одобренном scope.</write-scope>
   </ExecutionPolicy>
 </DevelopmentPlan>
