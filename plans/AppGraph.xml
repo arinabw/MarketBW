@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<KnowledgeGraph>
+  <MarketBW_3_13_Info TYPE="PROJECT_INFO">
+    <keywords>бисер, handmade, Slim, Twig, SQLite, CMS, SEO, каталог, статьи</keywords>
+    <annotation>Визитка мастера: каталог, статические статьи, CMS, админка, JSON-LD.</annotation>
+    <BusinessScenarios>
+      <Scenario NAME="CatalogBrowse">Visitor → /catalog → product → JSON-LD Product</Scenario>
+      <Scenario NAME="ArticlesRead">Visitor → /articles → HTML files → BlogPosting</Scenario>
+      <Scenario NAME="AdminCMS">Admin → /admin → CRUD + site_content</Scenario>
+    </BusinessScenarios>
+  </MarketBW_3_13_Info>
+
+  <config_settings_php FILE="config/settings.php" TYPE="UTILITY_MODULE">
+    <annotation>M-SETTINGS</annotation>
+  </config_settings_php>
+  <app_SiteContentDefaults_php FILE="app/SiteContentDefaults.php" TYPE="UTILITY_MODULE">
+    <annotation>M-CONTENT-DEFAULTS: CMS keys</annotation>
+  </app_SiteContentDefaults_php>
+
+  <app_Database_php FILE="app/Database.php" TYPE="DATA_LAYER_MODULE">
+    <annotation>M-DATABASE: SQLite CRUD</annotation>
+    <CrossLinks>
+      <Link TARGET="config_settings_php" TYPE="READS_CONFIG" />
+      <Link TARGET="app_Seed_php" TYPE="CALLS_SEED" />
+    </CrossLinks>
+  </app_Database_php>
+  <app_Seed_php FILE="app/Seed.php" TYPE="DATA_LAYER_MODULE">
+    <annotation>M-SEED</annotation>
+    <CrossLinks><Link TARGET="app_Database_php" TYPE="USES" /></CrossLinks>
+  </app_Seed_php>
+  <app_ArticleContent_php FILE="app/ArticleContent.php" TYPE="DATA_LAYER_MODULE">
+    <annotation>M-ARTICLE-CONTENT: 8 topics, 39 articles</annotation>
+    <CrossLinks><Link TARGET="content_articles_DIR" TYPE="READS_FILES" /></CrossLinks>
+  </app_ArticleContent_php>
+  <content_articles_DIR FILE="content/articles/" TYPE="CONTENT_ROOT">
+    <annotation>M-ARTICLE-FILES + _topics.php</annotation>
+  </content_articles_DIR>
+
+  <app_SeoHelper_php FILE="app/SeoHelper.php" TYPE="UTILITY_MODULE">
+    <annotation>M-SEO: JSON-LD, canonical</annotation>
+    <CrossLinks><Link TARGET="config_settings_php" TYPE="READS_PUBLIC_URL" /></CrossLinks>
+  </app_SeoHelper_php>
+  <app_ProductImages_php FILE="app/ProductImages.php" TYPE="UTILITY_MODULE">
+    <annotation>M-PRODUCT-IMAGES</annotation>
+  </app_ProductImages_php>
+  <app_SiteUpload_php FILE="app/SiteUpload.php" TYPE="UTILITY_MODULE">
+    <annotation>M-SITE-UPLOAD</annotation>
+  </app_SiteUpload_php>
+  <app_HttpsDetector_php FILE="app/HttpsDetector.php" TYPE="UTILITY_MODULE">
+    <annotation>M-HTTPS-DETECTOR</annotation>
+  </app_HttpsDetector_php>
+  <app_DatabaseExcelExport_php FILE="app/DatabaseExcelExport.php" TYPE="UTILITY_MODULE">
+    <annotation>M-EXCEL-EXPORT</annotation>
+    <CrossLinks><Link TARGET="app_Database_php" TYPE="USES" /></CrossLinks>
+  </app_DatabaseExcelExport_php>
+  <app_AuditLogMiddleware_php FILE="app/AuditLogMiddleware.php" TYPE="MIDDLEWARE_MODULE">
+    <annotation>M-AUDIT-LOG</annotation>
+    <CrossLinks><Link TARGET="app_Database_php" TYPE="WRITES" /></CrossLinks>
+  </app_AuditLogMiddleware_php>
+
+  <app_bootstrap_php FILE="app/bootstrap.php" TYPE="ENTRY_POINT_MODULE">
+    <annotation>M-BOOTSTRAP: DI, Twig, CMS middleware, CSRF</annotation>
+    <CrossLinks>
+      <Link TARGET="app_Database_php" TYPE="CALLS_INIT" />
+      <Link TARGET="app_routes_php" TYPE="INCLUDES_ROUTES" />
+      <Link TARGET="app_SeoHelper_php" TYPE="SETS_GLOBALS" />
+    </CrossLinks>
+  </app_bootstrap_php>
+  <app_routes_php FILE="app/routes.php" TYPE="ROUTING_MODULE">
+    <annotation>M-ROUTES: public + /admin/*</annotation>
+    <CrossLinks>
+      <Link TARGET="app_Database_php" TYPE="QUERIES" />
+      <Link TARGET="app_ArticleContent_php" TYPE="READS_ARTICLES" />
+      <Link TARGET="app_SeoHelper_php" TYPE="BUILDS_JSONLD" />
+      <Link TARGET="app_ProductImages_php" TYPE="HANDLES_UPLOADS" />
+    </CrossLinks>
+  </app_routes_php>
+  <public_index_php FILE="public/index.php" TYPE="ENTRY_POINT">
+    <annotation>M-ENTRY</annotation>
+    <CrossLinks><Link TARGET="app_bootstrap_php" TYPE="REQUIRES" /></CrossLinks>
+  </public_index_php>
+
+  <templates_base_twig FILE="templates/base.twig" TYPE="UI_MODULE">
+    <annotation>M-TWIG-BASE</annotation>
+  </templates_base_twig>
+  <templates_admin_layout_twig FILE="templates/admin/layout.twig" TYPE="UI_MODULE">
+    <annotation>M-TWIG-ADMIN</annotation>
+  </templates_admin_layout_twig>
+  <templates_articles_DIR FILE="templates/articles/" TYPE="UI_MODULE">
+    <annotation>M-TWIG-ARTICLES</annotation>
+  </templates_articles_DIR>
+  <public_css_app_css FILE="public/css/app.css" TYPE="UI_ASSETS">
+    <annotation>M-CSS</annotation>
+  </public_css_app_css>
+  <docker_nginx_conf FILE="docker/nginx.conf" TYPE="INFRASTRUCTURE">
+    <annotation>M-NGINX</annotation>
+  </docker_nginx_conf>
+  <public_site_webmanifest FILE="public/site.webmanifest" TYPE="INFRASTRUCTURE">
+    <annotation>M-MANIFEST</annotation>
+  </public_site_webmanifest>
+
+  <ProjectCrossLinks TYPE="MODULE_INTERACTIONS_OVERVIEW">
+    <Link TARGET="public_index_php" TYPE="ORCHESTRATES_FLOW" />
+    <Link TARGET="app_routes_php" TYPE="HTTP_SURFACE" />
+    <Link TARGET="app_Database_php" TYPE="PERSISTENCE" />
+  </ProjectCrossLinks>
+</KnowledgeGraph>
